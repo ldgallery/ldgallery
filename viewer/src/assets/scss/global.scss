@@ -1,0 +1,14 @@
+// Global CSS
+
+// === Forms
+
+.required label::after {
+  content: "*";
+  color: red;
+}
+
+// === Tools
+
+.nowrap {
+  white-space: nowrap;
+}

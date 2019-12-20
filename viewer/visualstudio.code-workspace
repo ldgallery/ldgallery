@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"editor.formatOnSave": true,
+		"javascript.format.semicolons": "insert",
+		"typescript.disableAutomaticTypeAcquisition": true,
+		"vue-i18n-ally.localesPaths": "src/locales",
+	}
+}
