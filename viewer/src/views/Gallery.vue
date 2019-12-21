@@ -1,5 +1,5 @@
 <template>
-  <div id="test-flex-col">
+  <div>
     <gallery-directory v-if="isDirectory" :directory="currentItem" />
     <gallery-image v-if="isImage" :image="currentItem" />
   </div>
@@ -50,10 +50,4 @@ export default class Root extends Vue {
 </script>
 
 <style lang="scss">
-#test-flex-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
 </style>

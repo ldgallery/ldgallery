@@ -1,4 +1,10 @@
 declare namespace Gallery {
+    interface Image extends Item {
+        properties: ImageProperties,
+    }
+    interface Directory extends Item {
+        properties: DirectoryProperties,
+    }
     interface Item {
         title: string,
         date: string,
@@ -8,9 +14,9 @@ declare namespace Gallery {
         thumbnail: {
             path: string,
         },
-        properties: Image | Directory,
+        properties: ImageProperties | DirectoryProperties,
     }
-    interface Image {
+    interface ImageProperties {
         type: "image",
         filesize: number,
         resolution: {
@@ -18,7 +24,7 @@ declare namespace Gallery {
             height: number,
         }
     }
-    interface Directory {
+    interface DirectoryProperties {
         type: "directory",
         items: Item[]
     }
