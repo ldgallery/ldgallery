@@ -1,0 +1,90 @@
+/* reference gallery index file, manually aggregated */
+
+{
+  "title": "",
+  "date": "",
+  "description": "",
+  "tags": [],
+  "filesize": 0,
+  "path": "/",
+  "thumbnail": { "path": "/thumbnails/_DSC8808-1.jpg" },
+  "properties": {
+    "type": "directory",
+    "items": [
+      {
+        "title": "Book shop",
+        "date": "2016:12:19T16:48:50+02:00",
+        "description": "© Philippe NGUYEN",
+        "tags": [
+          "photographer.nphilou",
+          "location.germany.berlin",
+          "books",
+          "book-shop"
+        ],
+        "filesize": 987,
+        "path": "/items/_DSC8808-1.jpg",
+        "thumbnail": { "path": "/thumbnails/_DSC8808-1.jpg" },
+        "properties": {
+          "type": "image",
+          "resolution": { "width": 3840, "height": 2160 },
+        }
+      },
+      {
+        "title": "Glacier 3000",
+        "date": "",
+        "description": "",
+        "tags": [],
+        "filesize": 0,
+        "path": "/items/Glacier 3000",
+        "thumbnail": { "path": "/thumbnails/Glacier 3000/_DSC5475.jpg" },
+        "properties": {
+          "type": "directory",
+          "items": [
+            {
+              "title": "Fog 3000",
+              "date": "2019:08:10T14:38:47+01:00",
+              "description": "© Philippe NGUYEN",
+              "tags": [
+                "photographer.nphilou",
+                "location.switzerland.ormont-dessus",
+                "glacier3000",
+                "time.day",
+                "weather.foggy",
+                "forest",
+                "trees"
+              ],
+              "filesize": 355,
+              "path": "/items/Glacier 3000/_DSC5475.jpg",
+              "thumbnail": { "path": "/thumbnails/Glacier 3000/_DSC5475.jpg" },
+              "properties": {
+                "type": "image",
+                "resolution": { "width": 3840, "height": 2160 },
+              }
+            },
+            {
+              "title": "Foggy catwalk",
+              "date": " 2019:08:10T16:00:45+01:00",
+              "description": "© Philippe NGUYEN",
+              "tags": [
+                "photographer.nphilou",
+                "location.switzerland.ormont-dessus",
+                "glacier3000",
+                "time.day",
+                "weather.foggy",
+                "catwalk",
+                "mountain"
+              ],
+              "filesize": 447,
+              "path": "/items/Glacier 3000/_DSC5542.jpg",
+              "thumbnail": { "path": "/thumbnails/Glacier 3000/_DSC5542.jpg" },
+              "properties": {
+                "type": "image",
+                "resolution": { "width": 3840, "height": 2160 },
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
