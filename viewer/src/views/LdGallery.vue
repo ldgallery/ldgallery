@@ -1,9 +1,13 @@
 <template>
-  <div :class="{fullscreen}">
+  <div :class="{fullscreen: $uiStore.fullscreen}">
     <div class="layout top">header</div>
     <div class="layout left">panel</div>
     <router-view class="layout content" />
-    <fa-icon icon="expand-arrows-alt" class="layout button-fullscreen" @click="toggleFullscreen" />
+    <fa-icon
+      icon="expand-arrows-alt"
+      class="layout button-fullscreen"
+      @click="$uiStore.toggleFullscreen()"
+    />
   </div>
 </template>
 
@@ -11,13 +15,7 @@
 import { Component, Vue } from "vue-property-decorator";
 
 @Component
-export default class LdGallery extends Vue {
-  fullscreen: boolean = false;
-
-  toggleFullscreen() {
-    this.fullscreen = !this.fullscreen;
-  }
-}
+export default class LdGallery extends Vue {}
 </script>
 
 <style lang="scss">

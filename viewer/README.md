@@ -1,4 +1,4 @@
-# ldgallery-front
+# ldgallery-viewer
 
 ## Project setup
 ```
