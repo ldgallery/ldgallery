@@ -1,19 +1,18 @@
 <template>
   <div id="test-flex-col">
-    <div v-if="isDirectory">
-      <strong>Directory: {{currentItem.path}}</strong>
-      <div v-for="(item, index) in currentItem.properties.items" :key="item.path">
-        <router-link :to="item.path">Thumbnail: {{index}}-{{item.path}}</router-link>
-      </div>
-    </div>
-    <div v-if="isImage">Image: {{currentItem.path}}</div>
+    <gallery-directory v-if="isDirectory" :directory="currentItem" />
+    <gallery-image v-if="isImage" :image="currentItem" />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
+import GalleryDirectory from "./GalleryDirectory.vue";
+import GalleryImage from "./GalleryImage.vue";
 
-@Component
+@Component({
+  components: { GalleryDirectory, GalleryImage },
+})
 export default class Root extends Vue {
   @Prop(String) readonly pathMatch!: string;
 
