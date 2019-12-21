@@ -8,7 +8,7 @@
     "photographer.nphilou",
     "location.germany.berlin",
     "books",
-    "book-shop"
+    "book-shop",
     "location.switzerland.ormont-dessus",
     "glacier3000",
     "time.day",
@@ -38,7 +38,7 @@
         "properties": {
           "type": "image",
           "filesize": 987,
-          "resolution": { "width": 3840, "height": 2160 },
+          "resolution": { "width": 3840, "height": 2160 }
         }
       },
       {
@@ -79,7 +79,7 @@
               "properties": {
                 "type": "image",
                 "filesize": 355,
-                "resolution": { "width": 3840, "height": 2160 },
+                "resolution": { "width": 3840, "height": 2160 }
               }
             },
             {
@@ -100,7 +100,7 @@
               "properties": {
                 "type": "image",
                 "filesize": 447,
-                "resolution": { "width": 3840, "height": 2160 },
+                "resolution": { "width": 3840, "height": 2160 }
               }
             }
           ]
