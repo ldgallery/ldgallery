@@ -146,7 +146,7 @@ Serialised item structure:
   "properties": {
     "type": "video",
     "filesize": 12345
-  }
+  },
 
   "properties": {
     "type": "directory",
