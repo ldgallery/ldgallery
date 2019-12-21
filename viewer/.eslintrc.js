@@ -17,7 +17,7 @@ module.exports = {
     'vue/html-closing-bracket-spacing': 'warn',
     'vue/html-end-tags': 'error',
     'vue/html-quotes': 'warn',
-    'vue/html-self-closing': 'warn',
+    'vue/html-self-closing': 'off',
     'vue/no-multi-spaces': 'warn',
     'vue/no-spaces-around-equal-signs-in-attribute': 'warn',
     'vue/no-template-shadow': 'error',

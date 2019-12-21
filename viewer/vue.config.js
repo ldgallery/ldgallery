@@ -15,7 +15,7 @@ module.exports = {
       app.get("/gallery/*", (req, res) => {
         const fs = require("fs");
         const fileName = req.url.replace(/^\/gallery/, "../example");
-        const file = fs.readFileSync(fileName);
+        const file = fs.readFileSync(decodeURIComponent(fileName));
         res.end(file);
       });
     }
