@@ -119,7 +119,7 @@ Serialised item structure:
 
 ```json
 {
-  /* common fields */
+  "_comment": "common fields",
 
   "title": "Some title",
   "date": "2019-12-20T16:51:52+00:00",
@@ -135,7 +135,7 @@ Serialised item structure:
   "thumbnail": { "path": "[resource path]" },
 
 
-  /* type-dependent */
+  "_comment": "type-dependent",
 
   "properties": {
     "type": "image",
@@ -150,7 +150,7 @@ Serialised item structure:
 
   "properties": {
     "type": "directory",
-    "items": [ /* item objects */ ]
+    "items": [ { "_comment": "item objects..." } ]
   }
 }
 ```
