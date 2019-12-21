@@ -3,7 +3,7 @@ import "@/assets/scss/global.scss";
 import "@/components"
 import "@/plugins/fontawesome";
 import "@/plugins/buefy";
-import store from '@/plugins/vuex'
+import store from '@/store'
 import i18n from "@/plugins/i18n";
 import router from "@/router";
 import LdGallery from "@/views/LdGallery.vue";

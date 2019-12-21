@@ -7,6 +7,17 @@ module.exports = {
       enableInSFC: false,
     },
   },
-
   productionSourceMap: false,
+  devServer: {
+    port: 8085,
+    serveIndex: true,
+    before: (app, server, compiler) => {
+      app.get("/gallery/*", (req, res) => {
+        const fs = require("fs");
+        const fileName = req.url.replace(/^\/gallery/, "../example");
+        const file = fs.readFileSync(fileName);
+        res.end(file);
+      });
+    }
+  }
 };

@@ -4,6 +4,7 @@
     <div class="layout layout-left">panel</div>
     <router-view class="layout layout-content" />
     <ld-button-fullscreen />
+    <b-loading :active="isLoading" is-full-page />
   </div>
 </template>
 
@@ -11,7 +12,32 @@
 import { Component, Vue } from "vue-property-decorator";
 
 @Component
-export default class LdGallery extends Vue {}
+export default class LdGallery extends Vue {
+  isLoading: boolean = false;
+
+  mounted() {
+    this.fetchGalleryItems();
+  }
+
+  fetchGalleryItems() {
+    this.isLoading = true;
+    this.$galleryStore
+      .fetchGalleryItems("/gallery/index.json")
+      .finally(() => (this.isLoading = false))
+      .catch(this.displayError);
+  }
+
+  displayError(reason: any) {
+    this.$buefy.snackbar.open({
+      message: `Error ${reason}`,
+      actionText: "Retry",
+      position: "is-top",
+      type: "is-danger",
+      indefinite: true,
+      onAction: this.fetchGalleryItems,
+    });
+  }
+}
 </script>
 
 <style lang="scss">
