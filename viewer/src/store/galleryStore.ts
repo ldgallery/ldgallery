@@ -7,9 +7,9 @@ const VuexModule = createModule({
 
 export default class GalleryStore extends VuexModule {
 
-    galleryItems: Gallery.Item[] = [];
+    galleryItems: Gallery.Item | null = null;
 
-    @mutation setGalleryItems(galleryItems: Gallery.Item[]) {
+    @mutation setGalleryItems(galleryItems: Gallery.Item) {
         this.galleryItems = galleryItems;
     }
 
@@ -18,4 +18,5 @@ export default class GalleryStore extends VuexModule {
             .then(response => response.json())
             .then(this.setGalleryItems);
     }
+
 }

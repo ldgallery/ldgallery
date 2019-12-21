@@ -12,7 +12,7 @@
 import { Component, Vue } from "vue-property-decorator";
 
 @Component
-export default class LdGallery extends Vue {
+export default class MainLayout extends Vue {
   isLoading: boolean = false;
 
   mounted() {
