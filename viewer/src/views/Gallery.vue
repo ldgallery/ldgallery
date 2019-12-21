@@ -44,7 +44,7 @@ export default class Root extends Vue {
     return null;
   }
 
-  private checkType(type: string) {
+  private checkType(type: string): boolean {
     return (this.currentItem && this.currentItem.properties.type === type) || false;
   }
 }
