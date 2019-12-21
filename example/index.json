@@ -4,8 +4,20 @@
   "title": "",
   "date": "",
   "description": "",
-  "tags": [],
-  "filesize": 0,
+  "tags": [
+    "photographer.nphilou",
+    "location.germany.berlin",
+    "books",
+    "book-shop"
+    "location.switzerland.ormont-dessus",
+    "glacier3000",
+    "time.day",
+    "weather.foggy",
+    "forest",
+    "trees",
+    "catwalk",
+    "mountain"
+  ],
   "path": "/",
   "thumbnail": { "path": "/thumbnails/_DSC8808-1.jpg" },
   "properties": {
@@ -21,11 +33,11 @@
           "books",
           "book-shop"
         ],
-        "filesize": 987,
         "path": "/items/_DSC8808-1.jpg",
         "thumbnail": { "path": "/thumbnails/_DSC8808-1.jpg" },
         "properties": {
           "type": "image",
+          "filesize": 987,
           "resolution": { "width": 3840, "height": 2160 },
         }
       },
@@ -33,8 +45,17 @@
         "title": "Glacier 3000",
         "date": "",
         "description": "",
-        "tags": [],
-        "filesize": 0,
+        "tags": [
+          "photographer.nphilou",
+          "location.switzerland.ormont-dessus",
+          "glacier3000",
+          "time.day",
+          "weather.foggy",
+          "forest",
+          "trees",
+          "catwalk",
+          "mountain"
+        ],
         "path": "/items/Glacier 3000",
         "thumbnail": { "path": "/thumbnails/Glacier 3000/_DSC5475.jpg" },
         "properties": {
@@ -53,11 +74,11 @@
                 "forest",
                 "trees"
               ],
-              "filesize": 355,
               "path": "/items/Glacier 3000/_DSC5475.jpg",
               "thumbnail": { "path": "/thumbnails/Glacier 3000/_DSC5475.jpg" },
               "properties": {
                 "type": "image",
+                "filesize": 355,
                 "resolution": { "width": 3840, "height": 2160 },
               }
             },
@@ -74,11 +95,11 @@
                 "catwalk",
                 "mountain"
               ],
-              "filesize": 447,
               "path": "/items/Glacier 3000/_DSC5542.jpg",
               "thumbnail": { "path": "/thumbnails/Glacier 3000/_DSC5542.jpg" },
               "properties": {
                 "type": "image",
+                "filesize": 447,
                 "resolution": { "width": 3840, "height": 2160 },
               }
             }
