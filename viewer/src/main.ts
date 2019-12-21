@@ -1,5 +1,6 @@
 import Vue from "vue";
 import "@/assets/scss/global.scss";
+import "@/components"
 import "@/plugins/fontawesome";
 import "@/plugins/buefy";
 import store from '@/plugins/vuex'
