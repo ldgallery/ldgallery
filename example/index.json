@@ -19,7 +19,7 @@
     "mountain"
   ],
   "path": "/",
-  "thumbnail": { "path": "/thumbnails/_DSC8808-1.jpg" },
+  "thumbnail": null,
   "properties": {
     "type": "directory",
     "items": [
@@ -34,7 +34,7 @@
           "book-shop"
         ],
         "path": "/items/_DSC8808-1.jpg",
-        "thumbnail": { "path": "/thumbnails/_DSC8808-1.jpg" },
+        "thumbnail": "/thumbnails/_DSC8808-1.jpg",
         "properties": {
           "type": "image",
           "filesize": 987,
@@ -57,7 +57,7 @@
           "mountain"
         ],
         "path": "/items/Glacier 3000",
-        "thumbnail": { "path": "/thumbnails/Glacier 3000/_DSC5475.jpg" },
+        "thumbnail": null,
         "properties": {
           "type": "directory",
           "items": [
@@ -75,7 +75,7 @@
                 "trees"
               ],
               "path": "/items/Glacier 3000/_DSC5475.jpg",
-              "thumbnail": { "path": "/thumbnails/Glacier 3000/_DSC5475.jpg" },
+              "thumbnail": "/thumbnails/Glacier 3000/_DSC5475.jpg",
               "properties": {
                 "type": "image",
                 "filesize": 355,
@@ -96,7 +96,7 @@
                 "mountain"
               ],
               "path": "/items/Glacier 3000/_DSC5542.jpg",
-              "thumbnail": { "path": "/thumbnails/Glacier 3000/_DSC5542.jpg" },
+              "thumbnail": "/thumbnails/Glacier 3000/_DSC5542.jpg",
               "properties": {
                 "type": "image",
                 "filesize": 447,
