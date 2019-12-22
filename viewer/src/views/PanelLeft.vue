@@ -1,8 +1,9 @@
 <template>
-  <div>
-    <b-field :label="$t('panelLeft.title')">
-      <ld-tag-input />
-    </b-field>
+  <div class="flex-column">
+    <h1>{{$t('panelLeft.mode')}}</h1>
+    <ld-mode-radio />
+    <h1>{{$t('panelLeft.filters')}}</h1>
+    <ld-tag-input />
   </div>
 </template>
 

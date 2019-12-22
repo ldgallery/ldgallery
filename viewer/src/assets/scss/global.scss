@@ -12,3 +12,14 @@
 .nowrap {
   white-space: nowrap;
 }
+
+.flex {
+  display: flex;
+}
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+.flex-center {
+  align-items: center;
+}

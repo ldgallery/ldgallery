@@ -5,28 +5,20 @@
 @import "buefy_variables";
 
 // 2. Setup your Custom Colors
-$linkedin: #0077b5;
-$linkedin-invert: findColorInvert($linkedin);
-$twitter: #55acee;
-$twitter-invert: findColorInvert($twitter);
-$github: #333;
-$github-invert: findColorInvert($github);
+// $linkedin: #0077b5;
+// $linkedin-invert: findColorInvert($linkedin);
 
 @import "~bulma/sass/utilities/derived-variables";
 
 // 3. Add new color variables to the color map.
 $addColors: (
-  "twitter": (
-    $twitter,
-    $twitter-invert
+  "green": (
+    $green,
+    $green-invert
   ),
-  "linkedin": (
-    $linkedin,
-    $linkedin-invert
-  ),
-  "github": (
-    $github,
-    $github-invert
+  "purple": (
+    $purple,
+    $purple-invert
   )
 );
 $colors: map-merge($colors, $addColors);

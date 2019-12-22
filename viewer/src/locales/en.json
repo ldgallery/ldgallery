@@ -1,5 +1,9 @@
 {
   "tagInput.placeholder": "Tags",
-  "panelLeft.title": "Filters",
-  "tagInput.nomatch": "No match"
+  "panelLeft.filters": "Filters",
+  "tagInput.nomatch": "No match",
+  "panelLeft.mode": "Mode",
+  "mode.navigation": "Navigation",
+  "mode.search": "Search",
+  "search.no-results": "No results"
 }

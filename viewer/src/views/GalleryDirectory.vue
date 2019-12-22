@@ -1,7 +1,7 @@
 <template>
   <div>
     <strong>Directory: {{directory.path}}</strong>
-    <div class="flex-thumbnails">
+    <div class="flex">
       <div v-for="(item) in directory.properties.items" :key="item.path">
         <router-link :to="item.path">
           <gallery-thumbnail :item="item" />
@@ -24,7 +24,4 @@ export default class GalleryDirectory extends Vue {
 </script>
 
 <style lang="scss">
-.flex-thumbnails {
-  display: flex;
-}
 </style>

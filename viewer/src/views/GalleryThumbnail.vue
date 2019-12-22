@@ -1,5 +1,11 @@
 <template>
-  <img class="thumbnail" :src="imageSrc" :title="item.path" />
+  <div>
+    <img v-if="item.thumbnail" class="thumbnail" :src="imageSrc" :title="item.path" />
+    <div v-else class="flex-column flex-center">
+      <fa-icon icon="folder" class="fa-4x" />
+      {{item.path}}
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -10,7 +16,7 @@ export default class GalleryThumbnail extends Vue {
   @Prop({ required: true }) readonly item!: Gallery.Item;
 
   get imageSrc() {
-    return `/gallery${this.item.thumbnail.path}`;
+    return `${process.env.VUE_APP_DATA_URL}${this.item.thumbnail}`;
   }
 }
 </script>

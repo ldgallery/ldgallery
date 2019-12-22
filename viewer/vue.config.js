@@ -12,9 +12,9 @@ module.exports = {
     port: 8085,
     serveIndex: true,
     before: (app, server, compiler) => {
-      app.get("/gallery/*", (req, res) => {
+      app.get(`${process.env.VUE_APP_DATA_URL}/*`, (req, res) => {
         const fs = require("fs");
-        const fileName = req.url.replace(/^\/gallery/, "../example");
+        const fileName = `../${process.env.VUE_APP_EXAMPLE_PROJECT}${req.url.slice(process.env.VUE_APP_DATA_URL.length)}`;
         const file = fs.readFileSync(decodeURIComponent(fileName));
         res.end(file);
       });

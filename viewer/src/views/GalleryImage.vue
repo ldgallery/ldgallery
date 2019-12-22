@@ -13,7 +13,7 @@ export default class GalleryImage extends Vue {
   @Prop({ required: true }) readonly image!: Gallery.Image;
 
   get imageSrc() {
-    return `/gallery${this.image.path}`;
+    return `${process.env.VUE_APP_DATA_URL}${this.image.path}`;
   }
 }
 </script>

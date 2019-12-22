@@ -22,6 +22,7 @@ export default class GalleryStore extends VuexModule {
 
     // ---
 
+    // Fetches the gallery's JSON metadata
     @action async fetchGalleryItems(url: string) {
         fetch(url)
             .then(response => response.json())
@@ -29,14 +30,18 @@ export default class GalleryStore extends VuexModule {
             .then(this.indexTags);
     }
 
+    // Indexes the gallery
     @action async indexTags() {
         let index = {};
         if (this.galleryItemsRoot)
             GalleryStore.pushTagsForItem(index, this.galleryItemsRoot);
-        console.log(index);
+        console.log("Index: ", index);
         this.setTags(index);
     }
 
+    // ---
+
+    // Pushes all tags for a root item (and its children) to the index
     private static pushTagsForItem(index: Tag.Index, item: Gallery.Item) {
         console.log("IndexingTagsFor: ", item.path);
         for (const tag of item.tags) {
@@ -44,12 +49,24 @@ export default class GalleryStore extends VuexModule {
             let lastPart: string | null = null;
             for (const part of parts) {
                 if (!index[part]) index[part] = { tag: part, items: [], children: {} };
-                index[part].items.push(item);
+                if (!index[part].items.includes(item)) index[part].items.push(item);
                 if (lastPart) index[lastPart].children[part] = index[part];
                 lastPart = part;
             }
         }
         if (item.properties.type === "directory")
             item.properties.items.forEach(item => this.pushTagsForItem(index, item));
+    }
+
+    // Searches for an item by path from a root item (navigation)
+    static searchCurrentItem(item: Gallery.Item, path: string): Gallery.Item | null {
+        if (path === item.path) return item;
+        if (item.properties.type === "directory" && path.startsWith(item.path)) {
+            const itemFound = item.properties.items
+                .map(item => this.searchCurrentItem(item, path))
+                .find(item => Boolean(item));
+            return itemFound || null;
+        }
+        return null;
     }
 }
