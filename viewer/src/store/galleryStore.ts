@@ -7,16 +7,49 @@ const VuexModule = createModule({
 
 export default class GalleryStore extends VuexModule {
 
-    galleryItems: Gallery.Item | null = null;
+    galleryItemsRoot: Gallery.Item | null = null;
+    tags: Tag.Index = {};
 
-    @mutation setGalleryItems(galleryItems: Gallery.Item) {
-        this.galleryItems = galleryItems;
+    // ---
+
+    @mutation setGalleryItemsRoot(galleryItemsRoot: Gallery.Item) {
+        this.galleryItemsRoot = galleryItemsRoot;
     }
+
+    @mutation private setTags(tags: Tag.Index) {
+        this.tags = tags;
+    }
+
+    // ---
 
     @action async fetchGalleryItems(url: string) {
         fetch(url)
             .then(response => response.json())
-            .then(this.setGalleryItems);
+            .then(this.setGalleryItemsRoot)
+            .then(this.indexTags);
     }
 
+    @action async indexTags() {
+        let index = {};
+        if (this.galleryItemsRoot)
+            GalleryStore.pushTagsForItem(index, this.galleryItemsRoot);
+        console.log(index);
+        this.setTags(index);
+    }
+
+    private static pushTagsForItem(index: Tag.Index, item: Gallery.Item) {
+        console.log("IndexingTagsFor: ", item.path);
+        for (const tag of item.tags) {
+            const parts = tag.split('.');
+            let lastPart: string | null = null;
+            for (const part of parts) {
+                if (!index[part]) index[part] = { tag: part, items: [], children: {} };
+                index[part].items.push(item);
+                if (lastPart) index[lastPart].children[part] = index[part];
+                lastPart = part;
+            }
+        }
+        if (item.properties.type === "directory")
+            item.properties.items.forEach(item => this.pushTagsForItem(index, item));
+    }
 }

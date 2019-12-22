@@ -1,3 +1,5 @@
 {
-  "message": "hello i18n !!"
+  "tagInput.placeholder": "Tags",
+  "panelLeft.title": "Filters",
+  "tagInput.nomatch": "No match"
 }

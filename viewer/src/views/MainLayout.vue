@@ -1,7 +1,7 @@
 <template>
   <div :class="{fullscreen: $uiStore.fullscreen}">
     <div class="layout layout-top">header</div>
-    <div class="layout layout-left">panel</div>
+    <panel-left class="layout layout-left" />
     <router-view class="layout layout-content" />
     <ld-button-fullscreen />
     <b-loading :active="isLoading" is-full-page />
@@ -10,8 +10,11 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import PanelLeft from "./PanelLeft.vue";
 
-@Component
+@Component({
+  components: { PanelLeft },
+})
 export default class MainLayout extends Vue {
   isLoading: boolean = false;
 

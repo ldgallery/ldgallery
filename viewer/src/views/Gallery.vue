@@ -13,7 +13,7 @@ import GalleryImage from "./GalleryImage.vue";
 @Component({
   components: { GalleryDirectory, GalleryImage },
 })
-export default class Root extends Vue {
+export default class Gallery extends Vue {
   @Prop(String) readonly pathMatch!: string;
 
   get isDirectory(): boolean {
@@ -25,8 +25,8 @@ export default class Root extends Vue {
   }
 
   get currentItem(): Gallery.Item | null {
-    const galleryItems = this.$galleryStore.galleryItems;
-    if (galleryItems) return this.searchCurrentItem(galleryItems, this.pathMatch);
+    const galleryItemsRoot = this.$galleryStore.galleryItemsRoot;
+    if (galleryItemsRoot) return this.searchCurrentItem(galleryItemsRoot, this.pathMatch);
     return null;
   }
 
