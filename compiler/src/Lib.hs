@@ -40,7 +40,7 @@ import Data.Text (Text, empty, pack)
 import Data.Yaml (ParseException, decodeFileEither)
 import Data.Aeson
 
-import System.FilePath (isExtensionOf)
+import System.FilePath ((</>), dropFileName, dropExtension, isExtensionOf)
 import qualified System.FilePath.Posix (joinPath)
 import System.Directory.Tree
 import System.Directory
@@ -147,44 +147,70 @@ joinURLPath :: [FileName] -> Text
 joinURLPath = pack . System.FilePath.Posix.joinPath
 
 
-toItemTree :: (MonadIO m) => FilePath -> FilePath -> DirTree SidecarItemMetadata -> m Item
+toItemTree :: (MonadIO m) => FilePath -> FilePath -> DirTree SidecarItemMetadata -> m (Item, DirTree SidecarItemMetadata)
 toItemTree itemsDir thumbnailsDir = nodeToItem []
   where
     nodeToItem pathTo d@(Dir dname dcontents) =
       mapM (nodeToItem path) dcontents
-      >>= \items -> return Item
-        { title = pack dname
-        , date = empty
-        , description = empty
-        , tags = aggregateTags items
-        , path = joinURLPath $ itemsDir:path
-        , thumbnail = Nothing
-        , properties = Directory { items = items } }
+      >>= return . unzip
+      >>= \(items, _) -> return
+        ( Item
+          { title = pack dname
+          , date = empty
+          , description = empty
+          , tags = aggregateTags items
+          , path = joinURLPath $ itemsDir:path
+          , thumbnail = Nothing
+          , properties = Directory { items = items } }
+        , d)
       where
         path = pathTo ++ [dname]
         aggregateTags = unique . concatMap (\item -> tags (item::Item))
 
     nodeToItem pathTo f@(File fname metadata) =
-      return Item
-        { title = optMeta title (pack fname)
-        , date = optMeta date empty -- TODO: check and normalise dates
-        , description = optMeta description empty
-        , tags = optMeta tags []
-        , path = joinURLPath $ itemsDir:path
-        , thumbnail = Just $ joinURLPath $ thumbnailsDir:path
-        , properties = Unknown } -- TODO
+      return
+        ( Item
+          { title = optMeta title $ pack $ dropExtension fname
+          , date = optMeta date empty -- TODO: check and normalise dates
+          , description = optMeta description empty
+          , tags = optMeta tags []
+          , path = joinURLPath $ itemsDir:path
+          , thumbnail = Just $ joinURLPath $ thumbnailsDir:path
+          , properties = Unknown } -- TODO
+        , f)
       where
         path = pathTo ++ [fname]
         optMeta get fallback = fromMaybe fallback $ get (metadata::SidecarItemMetadata)
 
 
+unrooted :: AnchoredDirTree a -> DirTree a
+unrooted t = (dirTree t) { name = "" }
+
+
+writeJSON :: ToJSON a => FilePath -> a -> IO ()
+writeJSON path obj =
+  createDirectoryIfMissing True (dropFileName path)
+  >> Data.Aeson.encodeFile path obj
+
+
+infixl 1 >>>>>>
+(>>>>>>) :: Monad m => m a -> (a -> m b) -> m a
+a >>>>>> f = a >>= f >>= return a
+
+
 process :: FilePath -> FilePath -> IO ()
 process inputDir outputDir =
   readDirectoryWith return inputDir
-  >>= metadataDirTree . dirTree
-  >>= toItemTree "items" "thumbnails"
-  >>= return . show . toEncoding
+  >>= return . unrooted
+  >>= metadataDirTree
+  >>= toItemTree itemsDir thumbnailsDir
+  >>>>>> writeJSON (outputDir </> indexFile) . fst
+  >>= return . show . toEncoding . fst
   >>= liftIO . putStrLn
+  where
+    itemsDir = "items"
+    thumbnailsDir = "thumbnails"
+    indexFile = "index.json"
 
 
 testRun :: IO ()
