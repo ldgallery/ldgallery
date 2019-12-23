@@ -34,12 +34,14 @@ import Control.Exception (Exception, throwIO)
 import Data.Function
 import Data.Maybe (fromMaybe)
 import Data.List (map)
+import Data.Set (fromList, toList)
 import Data.Char (toLower)
 import Data.Text (Text, empty, pack)
 import Data.Yaml (ParseException, decodeFileEither)
 import Data.Aeson
 
-import System.FilePath
+import System.FilePath (isExtensionOf)
+import qualified System.FilePath.Posix (joinPath)
 import System.Directory.Tree
 import System.Directory
 
@@ -137,37 +139,50 @@ metadataDirTree d@(Dir _ dcontents) =
      canContainMetadata (File fname _) = isExtensionOf ".yaml" fname
 
 
-toItemTree :: (MonadIO m) => [FileName] -> DirTree SidecarItemMetadata -> m Item
-toItemTree pathTo d@(Dir dname dcontents) =
-  mapM (toItemTree path) dcontents
-  >>= \items -> return Item
-    { title = pack dname
-    , date = empty -- TODO: would it make sense to take the date of child elements?
-    , description = empty
-    , tags = [] -- TODO: aggregate tags from childs
-    , path = pack $ joinPath $ "items":path -- FIXME: use URL path instead of system path sep
-    , thumbnail = Nothing
-    , properties = Directory { items = items }}
+unique :: Ord a => [a] -> [a]
+unique = Data.Set.toList . Data.Set.fromList
+
+
+joinURLPath :: [FileName] -> Text
+joinURLPath = pack . System.FilePath.Posix.joinPath
+
+
+toItemTree :: (MonadIO m) => FilePath -> FilePath -> DirTree SidecarItemMetadata -> m Item
+toItemTree itemsDir thumbnailsDir = nodeToItem []
   where
-    path = pathTo ++ [dname]
-toItemTree pathTo f@(File fname metadata) =
-  return Item
-    { title = optMeta title (pack fname)
-    , date = optMeta date empty -- TODO: check and normalise dates
-    , description = optMeta description empty
-    , tags = optMeta tags []
-    , path = pack $ joinPath $ "items":(pathTo ++ [fname])  -- FIXME: use URL path instead of system path sep
-    , thumbnail = Just $ pack $ joinPath $ "thumbnails":(pathTo ++ [fname])  -- FIXME: use URL path instead of system path sep
-    , properties = Unknown } -- TODO
-  where
-    optMeta get fallback = fromMaybe fallback $ get (metadata::SidecarItemMetadata)
+    nodeToItem pathTo d@(Dir dname dcontents) =
+      mapM (nodeToItem path) dcontents
+      >>= \items -> return Item
+        { title = pack dname
+        , date = empty
+        , description = empty
+        , tags = aggregateTags items
+        , path = joinURLPath $ itemsDir:path
+        , thumbnail = Nothing
+        , properties = Directory { items = items } }
+      where
+        path = pathTo ++ [dname]
+        aggregateTags = unique . concatMap (\item -> tags (item::Item))
+
+    nodeToItem pathTo f@(File fname metadata) =
+      return Item
+        { title = optMeta title (pack fname)
+        , date = optMeta date empty -- TODO: check and normalise dates
+        , description = optMeta description empty
+        , tags = optMeta tags []
+        , path = joinURLPath $ itemsDir:path
+        , thumbnail = Just $ joinURLPath $ thumbnailsDir:path
+        , properties = Unknown } -- TODO
+      where
+        path = pathTo ++ [fname]
+        optMeta get fallback = fromMaybe fallback $ get (metadata::SidecarItemMetadata)
 
 
 process :: FilePath -> FilePath -> IO ()
 process inputDir outputDir =
   readDirectoryWith return inputDir
   >>= metadataDirTree . dirTree
-  >>= toItemTree []
+  >>= toItemTree "items" "thumbnails"
   >>= return . show . toEncoding
   >>= liftIO . putStrLn
 
