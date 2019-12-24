@@ -32,7 +32,7 @@ import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Exception (Exception, throwIO)
 
 import Data.Function
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, listToMaybe)
 import Data.List (map)
 import Data.Set (fromList, toList)
 import Data.Char (toLower)
@@ -40,7 +40,7 @@ import Data.Text (Text, empty, pack)
 import Data.Yaml (ParseException, decodeFileEither)
 import Data.Aeson
 
-import System.FilePath ((</>), dropFileName, dropExtension, isExtensionOf)
+import System.FilePath ((</>), joinPath, dropFileName, dropExtension, isExtensionOf)
 import qualified System.FilePath.Posix (joinPath)
 import System.Directory.Tree
 import System.Directory
@@ -64,7 +64,7 @@ data SidecarItemMetadata = SidecarItemMetadata
   , date :: Maybe Text
   , description :: Maybe Text
   , tags :: Maybe [Text]
-  } deriving Generic
+  } deriving (Generic, Show)
 
 instance FromJSON SidecarItemMetadata where
   parseJSON = genericParseJSON encodingOptions
@@ -80,7 +80,7 @@ type FileSizeKB = Int
 data Resolution = Resolution
   { width :: Int
   , height :: Int
-  } deriving Generic
+  } deriving (Generic, Show)
 
 instance ToJSON Resolution where
   toJSON = genericToJSON encodingOptions
@@ -92,7 +92,7 @@ data ItemProperties =
   | Image { resolution :: Resolution, filesize :: FileSizeKB }
 --  | Video { filesize :: FileSizeKB }
   | Unknown
-  deriving Generic
+  deriving (Generic, Show)
 
 instance ToJSON ItemProperties where
   toJSON = genericToJSON encodingOptions
@@ -107,7 +107,7 @@ data Item = Item
   , path :: ResourcePath
   , thumbnail :: Maybe ResourcePath
   , properties :: ItemProperties
-  } deriving Generic
+  } deriving (Generic, Show)
 
 instance ToJSON Item where
   toJSON = genericToJSON encodingOptions
@@ -125,87 +125,127 @@ decodeYamlFile fpath =
   >>= either (throwIO . LoadException fpath) return
 
 
-metadataDirTree :: DirTree FilePath -> IO (DirTree SidecarItemMetadata)
-metadataDirTree (Failed _ ferr) = ioError ferr
-metadataDirTree f@(File _ fpath) =
-  decodeYamlFile fpath
-  >>= \metadata -> return f { file = metadata }
-metadataDirTree d@(Dir _ dcontents) =
-  filter canContainMetadata dcontents
-  & mapM metadataDirTree
-  >>= \contents -> return d { contents = contents }
+toMetaTree :: DirTree FilePath -> IO (DirTree SidecarItemMetadata)
+toMetaTree tree = return (filterDir canContainMetadata tree) >>= metaNode
   where
-     canContainMetadata (Dir _ _) = True
-     canContainMetadata (File fname _) = isExtensionOf ".yaml" fname
+    -- TODO: exclude hidden files (name starting with '.')?
+    canContainMetadata :: DirTree a -> Bool
+    canContainMetadata (File fname _) = isExtensionOf ".yaml" fname
+    canContainMetadata (Dir _ _) = True
+
+    metaNode :: DirTree FilePath -> IO (DirTree SidecarItemMetadata)
+    metaNode (Failed _ ferr) = ioError ferr
+    metaNode file@(File _ fpath) = decodeYamlFile fpath
+      >>= \metadata -> return file { file = metadata }
+    metaNode dir@(Dir _ dcontents) = mapM metaNode dcontents
+      >>= \contents -> return dir { contents = contents }
 
 
 unique :: Ord a => [a] -> [a]
 unique = Data.Set.toList . Data.Set.fromList
 
-
 joinURLPath :: [FileName] -> Text
 joinURLPath = pack . System.FilePath.Posix.joinPath
 
 
-toItemTree :: (MonadIO m) => FilePath -> FilePath -> DirTree SidecarItemMetadata -> m (Item, DirTree SidecarItemMetadata)
-toItemTree itemsDir thumbnailsDir = nodeToItem []
+toItemTree :: FilePath -> FilePath -> DirTree SidecarItemMetadata -> IO Item
+toItemTree itemsDir thumbnailsDir = itemNode []
   where
-    nodeToItem pathTo d@(Dir dname dcontents) =
-      mapM (nodeToItem path) dcontents
-      >>= return . unzip
-      >>= \(items, _) -> return
-        ( Item
-          { title = pack dname
-          , date = empty
-          , description = empty
-          , tags = aggregateTags items
-          , path = joinURLPath $ itemsDir:path
-          , thumbnail = Nothing
-          , properties = Directory { items = items } }
-        , d)
+    itemNode :: [FileName] -> DirTree SidecarItemMetadata -> IO Item
+    itemNode pathTo (Dir dname dcontents) =
+      mapM (itemNode path) dcontents
+      >>= \items -> return Item
+        { title = pack dname
+        , date = empty
+        , description = empty
+        , tags = aggregateChildTags items
+        , path = joinURLPath $ itemsDir:path
+        , thumbnail = Nothing
+        , properties = Directory items }
       where
         path = pathTo ++ [dname]
-        aggregateTags = unique . concatMap (\item -> tags (item::Item))
+        aggregateChildTags = unique . concatMap (\item -> tags (item::Item))
 
-    nodeToItem pathTo f@(File fname metadata) =
-      return
-        ( Item
-          { title = optMeta title $ pack $ dropExtension fname
-          , date = optMeta date empty -- TODO: check and normalise dates
-          , description = optMeta description empty
-          , tags = optMeta tags []
-          , path = joinURLPath $ itemsDir:path
-          , thumbnail = Just $ joinURLPath $ thumbnailsDir:path
-          , properties = Unknown } -- TODO
-        , f)
+    itemNode pathTo (File fname metadata) =
+      return Item
+        { title = optMeta title $ pack name
+        , date = optMeta date empty -- TODO: check and normalise dates
+        , description = optMeta description empty
+        , tags = optMeta tags []
+        , path = joinURLPath $ itemsDir:path
+        , thumbnail = Just $ joinURLPath $ thumbnailsDir:path
+        , properties = Unknown } -- TODO
       where
-        path = pathTo ++ [fname]
+        name = dropExtension fname
+        path = pathTo ++ [name]
         optMeta get fallback = fromMaybe fallback $ get (metadata::SidecarItemMetadata)
+
+
+data ObjectTree = ObjectTree
+  { pathTo :: [ObjectTree]
+  , meta :: (DirTree SidecarItemMetadata)
+  , item :: Item } deriving Show
+
+rootObjectTree :: DirTree SidecarItemMetadata -> Item -> ObjectTree
+rootObjectTree = ObjectTree []
+
+toObjectTree :: (DirTree SidecarItemMetadata -> IO Item) -> DirTree SidecarItemMetadata -> IO ObjectTree
+toObjectTree itemGen meta = itemGen meta >>= return . (rootObjectTree meta)
+
+flatten :: ObjectTree -> [ObjectTree]
+flatten object@(ObjectTree _ (File _ _) _) = [object]
+flatten object@(ObjectTree pathTo (Dir _ dcontents) item) =
+  zip dcontents (items $ properties item)
+  & map (uncurry $ ObjectTree $ pathTo ++ [object])
+  & concatMap flatten
+  & (:) object
+
+objFileName :: ObjectTree -> FileName
+objFileName (ObjectTree _ (Dir name _) _) = name
+objFileName (ObjectTree _ (File name _) _) = dropExtension name -- without ".yaml"
+
+objFilePath :: ObjectTree -> FilePath
+objFilePath obj@(ObjectTree pathTo _ _) =
+  (map (name . meta) pathTo) ++ [objFileName obj]
+  & System.FilePath.joinPath
+
+
+data FileTransform = FileTransform
+  { src :: FilePath
+  , dst :: FilePath } deriving Show
+
+
+isUpToDate :: FilePath -> FilePath -> IO Bool
+isUpToDate ref target =
+  do
+    refTime <- getModificationTime ref
+    targetTime <- getModificationTime target
+    return (target >= ref)
 
 
 unrooted :: AnchoredDirTree a -> DirTree a
 unrooted t = (dirTree t) { name = "" }
-
 
 writeJSON :: ToJSON a => FilePath -> a -> IO ()
 writeJSON path obj =
   createDirectoryIfMissing True (dropFileName path)
   >> Data.Aeson.encodeFile path obj
 
-
-infixl 1 >>>>>>
-(>>>>>>) :: Monad m => m a -> (a -> m b) -> m a
-a >>>>>> f = a >>= f >>= return a
-
+passthrough :: Monad m => (a -> m b) -> a -> m a
+passthrough f a = return a >>= f >>= \_ -> return a
 
 process :: FilePath -> FilePath -> IO ()
 process inputDir outputDir =
   readDirectoryWith return inputDir
   >>= return . unrooted
-  >>= metadataDirTree
-  >>= toItemTree itemsDir thumbnailsDir
-  >>>>>> writeJSON (outputDir </> indexFile) . fst
-  >>= return . show . toEncoding . fst
+  >>= toMetaTree
+  >>= toObjectTree (toItemTree itemsDir thumbnailsDir)
+  >>= passthrough (writeJSON (outputDir </> indexFile) . item)
+  >>= return . flatten
+--  >>= mapM (return . pathTo)
+  >>= return . (map objFilePath)
+  >>= return . show
+--  >>= return . show . toEncoding . item
   >>= liftIO . putStrLn
   where
     itemsDir = "items"
