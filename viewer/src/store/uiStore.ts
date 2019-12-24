@@ -9,7 +9,7 @@ export default class UIStore extends VuexModule {
 
     fullscreen: boolean = false;
     mode: "navigation" | "search" = "navigation";
-    currentTags: Tag.Node[] = [];
+    currentTags: Tag.Search[] = [];
 
     // ---
 

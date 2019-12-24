@@ -8,6 +8,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
+import { Operation } from '@/@types/tag/Operation';
 import GallerySearch from "./GallerySearch.vue";
 import GalleryDirectory from "./GalleryDirectory.vue";
 import GalleryImage from "./GalleryImage.vue";
@@ -29,10 +30,10 @@ export default class Gallery extends Vue {
 
   // Results of the search (by tags)
   get currentSearch(): Gallery.Item[] {
-    const currentTags = this.$uiStore.currentTags;
-    let items = new Set<Gallery.Item>();
-    currentTags.flatMap(tag => tag.items).forEach(item => items.add(item));
-    return [...items];
+    const byOperation = this.extractTagsByOperation(this.$uiStore.currentTags);
+    const intersection = this.extractIntersection(byOperation);
+    const substraction = this.extractSubstraction(byOperation);
+    return this.aggregateAll(byOperation, intersection, substraction);
   }
 
   // Item pointed by the URL (navigation)
@@ -45,7 +46,42 @@ export default class Gallery extends Vue {
   // ---
 
   private checkType(type: string): boolean {
-    return (this.currentItem && this.currentItem.properties.type === type) || false;
+    return this.currentItem?.properties.type === type ?? false;
+  }
+
+  private extractTagsByOperation(currentTags: Tag.Search[]): Tag.SearchByOperation {
+    let byOperation: Tag.SearchByOperation = {};
+    Object.values(Operation)
+      .forEach(operation => byOperation[operation] = currentTags.filter(tag => tag.operation === operation));
+    return byOperation;
+  }
+
+  private extractIntersection(byOperation: Tag.SearchByOperation): Set<Gallery.Item> {
+    let intersection = new Set<Gallery.Item>();
+    if (byOperation[Operation.INTERSECTION].length > 0) {
+      byOperation[Operation.INTERSECTION]
+        .map(tag => tag.items)
+        .reduce((a,b) => a.filter(c => b.includes(c)))
+        .flatMap(items=>items)
+        .forEach(item => intersection.add(item));
+    }
+    return intersection;
+  }
+
+  private extractSubstraction(byOperation: Tag.SearchByOperation): Set<Gallery.Item> {
+    let substraction = new Set<Gallery.Item>();
+    if (byOperation[Operation.SUBSTRACTION].length > 0) {
+      byOperation[Operation.SUBSTRACTION]
+        .flatMap(tag => tag.items)
+        .forEach(item => substraction.add(item));
+    }
+    return substraction;
+  }
+
+  private aggregateAll(byOperation: Tag.SearchByOperation, intersection: Set<Gallery.Item>, substraction: Set<Gallery.Item>): Gallery.Item[] {
+    byOperation[Operation.ADDITION].flatMap(tag => tag.items).forEach(item => intersection.add(item));
+    substraction.forEach(item => intersection.delete(item));
+    return [...intersection];
   }
 }
 </script>

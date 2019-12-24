@@ -17,6 +17,6 @@ requireComponent.keys().forEach(fileName => {
         // Look for the component options on `.default`, which will
         // exist if the component was exported with `export default`,
         // otherwise fall back to module's root.
-        componentConfig.default || componentConfig
+        componentConfig.default ?? componentConfig
     )
 })

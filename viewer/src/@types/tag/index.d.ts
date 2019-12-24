@@ -4,9 +4,11 @@ declare namespace Tag {
         items: Gallery.Item[];
         children: Index;
     }
-    interface NodeWithParent extends Node {
-        parent: Node;
+    interface Search extends Node {
+        parent?: Node;
+        operation: string; // Enum Operation
+        display: string;
     }
-    type Search = Node | NodeWithParent;
+    type SearchByOperation = { [index: string]: Tag.Search[] };
     type Index = { [index: string]: Node };
 }

@@ -1,5 +1,7 @@
 # ldgallery-viewer
 
+If you get errors with optionals and coalesce, enable the Vetur global preference: useWorkspaceDependencies
+
 ## Project setup
 ```
 npm install

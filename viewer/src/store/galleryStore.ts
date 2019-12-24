@@ -65,7 +65,7 @@ export default class GalleryStore extends VuexModule {
             const itemFound = item.properties.items
                 .map(item => this.searchCurrentItem(item, path))
                 .find(item => Boolean(item));
-            return itemFound || null;
+            return itemFound ?? null;
         }
         return null;
     }
