@@ -20,7 +20,8 @@
 
 
 module Input
-  ( Sidecar, title, date, description, tags
+  ( decodeYamlFile
+  , Sidecar, title, date, description, tags
   , InputTree(..), readInputTree
   ) where
 
@@ -42,12 +43,10 @@ import Utils
 data LoadException = LoadException String ParseException deriving Show
 instance Exception LoadException
 
-decodeYamlFile :: (MonadIO m, FromJSON a) => Path -> m a
+decodeYamlFile :: (MonadIO m, FromJSON a) => FileName -> m a
 decodeYamlFile path =
-  liftIO $ Data.Yaml.decodeFileEither fpath
-  >>= either (throwIO . LoadException fpath) return
-  where
-    fpath = localPath path
+  liftIO $ Data.Yaml.decodeFileEither path
+  >>= either (throwIO . LoadException path) return
 
 
 -- | Tree representing the input from the input directory.
@@ -75,7 +74,7 @@ readInputTree (AnchoredFSNode anchor root@Dir{}) =
   where
     mkInputNode :: FSNode -> IO (Maybe InputTree)
     mkInputNode (File path@(filename:pathto)) | ".yaml" `isExtensionOf` filename =
-      decodeYamlFile (anchor /> path)
+      decodeYamlFile (localPath $ anchor /> path)
       >>= return . InputFile ((dropExtension filename):pathto)
       >>= return . Just
     mkInputNode File{} = return Nothing

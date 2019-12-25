@@ -32,9 +32,9 @@ import Data.Bool (bool)
 import Data.List (isPrefixOf, length, deleteBy)
 import Data.Function ((&))
 import System.Directory (doesDirectoryExist, listDirectory)
+
 import qualified System.FilePath
 import qualified System.FilePath.Posix
-import Utils
 
 
 type FileName = String

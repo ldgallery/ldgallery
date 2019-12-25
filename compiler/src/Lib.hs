@@ -1,3 +1,5 @@
+{-# LANGUAGE DuplicateRecordFields, DeriveGeneric, DeriveAnyClass #-}
+
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
@@ -26,23 +28,32 @@ import GHC.Generics (Generic)
 import Data.Function ((&))
 import System.Directory (createDirectoryIfMissing)
 import System.FilePath (dropFileName, (</>))
-import Data.Aeson (ToJSON, encodeFile)
+import Data.Aeson (Object, ToJSON, FromJSON, encodeFile)
 
 import Files (FileName, readDirectory)
-import Input (readInputTree)
+import Input (decodeYamlFile, readInputTree)
 import Resource (buildResourceTree)
 import Gallery (buildGalleryTree)
 
 
-writeJSON :: ToJSON a => FileName -> a -> IO ()
-writeJSON path obj =
-  createDirectoryIfMissing True (dropFileName path)
-  >> encodeFile path obj
+data CompilerConfig = CompilerConfig
+  { dummy :: Maybe String -- TODO
+  } deriving (Generic, FromJSON, Show)
+
+data GalleryConfig = GalleryConfig
+  { compiler :: CompilerConfig
+  , viewer :: Data.Aeson.Object
+  } deriving (Generic, FromJSON, Show)
+
+readConfig :: FileName -> IO GalleryConfig
+readConfig = decodeYamlFile
 
 
 process :: FilePath -> FilePath -> IO ()
 process inputDirPath outputDirPath =
   do
+    config <- readConfig (inputDirPath </> "gallery.yaml")
+
     inputDir <- readDirectory inputDirPath
     putStrLn "\nINPUT DIR"
     putStrLn (show inputDir)
@@ -60,10 +71,28 @@ process inputDirPath outputDirPath =
     putStrLn (show resourceTree)
 
     -- TODO: make buildResourceTree build a resource compilation strategy
+    -- (need to know the settings)
+    -- flatten the tree of resources and their strategies
+    -- filter resources that are already up to date
+    --   (or recompile everything if the config file has changed!)
+    -- execute in parallel
+
     -- TODO: clean up output dir by comparing its content with the resource tree
+    -- aggregate both trees as list
+    -- compute the difference
+    -- sort by deepest and erase files and dirs
+
     -- TODO: execute (in parallel) the resource compilation strategy list
+    -- need to find a good library for that
 
     buildGalleryTree resourceTree & writeJSON (outputDirPath </> "index.json")
+    writeJSON (outputDirPath </> "viewer.json") (viewer config)
+
+  where
+    writeJSON :: ToJSON a => FileName -> a -> IO ()
+    writeJSON path obj =
+      createDirectoryIfMissing True (dropFileName path)
+      >> encodeFile path obj
 
 
 testRun :: IO ()
