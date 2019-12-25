@@ -17,4 +17,4 @@ License
 
 Copyright (C) 2019 Pacien TRAN-GIRARD and Guillaume FOUET.
 
-_ldgallery_ id distributed under the terms of the GNU Affero General Public License v3.0, as detailed in `license.md`.
+_ldgallery_ is distributed under the terms of the GNU Affero General Public License v3.0, as detailed in `license.md`.

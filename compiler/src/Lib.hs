@@ -28,7 +28,9 @@ import GHC.Generics (Generic)
 import Data.Function ((&))
 import System.Directory (createDirectoryIfMissing)
 import System.FilePath (dropFileName, (</>))
-import Data.Aeson (Object, ToJSON, FromJSON, encodeFile)
+
+import Data.Aeson (ToJSON, FromJSON)
+import qualified Data.Aeson as JSON
 
 import Files (FileName, readDirectory)
 import Input (decodeYamlFile, readInputTree)
@@ -42,7 +44,7 @@ data CompilerConfig = CompilerConfig
 
 data GalleryConfig = GalleryConfig
   { compiler :: CompilerConfig
-  , viewer :: Data.Aeson.Object
+  , viewer :: JSON.Object
   } deriving (Generic, FromJSON, Show)
 
 readConfig :: FileName -> IO GalleryConfig
@@ -92,7 +94,7 @@ process inputDirPath outputDirPath =
     writeJSON :: ToJSON a => FileName -> a -> IO ()
     writeJSON path obj =
       createDirectoryIfMissing True (dropFileName path)
-      >> encodeFile path obj
+      >> JSON.encodeFile path obj
 
 
 testRun :: IO ()
