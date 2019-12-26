@@ -23,7 +23,7 @@ module Files
   ( FileName, LocalPath, WebPath, Path
   , (</>), (</), (/>), localPath, webPath
   , FSNode(..), AnchoredFSNode(..)
-  , nodePath, nodeName, isHidden, flatten, filterDir, readDirectory
+  , nodePath, nodeName, isHidden, flattenDir, filterDir, readDirectory
   ) where
 
 
@@ -76,9 +76,10 @@ isHidden :: FSNode -> Bool
 isHidden node = "." `isPrefixOf` filename && length filename > 1
   where filename = nodeName node
 
-flatten :: FSNode -> [FSNode]
-flatten file@(File _) = [file]
-flatten dir@(Dir _ childs) = dir:(concatMap flatten childs)
+-- | DFS with intermediate dirs first.
+flattenDir :: FSNode -> [FSNode]
+flattenDir file@(File _) = [file]
+flattenDir dir@(Dir _ childs) = dir:(concatMap flattenDir childs)
 
 -- | Filters a dir tree. The root is always returned.
 filterDir :: (FSNode -> Bool) -> FSNode -> FSNode
@@ -87,7 +88,7 @@ filterDir cond (Dir path childs) =
   filter cond childs & map (filterDir cond) & Dir path
 
 readDirectory :: LocalPath -> IO AnchoredFSNode
-readDirectory root = mkNode [""] >>= return . AnchoredFSNode root
+readDirectory root = mkNode [] >>= return . AnchoredFSNode root
   where
     mkNode :: Path -> IO FSNode
     mkNode path =

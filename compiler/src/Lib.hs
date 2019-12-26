@@ -26,15 +26,17 @@ module Lib
 
 import GHC.Generics (Generic)
 import Data.Function ((&))
-import System.Directory (createDirectoryIfMissing)
+import Data.Ord (comparing)
+import Data.List (sortBy, length)
+import System.Directory (createDirectoryIfMissing, removePathForcibly)
 import System.FilePath (dropFileName, (</>))
 
 import Data.Aeson (ToJSON, FromJSON)
 import qualified Data.Aeson as JSON
 
-import Files (FileName, readDirectory)
+import Files (FileName, readDirectory, localPath, flattenDir, root, (/>))
 import Input (decodeYamlFile, readInputTree)
-import Resource (buildResourceTree)
+import Resource (ResourceTree, buildResourceTree, outputDiff)
 import Gallery (buildGalleryTree)
 
 
@@ -60,10 +62,6 @@ process inputDirPath outputDirPath =
     putStrLn "\nINPUT DIR"
     putStrLn (show inputDir)
 
-    outputDir <- readDirectory outputDirPath
-    putStrLn "\nOUTPUT DIR"
-    putStrLn (show outputDir)
-
     inputTree <- readInputTree inputDir
     putStrLn "\nINPUT TREE"
     putStrLn (show inputTree)
@@ -79,18 +77,26 @@ process inputDirPath outputDirPath =
     --   (or recompile everything if the config file has changed!)
     -- execute in parallel
 
-    -- TODO: clean up output dir by comparing its content with the resource tree
-    -- aggregate both trees as list
-    -- compute the difference
-    -- sort by deepest and erase files and dirs
+    cleanup resourceTree outputDirPath
 
     -- TODO: execute (in parallel) the resource compilation strategy list
     -- need to find a good library for that
 
-    buildGalleryTree resourceTree & writeJSON (outputDirPath </> "index.json")
-    writeJSON (outputDirPath </> "viewer.json") (viewer config)
+    buildGalleryTree resourceTree
+      & writeJSON (outputDirPath </> "index.json")
+
+    viewer config
+      & writeJSON (outputDirPath </> "viewer.json")
 
   where
+    cleanup :: ResourceTree -> FileName -> IO ()
+    cleanup resourceTree outputDir =
+      readDirectory outputDir
+      >>= return . outputDiff resourceTree . root
+      >>= return . sortBy (flip $ comparing length) -- nested files before dirs
+      >>= return . map (localPath . (/>) outputDir)
+      >>= mapM_ removePathForcibly
+
     writeJSON :: ToJSON a => FileName -> a -> IO ()
     writeJSON path obj =
       createDirectoryIfMissing True (dropFileName path)

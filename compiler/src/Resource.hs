@@ -22,10 +22,13 @@
 module Resource
   ( ResourceTree(..)
   , buildResourceTree
+  , flattenResourceTree
+  , outputDiff
   ) where
 
 
 import Data.Function ((&))
+import Data.List ((\\))
 import Files
 import Input
 
@@ -34,25 +37,47 @@ import Input
 data ResourceTree =
     ItemResource
       { sidecar :: Sidecar
-      , path :: Path
+      , resPath :: Path
       , itemThumbnailPath :: Path }
   | DirResource
       { items :: [ResourceTree]
-      , path :: Path
+      , resPath :: Path
       , dirThumbnailPath :: Maybe Path }
   deriving Show
 
 
-  -- TODO: actually generate compilation strategies
+-- TODO: actually generate compilation strategies
 buildResourceTree :: InputTree -> ResourceTree
 buildResourceTree = resNode
   where
     resNode (InputFile path sidecar) =
-      ItemResource sidecar (itemsDir /> path) (thumbnailsDir /> path)
+      ItemResource
+        { sidecar = sidecar
+        , resPath = itemsDir /> path
+        , itemThumbnailPath = thumbnailsDir /> path }
 
     resNode (InputDir path thumbnailPath items) =
       map resNode items
-      & \dirItems -> DirResource dirItems (itemsDir /> path) Nothing
+      & \dirItems -> DirResource
+        { items = dirItems
+        , resPath = itemsDir /> path
+        , dirThumbnailPath = fmap ((/>) thumbnailsDir) thumbnailPath }
 
     itemsDir = "items"
     thumbnailsDir = "thumbnails"
+
+
+flattenResourceTree :: ResourceTree -> [ResourceTree]
+flattenResourceTree item@ItemResource{} = [item]
+flattenResourceTree dir@(DirResource items _ _) =
+  dir:(concatMap flattenResourceTree items)
+
+
+outputDiff :: ResourceTree -> FSNode -> [Path]
+outputDiff resources ref = (fsPaths ref) \\ (resPaths resources)
+  where
+    resPaths :: ResourceTree -> [Path]
+    resPaths = map resPath . flattenResourceTree
+
+    fsPaths :: FSNode -> [Path]
+    fsPaths = map nodePath . tail . flattenDir
