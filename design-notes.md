@@ -21,6 +21,7 @@ example-gallery-source
 ├── _DSC8808-1.jpg           -- a picture
 ├── _DSC8808-1.jpg.yaml      -- its associated sidecar metadata file
 └── Glacier 3000             -- a directory grouping gallery items
+    ├── thumbnail.jpg        -- optional directory thumbnail
     ├── _DSC5475.jpg
     ├── _DSC5475.jpg.yaml
     ├── _DSC5542.jpg
@@ -95,6 +96,7 @@ data
 ├── thumbnails             -- item thumbnails directory
 │   ├── _DSC8808-1.jpg
 │   └── Glacier 3000
+│       ├── thumbnail.jpg
 │       ├── _DSC5475.jpg
 │       └── _DSC5542.jpg
 ├── index.json             -- content index file
