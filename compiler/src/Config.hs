@@ -1,3 +1,5 @@
+{-# LANGUAGE DuplicateRecordFields, DeriveGeneric, DeriveAnyClass #-}
+
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
@@ -17,33 +19,31 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-module Utils
-  ( conj, neg
-  , unique
-  , passthrough
+module Config
+  ( GalleryConfig(..)
+  , CompilerConfig(..)
+  , readConfig
   ) where
 
+import GHC.Generics (Generic)
+import Data.Aeson (ToJSON, FromJSON)
+import qualified Data.Aeson as JSON
 
-import qualified Data.List
-import qualified Data.Set
-
-
--- predicates
-
-conj :: (a -> Bool) -> (a -> Bool) -> a -> Bool
-conj p q x = (p x) && (q x)
-
-neg :: (a -> Bool) -> a -> Bool
-neg p x = not (p x)
+import Files (FileName)
+import Input (decodeYamlFile)
 
 
--- lists
+data CompilerConfig = CompilerConfig
+  { dummy :: Maybe String -- TODO
+  } deriving (Generic, FromJSON, Show)
 
-unique :: Ord a => [a] -> [a]
-unique = Data.Set.toList . Data.Set.fromList
+data GalleryConfig = GalleryConfig
+  { compiler :: CompilerConfig
+  , viewer :: JSON.Object
+  } deriving (Generic, FromJSON, Show)
+
+-- TODO: add compiler config keys and their default values
 
 
--- monads
-
-passthrough :: Monad m => (a -> m b) -> a -> m a
-passthrough f a = return a >>= f >>= \_ -> return a
+readConfig :: FileName -> IO GalleryConfig
+readConfig = decodeYamlFile

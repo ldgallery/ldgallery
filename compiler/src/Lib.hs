@@ -24,47 +24,28 @@ module Lib
   ) where
 
 
-import GHC.Generics (Generic)
 import Data.Function ((&))
 import Data.Ord (comparing)
 import Data.List (sortBy, length)
 import System.Directory (createDirectoryIfMissing, removePathForcibly)
 import System.FilePath (dropFileName, (</>))
 
-import Data.Aeson (ToJSON, FromJSON)
+import Data.Aeson (ToJSON)
 import qualified Data.Aeson as JSON
 
+import Config
 import Files (FileName, readDirectory, localPath, flattenDir, root, (/>))
 import Input (decodeYamlFile, readInputTree)
 import Resource (ResourceTree, buildResourceTree, outputDiff)
 import Gallery (buildGalleryTree)
 
 
-data CompilerConfig = CompilerConfig
-  { dummy :: Maybe String -- TODO
-  } deriving (Generic, FromJSON, Show)
-
-data GalleryConfig = GalleryConfig
-  { compiler :: CompilerConfig
-  , viewer :: JSON.Object
-  } deriving (Generic, FromJSON, Show)
-
-readConfig :: FileName -> IO GalleryConfig
-readConfig = decodeYamlFile
-
-
 process :: FilePath -> FilePath -> IO ()
 process inputDirPath outputDirPath =
   do
     config <- readConfig (inputDirPath </> "gallery.yaml")
-
     inputDir <- readDirectory inputDirPath
-    putStrLn "\nINPUT DIR"
-    putStrLn (show inputDir)
-
     inputTree <- readInputTree inputDir
-    putStrLn "\nINPUT TREE"
-    putStrLn (show inputTree)
 
     let resourceTree = buildResourceTree inputTree
     putStrLn "\nRESOURCE TREE"
@@ -77,10 +58,10 @@ process inputDirPath outputDirPath =
     --   (or recompile everything if the config file has changed!)
     -- execute in parallel
 
-    cleanup resourceTree outputDirPath
-
     -- TODO: execute (in parallel) the resource compilation strategy list
     -- need to find a good library for that
+
+    cleanup resourceTree outputDirPath
 
     buildGalleryTree resourceTree
       & writeJSON (outputDirPath </> "index.json")
@@ -95,7 +76,13 @@ process inputDirPath outputDirPath =
       >>= return . outputDiff resourceTree . root
       >>= return . sortBy (flip $ comparing length) -- nested files before dirs
       >>= return . map (localPath . (/>) outputDir)
-      >>= mapM_ removePathForcibly
+      >>= mapM_ remove
+
+    remove :: FileName -> IO ()
+    remove path =
+      do
+        putStrLn $ "Removing: " ++ path
+        removePathForcibly path
 
     writeJSON :: ToJSON a => FileName -> a -> IO ()
     writeJSON path obj =

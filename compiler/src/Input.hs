@@ -37,7 +37,6 @@ import Data.Aeson (FromJSON)
 import System.FilePath (isExtensionOf, dropExtension)
 
 import Files
-import Utils
 
 
 data LoadException = LoadException String ParseException deriving Show
@@ -70,7 +69,7 @@ data Sidecar = Sidecar
 
 readInputTree :: AnchoredFSNode -> IO InputTree
 readInputTree (AnchoredFSNode anchor root@Dir{}) =
-  filterDir (neg isHidden) root & mkDirNode
+  filterDir (not . isHidden) root & mkDirNode
   where
     mkInputNode :: FSNode -> IO (Maybe InputTree)
     mkInputNode (File path@(filename:pathto)) | ".yaml" `isExtensionOf` filename =

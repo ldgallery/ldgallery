@@ -32,7 +32,8 @@ import Data.Maybe (fromMaybe)
 import Data.Aeson (ToJSON, genericToJSON, genericToEncoding)
 import qualified Data.Aeson as JSON
 
-import Utils
+import qualified Data.Set as Set
+
 import Files
 import Input
 import Resource
@@ -121,3 +122,6 @@ buildGalleryTree (DirResource dirItems path@(dirname:_) thumbnailPath) =
   where
     aggregateChildTags :: [GalleryItem] -> [Tag]
     aggregateChildTags = unique . concatMap (\item -> tags (item::GalleryItem))
+
+    unique :: Ord a => [a] -> [a]
+    unique = Set.toList . Set.fromList
