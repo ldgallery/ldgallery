@@ -19,6 +19,7 @@ dependencies:
 - containers
 - filepath
 - directory
+- text
 - aeson
 - yaml
 - optparse-applicative

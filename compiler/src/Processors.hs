@@ -36,6 +36,9 @@ import Control.Exception (throwIO)
 import Data.Function ((&))
 import Data.Ratio ((%))
 
+import GHC.Generics (Generic)
+import Data.Aeson (FromJSON)
+
 import System.Directory hiding (copyFile)
 import qualified System.Directory
 import System.FilePath
@@ -64,7 +67,7 @@ formatFromExt _ = Other
 
 data Resolution = Resolution
   { width :: Int
-  , height :: Int } deriving Show
+  , height :: Int } deriving (Show, Generic, FromJSON)
 
 type FileProcessor =
      FileName        -- ^ Input path
@@ -143,13 +146,6 @@ withCached processor inputPath outputPath =
     noop = return ()
     update = processor inputPath outputPath
     skip = putStrLn $ "Skipping:\t" ++ outputPath
-
-    isOutdated :: FilePath -> FilePath -> IO Bool
-    isOutdated ref target =
-      do
-        refTime <- getModificationTime ref
-        targetTime <- getModificationTime target
-        return (targetTime < refTime)
 
 
 type DirFileProcessor =

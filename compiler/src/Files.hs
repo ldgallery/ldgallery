@@ -26,7 +26,7 @@ module Files
   , (</>), (</), (/>), localPath, webPath
   , FSNode(..), AnchoredFSNode(..)
   , nodePath, nodeName, isHidden, flattenDir, filterDir, readDirectory
-  , ensureParentDir, remove
+  , ensureParentDir, remove, isOutdated
   ) where
 
 
@@ -36,6 +36,8 @@ import Data.List (isPrefixOf, length, deleteBy)
 import Data.Function ((&))
 import System.Directory
   ( doesDirectoryExist
+  , doesPathExist
+  , getModificationTime
   , listDirectory
   , createDirectoryIfMissing
   , removePathForcibly )
@@ -128,3 +130,16 @@ remove path =
   do
     putStrLn $ "Removing:\t" ++ path
     removePathForcibly path
+
+isOutdated :: FilePath -> FilePath -> IO Bool
+isOutdated ref target =
+  do
+    refExists <- doesPathExist ref
+    targetExists <- doesPathExist target
+    if refExists && targetExists then
+      do
+        refTime <- getModificationTime ref
+        targetTime <- getModificationTime target
+        return (targetTime < refTime)
+    else
+      return True

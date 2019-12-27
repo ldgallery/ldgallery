@@ -35,7 +35,19 @@ import Data.Aeson (ToJSON)
 import qualified Data.Aeson as JSON
 
 import Config
-import Files (FileName, readDirectory, localPath, isHidden, nodeName, filterDir, flattenDir, root, (/>), ensureParentDir)
+import Files
+  ( FileName
+  , readDirectory
+  , localPath
+  , isHidden
+  , nodeName
+  , filterDir
+  , flattenDir
+  , root
+  , (/>)
+  , ensureParentDir
+  , isOutdated )
+
 import Input (decodeYamlFile, readInputTree)
 import Resource (ResourceTree, buildResourceTree, cleanupResourceDir)
 import Gallery (buildGalleryTree)
@@ -52,7 +64,10 @@ writeJSON outputPath object =
 compileGallery :: FilePath -> FilePath -> IO ()
 compileGallery inputDirPath outputDirPath =
   do
-    config <- readConfig (inputDirPath </> galleryConf)
+    fullConfig <- readConfig inputGalleryConf
+    let config = compiler fullConfig
+
+    -- TODO: exclude output dir if it's under the input dir
     inputDir <- readDirectory inputDirPath
 
     let isGalleryFile = \n -> nodeName n == galleryConf
@@ -60,20 +75,26 @@ compileGallery inputDirPath outputDirPath =
 
     inputTree <- readInputTree galleryTree
 
+    invalidateCache <- isOutdated inputGalleryConf outputIndex
+    let cache = if invalidateCache then skipCached else withCached
     let dirProc = dirFileProcessor inputDirPath outputDirPath itemsDir
-    let itemProc = itemFileProcessor Nothing skipCached inputDirPath outputDirPath itemsDir
-    let thumbnailProc = thumbnailFileProcessor (Resolution 150 50) skipCached inputDirPath outputDirPath thumbnailsDir
+    let itemProc = itemFileProcessor (pictureMaxResolution config) cache inputDirPath outputDirPath itemsDir
+    let thumbnailProc = thumbnailFileProcessor (thumbnailResolution config) cache inputDirPath outputDirPath thumbnailsDir
     resourceTree <- buildResourceTree dirProc itemProc thumbnailProc inputTree
 
     cleanupResourceDir resourceTree outputDirPath
 
     buildGalleryTree resourceTree
-      & writeJSON (outputDirPath </> "index.json")
+      & writeJSON outputIndex
 
-    viewer config
-      & writeJSON (outputDirPath </> "viewer.json")
+    viewer fullConfig
+      & writeJSON outputViewerConf
 
   where
     galleryConf = "gallery.yaml"
     itemsDir = "items"
     thumbnailsDir = "thumbnails"
+
+    inputGalleryConf = inputDirPath </> galleryConf
+    outputIndex = outputDirPath </> "index.json"
+    outputViewerConf = outputDirPath </> "viewer.json"

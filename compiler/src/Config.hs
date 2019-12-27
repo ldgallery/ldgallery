@@ -20,6 +20,7 @@
     DuplicateRecordFields
   , DeriveGeneric
   , DeriveAnyClass
+  , OverloadedStrings
 #-}
 
 module Config
@@ -29,25 +30,31 @@ module Config
   ) where
 
 
+import Data.Text (Text)
 import GHC.Generics (Generic)
-import Data.Aeson (ToJSON, FromJSON)
+import Data.Aeson (ToJSON, FromJSON, withObject, (.:?), (.!=))
 import qualified Data.Aeson as JSON
 
 import Files (FileName)
 import Input (decodeYamlFile)
+import Processors (Resolution(..))
 
 
 data CompilerConfig = CompilerConfig
-  { dummy :: Maybe String -- TODO
-  } deriving (Generic, FromJSON, Show)
+  { thumbnailResolution :: Resolution
+  , pictureMaxResolution :: Maybe Resolution
+  } deriving (Generic, Show)
+
+instance FromJSON CompilerConfig where
+  parseJSON = withObject "CompilerConfig" $ \v -> CompilerConfig
+    <$> v .:? "thumbnailResolution" .!= (Resolution 400 400)
+    <*> v .:? "pictureMaxResolution"
+
 
 data GalleryConfig = GalleryConfig
   { compiler :: CompilerConfig
   , viewer :: JSON.Object
   } deriving (Generic, FromJSON, Show)
-
--- TODO: add compiler config keys and their default values
-
 
 readConfig :: FileName -> IO GalleryConfig
 readConfig = decodeYamlFile
