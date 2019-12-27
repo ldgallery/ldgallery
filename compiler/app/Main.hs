@@ -29,29 +29,38 @@ import Compiler
 
 data Args = Args
   { inputDir :: String
-  , outputDir :: String }
+  , outputDir :: String
+  , rebuild :: Bool }
 
 args :: Parser Args
 args = Args
   <$> strOption
      ( long "input"
     <> short 'i'
-    <> metavar "INPUT DIR"
+    <> metavar "SOURCE DIR"
+    <> value "./"
+    <> showDefault
     <> help "Gallery source directory" )
   <*> strOption
      ( long "output"
     <> short 'o'
     <> metavar "OUTPUT DIR"
-    <> help "Generated gallery output path, outside of the input directory" )
+    <> value "./out"
+    <> showDefault
+    <> help "Generated gallery output path" )
+  <*> switch
+     ( long "rebuild"
+    <> short 'r'
+    <> help "Invalidate cache and recompile everything" )
 
 main :: IO ()
 main =
   do
     options <- execParser opts
-    compileGallery (inputDir options) (outputDir options)
+    compileGallery (inputDir options) (outputDir options) (rebuild options)
 
   where
     opts = info (args <**> helper)
        ( fullDesc
-      <> progDesc "Compile a picture gallery"
-      <> header "ldgallery - A static generator which turns a collection of tagged pictures into a searchable web gallery.")
+      <> progDesc "Compile a gallery"
+      <> header "ldgallery - a static gallery generator with tags" )

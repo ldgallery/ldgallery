@@ -27,31 +27,33 @@ module Compiler
   ) where
 
 
-import Control.Monad
+import Control.Monad (liftM2)
 import Data.Function ((&))
+import Data.List (any)
 import System.FilePath ((</>))
 
 import Data.Aeson (ToJSON)
 import qualified Data.Aeson as JSON
 
 import Config
-import Files
-  ( FileName
-  , readDirectory
-  , localPath
-  , isHidden
-  , nodeName
-  , filterDir
-  , flattenDir
-  , root
-  , (/>)
-  , ensureParentDir
-  , isOutdated )
-
 import Input (decodeYamlFile, readInputTree)
 import Resource (ResourceTree, buildResourceTree, cleanupResourceDir)
 import Gallery (buildGalleryTree)
+import Files
+  ( FileName
+  , FSNode(..)
+  , readDirectory
+  , isHidden
+  , nodeName
+  , filterDir
+  , ensureParentDir
+  , isOutdated )
 import Processors
+  ( dirFileProcessor
+  , itemFileProcessor
+  , thumbnailFileProcessor
+  , skipCached
+  , withCached )
 
 
 writeJSON :: ToJSON a => FileName -> a -> IO ()
@@ -61,26 +63,21 @@ writeJSON outputPath object =
     ensureParentDir JSON.encodeFile outputPath object
 
 
-compileGallery :: FilePath -> FilePath -> IO ()
-compileGallery inputDirPath outputDirPath =
+compileGallery :: FilePath -> FilePath -> Bool -> IO ()
+compileGallery inputDirPath outputDirPath rebuildAll =
   do
     fullConfig <- readConfig inputGalleryConf
     let config = compiler fullConfig
 
-    -- TODO: exclude output dir if it's under the input dir
     inputDir <- readDirectory inputDirPath
-
-    let isGalleryFile = \n -> nodeName n == galleryConf
-    let galleryTree = filterDir (liftM2 (&&) (not . isGalleryFile) (not . isHidden)) inputDir
-
-    inputTree <- readInputTree galleryTree
+    let sourceTree = filterDir galleryDirFilter inputDir
+    inputTree <- readInputTree sourceTree
 
     invalidateCache <- isOutdated inputGalleryConf outputIndex
-    let cache = if invalidateCache then skipCached else withCached
-    let dirProc = dirFileProcessor inputDirPath outputDirPath itemsDir
-    let itemProc = itemFileProcessor (pictureMaxResolution config) cache inputDirPath outputDirPath itemsDir
-    let thumbnailProc = thumbnailFileProcessor (thumbnailResolution config) cache inputDirPath outputDirPath thumbnailsDir
-    resourceTree <- buildResourceTree dirProc itemProc thumbnailProc inputTree
+    let cache = if invalidateCache || rebuildAll then skipCached else withCached
+    let itemProc = itemProcessor (pictureMaxResolution config) cache
+    let thumbnailProc = thumbnailProcessor (thumbnailResolution config) cache
+    resourceTree <- buildResourceTree dirProcessor itemProc thumbnailProc inputTree
 
     cleanupResourceDir resourceTree outputDirPath
 
@@ -92,9 +89,23 @@ compileGallery inputDirPath outputDirPath =
 
   where
     galleryConf = "gallery.yaml"
+    indexFile = "index.json"
+    viewerConfFile = "viewer.json"
     itemsDir = "items"
     thumbnailsDir = "thumbnails"
 
     inputGalleryConf = inputDirPath </> galleryConf
-    outputIndex = outputDirPath </> "index.json"
-    outputViewerConf = outputDirPath </> "viewer.json"
+    outputIndex = outputDirPath </> indexFile
+    outputViewerConf = outputDirPath </> viewerConfFile
+
+    (&&&) = liftM2 (&&)
+    galleryDirFilter = (not . containsOutputGallery) &&& (not . isConfigFile) &&& (not . isHidden)
+    isConfigFile = (==) galleryConf . nodeName
+    containsOutputGallery (File _) = False
+    containsOutputGallery (Dir _ items) = any ((==) indexFile . nodeName) items
+
+    dirProcessor = dirFileProcessor inputDirPath outputDirPath itemsDir
+    itemProcessor maxRes cache =
+      itemFileProcessor maxRes cache inputDirPath outputDirPath itemsDir
+    thumbnailProcessor thumbRes cache =
+      thumbnailFileProcessor thumbRes cache inputDirPath outputDirPath thumbnailsDir
