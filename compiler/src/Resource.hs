@@ -58,7 +58,6 @@ type DirProcessor = Path -> IO Path
 type ItemProcessor = Path -> IO Path
 type ThumbnailProcessor = Path -> IO (Maybe Path)
 
--- TODO: parallelise this!
 buildResourceTree ::
      DirProcessor -> ItemProcessor -> ThumbnailProcessor -> InputTree
   -> IO ResourceTree
