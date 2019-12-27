@@ -35,6 +35,7 @@ module Processors
 import Control.Exception (throwIO)
 import Data.Function ((&))
 import Data.Ratio ((%))
+import Data.Char (toLower)
 
 import GHC.Generics (Generic)
 import Data.Aeson (FromJSON)
@@ -56,14 +57,16 @@ data Format =
   | Other
 
 formatFromExt :: String -> Format
-formatFromExt ".bmp" = Bmp
-formatFromExt ".jpg" = Jpg
-formatFromExt ".jpeg" = Jpg
-formatFromExt ".png" = Png
-formatFromExt ".tiff" = Tiff
-formatFromExt ".hdr" = Hdr
-formatFromExt ".gif" = Gif
-formatFromExt _ = Other
+formatFromExt = aux . (map toLower)
+  where
+    aux ".bmp" = Bmp
+    aux ".jpg" = Jpg
+    aux ".jpeg" = Jpg
+    aux ".png" = Png
+    aux ".tiff" = Tiff
+    aux ".hdr" = Hdr
+    aux ".gif" = Gif
+    aux _ = Other
 
 data Resolution = Resolution
   { width :: Int
