@@ -29,10 +29,7 @@ module Compiler
 
 import Control.Monad
 import Data.Function ((&))
-import Data.Ord (comparing)
-import Data.List (sortBy, length)
-import System.Directory (createDirectoryIfMissing, removePathForcibly)
-import System.FilePath (dropFileName, (</>))
+import System.FilePath ((</>))
 
 import Data.Aeson (ToJSON)
 import qualified Data.Aeson as JSON
@@ -40,25 +37,25 @@ import qualified Data.Aeson as JSON
 import Config
 import Files (FileName, readDirectory, localPath, isHidden, nodeName, filterDir, flattenDir, root, (/>), ensureParentDir)
 import Input (decodeYamlFile, readInputTree)
-import Resource (ResourceTree, buildResourceTree, outputDiff)
+import Resource (ResourceTree, buildResourceTree, cleanupResourceDir)
 import Gallery (buildGalleryTree)
 import Processors
 
 
-itemsDir :: String
-itemsDir = "items"
-
-thumbnailsDir :: String
-thumbnailsDir = "thumbnails"
+writeJSON :: ToJSON a => FileName -> a -> IO ()
+writeJSON outputPath object =
+  do
+    putStrLn $ "Generating:\t" ++ outputPath
+    ensureParentDir JSON.encodeFile outputPath object
 
 
 compileGallery :: FilePath -> FilePath -> IO ()
 compileGallery inputDirPath outputDirPath =
   do
-    config <- readConfig (inputDirPath </> "gallery.yaml")
+    config <- readConfig (inputDirPath </> galleryConf)
     inputDir <- readDirectory inputDirPath
 
-    let isGalleryFile = \n -> nodeName n == "gallery.yaml"
+    let isGalleryFile = \n -> nodeName n == galleryConf
     let galleryTree = filterDir (liftM2 (&&) (not . isGalleryFile) (not . isHidden)) inputDir
 
     inputTree <- readInputTree galleryTree
@@ -68,10 +65,7 @@ compileGallery inputDirPath outputDirPath =
     let thumbnailProc = thumbnailFileProcessor (Resolution 150 50) skipCached inputDirPath outputDirPath thumbnailsDir
     resourceTree <- buildResourceTree dirProc itemProc thumbnailProc inputTree
 
-    putStrLn "\nRESOURCE TREE"
-    putStrLn (show resourceTree)
-
-    cleanup resourceTree outputDirPath
+    cleanupResourceDir resourceTree outputDirPath
 
     buildGalleryTree resourceTree
       & writeJSON (outputDirPath </> "index.json")
@@ -80,22 +74,6 @@ compileGallery inputDirPath outputDirPath =
       & writeJSON (outputDirPath </> "viewer.json")
 
   where
-    cleanup :: ResourceTree -> FileName -> IO ()
-    cleanup resourceTree outputDir =
-      readDirectory outputDir
-      >>= return . outputDiff resourceTree . root
-      >>= return . sortBy (flip $ comparing length) -- nested files before dirs
-      >>= return . map (localPath . (/>) outputDir)
-      >>= mapM_ remove
-
-    remove :: FileName -> IO ()
-    remove path =
-      do
-        putStrLn $ "Removing: " ++ path
-        removePathForcibly path
-
-    writeJSON :: ToJSON a => FileName -> a -> IO ()
-    writeJSON outputPath object =
-      do
-        putStrLn $ "Generating: " ++ outputPath
-        ensureParentDir JSON.encodeFile outputPath object
+    galleryConf = "gallery.yaml"
+    itemsDir = "items"
+    thumbnailsDir = "thumbnails"

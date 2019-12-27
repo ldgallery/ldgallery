@@ -28,13 +28,13 @@ module Resource
   , ItemProcessor
   , ThumbnailProcessor
   , buildResourceTree
-  , flattenResourceTree
-  , outputDiff
+  , cleanupResourceDir
   ) where
 
 
 import Data.Function ((&))
-import Data.List ((\\), subsequences)
+import Data.List ((\\), subsequences, sortBy)
+import Data.Ord (comparing)
 import Data.Maybe (mapMaybe)
 import Files
 import Input (InputTree(..), Sidecar)
@@ -104,3 +104,11 @@ outputDiff resources ref =
 
     fsPaths :: FSNode -> [Path]
     fsPaths = map nodePath . tail . flattenDir
+
+cleanupResourceDir :: ResourceTree -> FileName -> IO ()
+cleanupResourceDir resourceTree outputDir =
+  readDirectory outputDir
+  >>= return . outputDiff resourceTree . root
+  >>= return . sortBy (flip $ comparing length) -- nested files before dirs
+  >>= return . map (localPath . (/>) outputDir)
+  >>= mapM_ remove

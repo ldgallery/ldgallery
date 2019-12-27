@@ -26,7 +26,7 @@ module Files
   , (</>), (</), (/>), localPath, webPath
   , FSNode(..), AnchoredFSNode(..)
   , nodePath, nodeName, isHidden, flattenDir, filterDir, readDirectory
-  , ensureParentDir
+  , ensureParentDir, remove
   ) where
 
 
@@ -34,7 +34,11 @@ import Control.Monad (filterM, mapM)
 import Data.Bool (bool)
 import Data.List (isPrefixOf, length, deleteBy)
 import Data.Function ((&))
-import System.Directory (doesDirectoryExist, listDirectory, createDirectoryIfMissing)
+import System.Directory
+  ( doesDirectoryExist
+  , listDirectory
+  , createDirectoryIfMissing
+  , removePathForcibly )
 
 import qualified System.FilePath
 import qualified System.FilePath.Posix
@@ -118,3 +122,9 @@ ensureParentDir writer filePath a =
   >> writer filePath a
   where
     parentDir = System.FilePath.dropFileName filePath
+
+remove :: FileName -> IO ()
+remove path =
+  do
+    putStrLn $ "Removing:\t" ++ path
+    removePathForcibly path

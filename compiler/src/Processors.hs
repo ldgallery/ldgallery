@@ -73,7 +73,7 @@ type FileProcessor =
 
 copyFileProcessor :: FileProcessor
 copyFileProcessor inputPath outputPath =
-  (putStrLn $ "Copying: " ++ outputPath)
+  (putStrLn $ "Copying:\t" ++ outputPath)
   >> ensureParentDir (flip System.Directory.copyFile) outputPath inputPath
 
 eitherIOToIO :: Either String (IO a) -> IO a
@@ -99,7 +99,7 @@ type StaticImageWriter = FilePath -> DynamicImage -> IO ()
 
 resizeStaticGeneric :: StaticImageReader -> StaticImageWriter -> Resolution -> FileProcessor
 resizeStaticGeneric reader writer maxRes inputPath outputPath =
-  (putStrLn $ "Generating: " ++ outputPath)
+  (putStrLn $ "Generating:\t" ++ outputPath)
   >>  reader inputPath
   >>= eitherResToIO
   >>= return . (fitDynamicImage maxRes)
@@ -142,7 +142,7 @@ withCached processor inputPath outputPath =
   where
     noop = return ()
     update = processor inputPath outputPath
-    skip = putStrLn $ "Skipping: " ++ outputPath
+    skip = putStrLn $ "Skipping:\t" ++ outputPath
 
     isOutdated :: FilePath -> FilePath -> IO Bool
     isOutdated ref target =
