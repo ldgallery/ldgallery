@@ -68,12 +68,17 @@ Proposed configuration file, named `gallery.yaml` at the root of the source dire
 
 ```yaml
 compiler:
-  # TODO: configuration options to be defined
+  thumbnailResolution:
+    width: 400  # default
+    height: 400 # default
+
+  pictureMaxResolution: # or unspecified to copy files as is
+    width: 1024
+    height: 768
+
   # format normalisation?
-  # image maximum size?
   # item compression?
-  # thumbnail size?
-  # thumbnail generation algorithm?
+
 
 viewer:
   # TODO: configuration options to be defined
