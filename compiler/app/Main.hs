@@ -17,50 +17,42 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 {-# LANGUAGE
-    RecordWildCards
-  , ApplicativeDo
+    DeriveDataTypeable
 #-}
 
 module Main where
 
-import Options.Applicative
-import Data.Semigroup ((<>))
+import Paths_ldgallery_compiler (version)
+import Data.Version (showVersion)
+import System.Console.CmdArgs
 import Compiler
 
-data Args = Args
+
+data Options = Options
   { inputDir :: String
   , outputDir :: String
-  , rebuild :: Bool }
+  , rebuild :: Bool
+  } deriving (Show, Data, Typeable)
 
-args :: Parser Args
-args = Args
-  <$> strOption
-     ( long "input"
-    <> short 'i'
-    <> metavar "SOURCE DIR"
-    <> value "./"
-    <> showDefault
-    <> help "Gallery source directory" )
-  <*> strOption
-     ( long "output"
-    <> short 'o'
-    <> metavar "OUTPUT DIR"
-    <> value "./out"
-    <> showDefault
-    <> help "Generated gallery output path" )
-  <*> switch
-     ( long "rebuild"
-    <> short 'r'
-    <> help "Invalidate cache and recompile everything" )
+options = Options
+  { inputDir = "./"
+      &= typDir
+      &= help "Gallery source directory (default=./)"
+  , outputDir = "./out"
+      &= typDir
+      &= help "Generated gallery output path (default=./out)"
+  , rebuild = False
+      &= help "Invalidate cache and recompile everything"
+  }
+    &= summary ("ldgallery v" ++ (showVersion version) ++ " - a static gallery generator with tags")
+    &= program "ldgallery"
+    &= help "Compile a gallery"
+    &= helpArg [explicit, name "h", name "help"]
+    &= versionArg [explicit, name "v", name "version"]
+
 
 main :: IO ()
 main =
   do
-    options <- execParser opts
-    compileGallery (inputDir options) (outputDir options) (rebuild options)
-
-  where
-    opts = info (args <**> helper)
-       ( fullDesc
-      <> progDesc "Compile a gallery"
-      <> header "ldgallery - a static gallery generator with tags" )
+    opts <- cmdArgs options
+    compileGallery (inputDir opts) (outputDir opts) (rebuild opts)

@@ -22,7 +22,7 @@ dependencies:
 - text
 - aeson
 - yaml
-- optparse-applicative
+- cmdargs
 - JuicyPixels
 - JuicyPixels-extra
 
