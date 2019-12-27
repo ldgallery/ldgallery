@@ -16,7 +16,6 @@ description:         Please see the README on GitHub at <https://github.com/paci
 
 dependencies:
 - base >= 4.7 && < 5
-#- text
 - containers
 - filepath
 - directory
@@ -24,8 +23,8 @@ dependencies:
 - yaml
 #- optparse-applicative
 #- cmdargs
-#- JuicyPixels
-#- JuicyPixels-extra
+- JuicyPixels
+- JuicyPixels-extra
 
 library:
   source-dirs: src

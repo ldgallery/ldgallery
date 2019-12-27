@@ -1,5 +1,3 @@
-{-# LANGUAGE DuplicateRecordFields, DeriveGeneric, DeriveAnyClass #-}
-
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
@@ -18,12 +16,18 @@
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+{-# LANGUAGE
+    DuplicateRecordFields
+  , DeriveGeneric
+  , DeriveAnyClass
+#-}
 
 module Config
   ( GalleryConfig(..)
   , CompilerConfig(..)
   , readConfig
   ) where
+
 
 import GHC.Generics (Generic)
 import Data.Aeson (ToJSON, FromJSON)

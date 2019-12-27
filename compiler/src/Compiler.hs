@@ -1,5 +1,3 @@
-{-# LANGUAGE DuplicateRecordFields, DeriveGeneric, DeriveAnyClass #-}
-
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
@@ -18,12 +16,18 @@
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+{-# LANGUAGE
+    DuplicateRecordFields
+  , DeriveGeneric
+  , DeriveAnyClass
+#-}
 
-module Lib
-  ( testRun
+module Compiler
+  ( compileGallery
   ) where
 
 
+import Control.Monad
 import Data.Function ((&))
 import Data.Ord (comparing)
 import Data.List (sortBy, length)
@@ -34,42 +38,49 @@ import Data.Aeson (ToJSON)
 import qualified Data.Aeson as JSON
 
 import Config
-import Files (FileName, readDirectory, localPath, flattenDir, root, (/>))
+import Files (FileName, readDirectory, localPath, isHidden, nodeName, filterDir, flattenDir, root, (/>), ensureParentDir)
 import Input (decodeYamlFile, readInputTree)
 import Resource (ResourceTree, buildResourceTree, outputDiff)
 import Gallery (buildGalleryTree)
+import Processors
 
 
-process :: FilePath -> FilePath -> IO ()
-process inputDirPath outputDirPath =
+itemsDir :: String
+itemsDir = "items"
+
+thumbnailsDir :: String
+thumbnailsDir = "thumbnails"
+
+
+compileGallery :: FilePath -> FilePath -> IO ()
+compileGallery inputDirPath outputDirPath =
   do
     config <- readConfig (inputDirPath </> "gallery.yaml")
     inputDir <- readDirectory inputDirPath
-    inputTree <- readInputTree inputDir
 
-    let resourceTree = buildResourceTree inputTree
+    let isGalleryFile = \n -> nodeName n == "gallery.yaml"
+    let galleryTree = filterDir (liftM2 (&&) (not . isGalleryFile) (not . isHidden)) inputDir
+
+    inputTree <- readInputTree galleryTree
+
+    let dirProc = dirFileProcessor inputDirPath outputDirPath itemsDir
+    let itemProc = itemFileProcessor Nothing skipCached inputDirPath outputDirPath itemsDir
+    let thumbnailProc = thumbnailFileProcessor (Resolution 150 50) skipCached inputDirPath outputDirPath thumbnailsDir
+    resourceTree <- buildResourceTree dirProc itemProc thumbnailProc inputTree
+
     putStrLn "\nRESOURCE TREE"
     putStrLn (show resourceTree)
 
-    -- TODO: make buildResourceTree build a resource compilation strategy
-    -- (need to know the settings)
-    -- flatten the tree of resources and their strategies
-    -- filter resources that are already up to date
-    --   (or recompile everything if the config file has changed!)
-    -- execute in parallel
-
-    -- TODO: execute (in parallel) the resource compilation strategy list
-    -- need to find a good library for that
-
-    cleanup resourceTree outputDirPath
+    --cleanup resourceTree outputDirPath
 
     buildGalleryTree resourceTree
-      & writeJSON (outputDirPath </> "index.json")
+      & ensureParentDir JSON.encodeFile (outputDirPath </> "index.json")
 
     viewer config
-      & writeJSON (outputDirPath </> "viewer.json")
+      & ensureParentDir JSON.encodeFile (outputDirPath </> "viewer.json")
 
   where
+    -- TODO: delete all files, then only non-empty dirs
     cleanup :: ResourceTree -> FileName -> IO ()
     cleanup resourceTree outputDir =
       readDirectory outputDir
@@ -83,12 +94,3 @@ process inputDirPath outputDirPath =
       do
         putStrLn $ "Removing: " ++ path
         removePathForcibly path
-
-    writeJSON :: ToJSON a => FileName -> a -> IO ()
-    writeJSON path obj =
-      createDirectoryIfMissing True (dropFileName path)
-      >> JSON.encodeFile path obj
-
-
-testRun :: IO ()
-testRun = process "../../example" "../../out"

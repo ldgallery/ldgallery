@@ -1,5 +1,3 @@
-{-# LANGUAGE DuplicateRecordFields, DeriveGeneric, DeriveAnyClass #-}
-
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
@@ -18,6 +16,11 @@
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+{-# LANGUAGE
+    DuplicateRecordFields
+  , DeriveGeneric
+  , DeriveAnyClass
+#-}
 
 module Input
   ( decodeYamlFile
@@ -55,7 +58,7 @@ data InputTree =
       , sidecar :: Sidecar }
     | InputDir
       { path :: Path
-      , thumbnailPath :: Maybe Path
+      , dirThumbnailPath :: Maybe Path
       , items :: [InputTree] }
   deriving Show
 
@@ -68,8 +71,7 @@ data Sidecar = Sidecar
 
 
 readInputTree :: AnchoredFSNode -> IO InputTree
-readInputTree (AnchoredFSNode anchor root@Dir{}) =
-  filterDir (not . isHidden) root & mkDirNode
+readInputTree (AnchoredFSNode anchor root@Dir{}) = mkDirNode root
   where
     mkInputNode :: FSNode -> IO (Maybe InputTree)
     mkInputNode (File path@(filename:pathto)) | ".yaml" `isExtensionOf` filename =

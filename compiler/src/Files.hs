@@ -1,5 +1,3 @@
-{-# LANGUAGE DuplicateRecordFields, DeriveGeneric #-}
-
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
@@ -18,12 +16,17 @@
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+{-# LANGUAGE
+    DuplicateRecordFields
+  , DeriveGeneric
+#-}
 
 module Files
   ( FileName, LocalPath, WebPath, Path
   , (</>), (</), (/>), localPath, webPath
   , FSNode(..), AnchoredFSNode(..)
   , nodePath, nodeName, isHidden, flattenDir, filterDir, readDirectory
+  , ensureParentDir
   ) where
 
 
@@ -31,7 +34,7 @@ import Control.Monad (filterM, mapM)
 import Data.Bool (bool)
 import Data.List (isPrefixOf, length, deleteBy)
 import Data.Function ((&))
-import System.Directory (doesDirectoryExist, listDirectory)
+import System.Directory (doesDirectoryExist, listDirectory, createDirectoryIfMissing)
 
 import qualified System.FilePath
 import qualified System.FilePath.Posix
@@ -79,13 +82,17 @@ isHidden node = "." `isPrefixOf` filename && length filename > 1
 -- | DFS with intermediate dirs first.
 flattenDir :: FSNode -> [FSNode]
 flattenDir file@(File _) = [file]
-flattenDir dir@(Dir _ childs) = dir:(concatMap flattenDir childs)
+flattenDir dir@(Dir _ items) = dir:(concatMap flattenDir items)
 
 -- | Filters a dir tree. The root is always returned.
-filterDir :: (FSNode -> Bool) -> FSNode -> FSNode
-filterDir _ file@(File _) = file
-filterDir cond (Dir path childs) =
-  filter cond childs & map (filterDir cond) & Dir path
+filterDir :: (FSNode -> Bool) -> AnchoredFSNode -> AnchoredFSNode
+filterDir cond (AnchoredFSNode anchor root) =
+  AnchoredFSNode anchor (filterNode root)
+  where
+  filterNode :: FSNode -> FSNode
+  filterNode file@(File _) = file
+  filterNode (Dir path items) =
+    filter cond items & map filterNode & Dir path
 
 readDirectory :: LocalPath -> IO AnchoredFSNode
 readDirectory root = mkNode [] >>= return . AnchoredFSNode root
@@ -103,3 +110,11 @@ readDirectory root = mkNode [] >>= return . AnchoredFSNode root
       (listDirectory $ localPath (root /> path))
       >>= mapM (mkNode . ((</) path))
       >>= return . Dir path
+
+
+ensureParentDir :: (FileName -> a -> IO b) -> FileName -> a -> IO b
+ensureParentDir writer filePath a =
+  createDirectoryIfMissing True parentDir
+  >> writer filePath a
+  where
+    parentDir = System.FilePath.dropFileName filePath

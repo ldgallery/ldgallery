@@ -1,5 +1,3 @@
-{-# LANGUAGE DuplicateRecordFields, DeriveGeneric, DeriveAnyClass #-}
-
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
@@ -18,6 +16,11 @@
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+{-# LANGUAGE
+    DuplicateRecordFields
+  , DeriveGeneric
+  , DeriveAnyClass
+#-}
 
 module Gallery
   ( GalleryItem(..), buildGalleryTree
@@ -94,20 +97,20 @@ instance ToJSON GalleryItem where
 
 
 buildGalleryTree :: ResourceTree -> GalleryItem
-buildGalleryTree (ItemResource sidecar path@(filename:_) thumbnailPath) =
+buildGalleryTree (ItemResource sidecar path@(filename:_) thumbnail) =
   GalleryItem
     { title = optMeta title filename
     , date = optMeta date "" -- TODO: check and normalise dates
     , description = optMeta description ""
     , tags = optMeta tags []
     , path = webPath path
-    , thumbnail = Just $ webPath thumbnailPath
+    , thumbnail = fmap webPath thumbnail
     , properties = Unknown } -- TODO
   where
     optMeta :: (Sidecar -> Maybe a) -> a -> a
     optMeta get fallback = fromMaybe fallback $ get sidecar
 
-buildGalleryTree (DirResource dirItems path@(dirname:_) thumbnailPath) =
+buildGalleryTree (DirResource dirItems path@(dirname:_) thumbnail) =
   map buildGalleryTree dirItems
   & \items -> GalleryItem
     { title = dirname
@@ -117,7 +120,7 @@ buildGalleryTree (DirResource dirItems path@(dirname:_) thumbnailPath) =
     , description = ""
     , tags = aggregateChildTags items
     , path = webPath path
-    , thumbnail = fmap webPath thumbnailPath
+    , thumbnail = fmap webPath thumbnail
     , properties = Directory items }
   where
     aggregateChildTags :: [GalleryItem] -> [Tag]

@@ -1,5 +1,3 @@
-{-# LANGUAGE DuplicateRecordFields, DeriveGeneric, DeriveAnyClass #-}
-
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
@@ -18,9 +16,17 @@
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+{-# LANGUAGE
+    DuplicateRecordFields
+  , DeriveGeneric
+  , DeriveAnyClass
+#-}
 
 module Resource
   ( ResourceTree(..)
+  , DirProcessor
+  , ItemProcessor
+  , ThumbnailProcessor
   , buildResourceTree
   , flattenResourceTree
   , outputDiff
@@ -29,8 +35,9 @@ module Resource
 
 import Data.Function ((&))
 import Data.List ((\\))
+import Data.Maybe (mapMaybe)
 import Files
-import Input
+import Input (InputTree(..), Sidecar)
 
 
 -- | Tree representing the compiled gallery resources.
@@ -38,33 +45,46 @@ data ResourceTree =
     ItemResource
       { sidecar :: Sidecar
       , resPath :: Path
-      , itemThumbnailPath :: Path }
+      , thumbnailPath :: Maybe Path }
   | DirResource
       { items :: [ResourceTree]
       , resPath :: Path
-      , dirThumbnailPath :: Maybe Path }
+      , thumbnailPath :: Maybe Path }
   deriving Show
 
 
--- TODO: actually generate compilation strategies
-buildResourceTree :: InputTree -> ResourceTree
-buildResourceTree = resNode
+type DirProcessor = Path -> IO Path
+type ItemProcessor = Path -> IO Path
+type ThumbnailProcessor = Path -> IO (Maybe Path)
+
+-- TODO: parallelise this!
+buildResourceTree ::
+     DirProcessor -> ItemProcessor -> ThumbnailProcessor -> InputTree
+  -> IO ResourceTree
+buildResourceTree processDir processItem processThumbnail = resNode
   where
     resNode (InputFile path sidecar) =
-      ItemResource
-        { sidecar = sidecar
-        , resPath = itemsDir /> path
-        , itemThumbnailPath = thumbnailsDir /> path }
+      do
+        processedItem <- processItem path
+        processedThumbnail <- processThumbnail path
+        return ItemResource
+          { sidecar = sidecar
+          , resPath = processedItem
+          , thumbnailPath = processedThumbnail }
 
     resNode (InputDir path thumbnailPath items) =
-      map resNode items
-      & \dirItems -> DirResource
-        { items = dirItems
-        , resPath = itemsDir /> path
-        , dirThumbnailPath = fmap ((/>) thumbnailsDir) thumbnailPath }
+      do
+        processedDir <- processDir path
+        processedThumbnail <- maybeThumbnail thumbnailPath
+        dirItems <- mapM resNode items
+        return DirResource
+          { items = dirItems
+          , resPath = processedDir
+          , thumbnailPath = processedThumbnail }
 
-    itemsDir = "items"
-    thumbnailsDir = "thumbnails"
+    maybeThumbnail :: Maybe Path -> IO (Maybe Path)
+    maybeThumbnail Nothing = return Nothing
+    maybeThumbnail (Just path) = processThumbnail path
 
 
 flattenResourceTree :: ResourceTree -> [ResourceTree]
@@ -72,12 +92,11 @@ flattenResourceTree item@ItemResource{} = [item]
 flattenResourceTree dir@(DirResource items _ _) =
   dir:(concatMap flattenResourceTree items)
 
-
 outputDiff :: ResourceTree -> FSNode -> [Path]
-outputDiff resources ref = (fsPaths ref) \\ (resPaths resources)
+outputDiff resources ref = (fsPaths ref) \\ (resPaths $ flattenResourceTree resources)
   where
-    resPaths :: ResourceTree -> [Path]
-    resPaths = map resPath . flattenResourceTree
+    resPaths :: [ResourceTree] -> [Path]
+    resPaths resList = (map resPath resList) ++ (mapMaybe thumbnailPath resList)
 
     fsPaths :: FSNode -> [Path]
     fsPaths = map nodePath . tail . flattenDir
