@@ -17,14 +17,41 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 {-# LANGUAGE
-    DuplicateRecordFields
-  , DeriveGeneric
-  , DeriveAnyClass
+    RecordWildCards
+  , ApplicativeDo
 #-}
 
 module Main where
 
+import Options.Applicative
+import Data.Semigroup ((<>))
 import Compiler
 
+data Args = Args
+  { inputDir :: String
+  , outputDir :: String }
+
+args :: Parser Args
+args = Args
+  <$> strOption
+     ( long "input"
+    <> short 'i'
+    <> metavar "INPUT DIR"
+    <> help "Gallery source directory" )
+  <*> strOption
+     ( long "output"
+    <> short 'o'
+    <> metavar "OUTPUT DIR"
+    <> help "Generated gallery output path, outside of the input directory" )
+
 main :: IO ()
-main = compileGallery "../../example" "../../out"
+main =
+  do
+    options <- execParser opts
+    compileGallery (inputDir options) (outputDir options)
+
+  where
+    opts = info (args <**> helper)
+       ( fullDesc
+      <> progDesc "Compile a picture gallery"
+      <> header "ldgallery - A static generator which turns a collection of tagged pictures into a searchable web gallery.")

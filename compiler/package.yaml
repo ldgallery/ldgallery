@@ -21,8 +21,7 @@ dependencies:
 - directory
 - aeson
 - yaml
-#- optparse-applicative
-#- cmdargs
+- optparse-applicative
 - JuicyPixels
 - JuicyPixels-extra
 
