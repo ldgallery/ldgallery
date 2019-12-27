@@ -25,6 +25,7 @@ dependencies:
 - cmdargs
 - JuicyPixels
 - JuicyPixels-extra
+- parallel-io
 
 library:
   source-dirs: src

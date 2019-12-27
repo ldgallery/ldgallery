@@ -32,6 +32,7 @@ module Resource
   ) where
 
 
+import Control.Concurrent.ParallelIO.Global (parallel)
 import Data.Function ((&))
 import Data.List ((\\), subsequences, sortBy)
 import Data.Ord (comparing)
@@ -76,7 +77,7 @@ buildResourceTree processDir processItem processThumbnail = resNode
       do
         processedDir <- processDir path
         processedThumbnail <- maybeThumbnail thumbnailPath
-        dirItems <- mapM resNode items
+        dirItems <- parallel $ map resNode items
         return DirResource
           { items = dirItems
           , resPath = processedDir
