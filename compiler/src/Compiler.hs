@@ -71,16 +71,15 @@ compileGallery inputDirPath outputDirPath =
     putStrLn "\nRESOURCE TREE"
     putStrLn (show resourceTree)
 
-    --cleanup resourceTree outputDirPath
+    cleanup resourceTree outputDirPath
 
     buildGalleryTree resourceTree
-      & ensureParentDir JSON.encodeFile (outputDirPath </> "index.json")
+      & writeJSON (outputDirPath </> "index.json")
 
     viewer config
-      & ensureParentDir JSON.encodeFile (outputDirPath </> "viewer.json")
+      & writeJSON (outputDirPath </> "viewer.json")
 
   where
-    -- TODO: delete all files, then only non-empty dirs
     cleanup :: ResourceTree -> FileName -> IO ()
     cleanup resourceTree outputDir =
       readDirectory outputDir
@@ -94,3 +93,9 @@ compileGallery inputDirPath outputDirPath =
       do
         putStrLn $ "Removing: " ++ path
         removePathForcibly path
+
+    writeJSON :: ToJSON a => FileName -> a -> IO ()
+    writeJSON outputPath object =
+      do
+        putStrLn $ "Generating: " ++ outputPath
+        ensureParentDir JSON.encodeFile outputPath object

@@ -34,7 +34,7 @@ module Resource
 
 
 import Data.Function ((&))
-import Data.List ((\\))
+import Data.List ((\\), subsequences)
 import Data.Maybe (mapMaybe)
 import Files
 import Input (InputTree(..), Sidecar)
@@ -93,10 +93,14 @@ flattenResourceTree dir@(DirResource items _ _) =
   dir:(concatMap flattenResourceTree items)
 
 outputDiff :: ResourceTree -> FSNode -> [Path]
-outputDiff resources ref = (fsPaths ref) \\ (resPaths $ flattenResourceTree resources)
+outputDiff resources ref =
+  (fsPaths ref) \\ (resPaths $ flattenResourceTree resources)
   where
     resPaths :: [ResourceTree] -> [Path]
-    resPaths resList = (map resPath resList) ++ (mapMaybe thumbnailPath resList)
+    resPaths resList = map resPath resList ++ thumbnailPaths resList
+
+    thumbnailPaths :: [ResourceTree] -> [Path]
+    thumbnailPaths = (concatMap subsequences) . (mapMaybe thumbnailPath)
 
     fsPaths :: FSNode -> [Path]
     fsPaths = map nodePath . tail . flattenDir
