@@ -44,6 +44,10 @@ export default class GalleryStore extends VuexModule {
     // Pushes all tags for a root item (and its children) to the index
     private static pushTagsForItem(index: Tag.Index, item: Gallery.Item) {
         console.log("IndexingTagsFor: ", item.path);
+        if (item.properties.type === "directory") {
+            item.properties.items.forEach(item => this.pushTagsForItem(index, item));
+            return; // Directories are not indexed
+        }
         for (const tag of item.tags) {
             const parts = tag.split('.');
             let lastPart: string | null = null;
@@ -54,8 +58,6 @@ export default class GalleryStore extends VuexModule {
                 lastPart = part;
             }
         }
-        if (item.properties.type === "directory")
-            item.properties.items.forEach(item => this.pushTagsForItem(index, item));
     }
 
     // Searches for an item by path from a root item (navigation)

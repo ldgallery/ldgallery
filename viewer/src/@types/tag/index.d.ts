@@ -1,6 +1,6 @@
 declare namespace Tag {
     interface Node {
-        tag: string;
+        tag: Gallery.RawTag;
         items: Gallery.Item[];
         children: Index;
     }

@@ -9,7 +9,7 @@ declare namespace Gallery {
         title: string,
         date: string,
         description: string,
-        tags: string[],
+        tags: RawTag[],
         path: string,
         thumbnail: {
             path: string,
@@ -28,4 +28,5 @@ declare namespace Gallery {
         type: "directory",
         items: Item[]
     }
+    type RawTag = string;
 }

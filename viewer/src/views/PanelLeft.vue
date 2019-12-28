@@ -4,6 +4,8 @@
     <ld-mode-radio />
     <h1>{{$t('panelLeft.filters')}}</h1>
     <ld-tag-input />
+    <h1>{{$t('panelLeft.propositions')}}</h1>
+    <ld-proposition />
   </div>
 </template>
 

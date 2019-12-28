@@ -6,7 +6,9 @@ import {
     faExpandArrowsAlt,
     faFolder,
     faSearch,
-    faTag
+    faTag,
+    faPlus,
+    faMinus,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -14,6 +16,8 @@ library.add(
     faFolder,
     faSearch,
     faTag,
+    faPlus,
+    faMinus,
 );
 
 Vue.component("fa-icon", FontAwesomeIcon);

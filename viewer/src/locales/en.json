@@ -5,5 +5,6 @@
   "panelLeft.mode": "Mode",
   "mode.navigation": "Navigation",
   "mode.search": "Search",
-  "search.no-results": "No results"
+  "search.no-results": "No results",
+  "panelLeft.propositions": "Proposed tags"
 }
