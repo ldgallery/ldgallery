@@ -23,7 +23,7 @@
 #-}
 
 module Gallery
-  ( GalleryItem(..), buildGalleryTree
+  ( GalleryItem(..), buildGallery
   ) where
 
 
@@ -128,3 +128,7 @@ buildGalleryTree (DirResource dirItems path@(dirname:_) thumbnail) =
 
     unique :: Ord a => [a] -> [a]
     unique = Set.toList . Set.fromList
+
+buildGallery :: String -> ResourceTree -> GalleryItem
+buildGallery galleryName resourceTree =
+  (buildGalleryTree resourceTree) { title = galleryName }

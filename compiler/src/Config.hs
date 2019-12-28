@@ -41,13 +41,15 @@ import Processors (Resolution(..))
 
 
 data CompilerConfig = CompilerConfig
-  { thumbnailResolution :: Resolution
+  { galleryName :: String
+  , thumbnailResolution :: Resolution
   , pictureMaxResolution :: Maybe Resolution
   } deriving (Generic, Show)
 
 instance FromJSON CompilerConfig where
   parseJSON = withObject "CompilerConfig" $ \v -> CompilerConfig
-    <$> v .:? "thumbnailResolution" .!= (Resolution 400 400)
+    <$> v .:? "galleryName" .!= "Gallery"
+    <*> v .:? "thumbnailResolution" .!= (Resolution 400 400)
     <*> v .:? "pictureMaxResolution"
 
 

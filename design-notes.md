@@ -68,6 +68,8 @@ Proposed configuration file, named `gallery.yaml` at the root of the source dire
 
 ```yaml
 compiler:
+  galleryName: My Little Gallery
+
   thumbnailResolution:
     width: 400  # default
     height: 400 # default

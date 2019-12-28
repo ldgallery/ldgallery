@@ -38,7 +38,7 @@ import qualified Data.Aeson as JSON
 import Config
 import Input (decodeYamlFile, readInputTree)
 import Resource (ResourceTree, buildResourceTree, cleanupResourceDir)
-import Gallery (buildGalleryTree)
+import Gallery (buildGallery)
 import Files
   ( FileName
   , FSNode(..)
@@ -81,7 +81,7 @@ compileGallery inputDirPath outputDirPath rebuildAll =
 
     cleanupResourceDir resourceTree outputDirPath
 
-    buildGalleryTree resourceTree
+    buildGallery (galleryName config) resourceTree
       & writeJSON outputIndex
 
     viewer fullConfig
