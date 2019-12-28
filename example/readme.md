@@ -16,6 +16,6 @@ Content
 │   ├── _DSC5475.jpg.yaml
 │   ├── _DSC5542.jpg
 │   └── _DSC5542.jpg.yaml
-├── index.json               -- reference gallery index file
+├── gallery.yaml             -- gallery settings file
 └── readme.md                -- this README
 ```
