@@ -69,13 +69,21 @@ data Sidecar = Sidecar
   , tags :: Maybe [String]
   } deriving (Generic, FromJSON, Show)
 
+emptySidecar :: Sidecar
+emptySidecar = Sidecar
+  { title = Nothing
+  , date = Nothing
+  , description = Nothing
+  , tags = Nothing }
+
 
 readInputTree :: AnchoredFSNode -> IO InputTree
 readInputTree (AnchoredFSNode anchor root@Dir{}) = mkDirNode root
   where
     mkInputNode :: FSNode -> IO (Maybe InputTree)
     mkInputNode (File path@(filename:pathto)) | ".yaml" `isExtensionOf` filename =
-      decodeYamlFile (localPath $ anchor /> path)
+      (decodeYamlFile (localPath $ anchor /> path) :: IO (Maybe Sidecar))
+      >>= return . maybe emptySidecar id
       >>= return . InputFile ((dropExtension filename):pathto)
       >>= return . Just
     mkInputNode File{} = return Nothing
