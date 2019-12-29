@@ -32,7 +32,7 @@ module Processors
   ) where
 
 
-import Control.Exception (throwIO)
+import Control.Exception (Exception, throwIO)
 import Data.Function ((&))
 import Data.Ratio ((%))
 import Data.Char (toLower)
@@ -50,6 +50,9 @@ import Codec.Picture.Extra -- TODO: compare DCT and bilinear (and Lanczos, but i
 import Resource
 import Files
 
+
+data ProcessingException = ProcessingException FilePath String deriving Show
+instance Exception ProcessingException
 
 data Format =
     Bmp | Jpg | Png | Tiff | Hdr -- static images
@@ -82,14 +85,6 @@ copyFileProcessor inputPath outputPath =
   (putStrLn $ "Copying:\t" ++ outputPath)
   >> ensureParentDir (flip System.Directory.copyFile) outputPath inputPath
 
-eitherIOToIO :: Either String (IO a) -> IO a
-eitherIOToIO (Left err) = throwIO $ userError err
-eitherIOToIO (Right res) = res
-
-eitherResToIO :: Either String a -> IO a
-eitherResToIO (Left err) = throwIO $ userError err
-eitherResToIO (Right res) = return res
-
 resizeStaticImageUpTo :: Format -> Resolution -> FileProcessor
 resizeStaticImageUpTo Bmp = resizeStaticGeneric readBitmap saveBmpImage
 -- TODO: parameterise export quality for jpg
@@ -97,7 +92,12 @@ resizeStaticImageUpTo Jpg = resizeStaticGeneric readJpeg (saveJpgImage 80)
 resizeStaticImageUpTo Png = resizeStaticGeneric readPng savePngImage
 resizeStaticImageUpTo Tiff = resizeStaticGeneric readTiff saveTiffImage
 resizeStaticImageUpTo Hdr = resizeStaticGeneric readHDR saveRadianceImage
-resizeStaticImageUpTo Gif = resizeStaticGeneric readGif ((.) eitherIOToIO . saveGifImage)
+resizeStaticImageUpTo Gif = resizeStaticGeneric readGif writeGifImage
+  where
+    writeGifImage :: StaticImageWriter
+    writeGifImage outputPath image =
+      saveGifImage outputPath image
+      & either (throwIO . ProcessingException outputPath) id
 
 
 type StaticImageReader = FilePath -> IO (Either String DynamicImage)
@@ -107,7 +107,7 @@ resizeStaticGeneric :: StaticImageReader -> StaticImageWriter -> Resolution -> F
 resizeStaticGeneric reader writer maxRes inputPath outputPath =
   (putStrLn $ "Generating:\t" ++ outputPath)
   >>  reader inputPath
-  >>= eitherResToIO
+  >>= either (throwIO . ProcessingException inputPath) return
   >>= return . (fitDynamicImage maxRes)
   >>= ensureParentDir writer outputPath
 
