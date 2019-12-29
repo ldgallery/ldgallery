@@ -73,7 +73,7 @@ compileGallery inputDirPath outputDirPath rebuildAll =
     let sourceTree = filterDir galleryDirFilter inputDir
     inputTree <- readInputTree sourceTree
 
-    invalidateCache <- isOutdated inputGalleryConf outputIndex
+    invalidateCache <- isOutdated False inputGalleryConf outputIndex
     let cache = if invalidateCache || rebuildAll then skipCached else withCached
     let itemProc = itemProcessor (pictureMaxResolution config) cache
     let thumbnailProc = thumbnailProcessor (thumbnailResolution config) cache

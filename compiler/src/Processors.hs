@@ -140,7 +140,7 @@ withCached processor inputPath outputPath =
     fileExists <- doesFileExist outputPath
     if fileExists then
       do
-        needUpdate <- isOutdated inputPath outputPath
+        needUpdate <- isOutdated True inputPath outputPath
         if needUpdate then update else skip
     else
       update

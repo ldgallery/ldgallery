@@ -131,8 +131,8 @@ remove path =
     putStrLn $ "Removing:\t" ++ path
     removePathForcibly path
 
-isOutdated :: FilePath -> FilePath -> IO Bool
-isOutdated ref target =
+isOutdated :: Bool -> FilePath -> FilePath -> IO Bool
+isOutdated onMissingTarget ref target =
   do
     refExists <- doesPathExist ref
     targetExists <- doesPathExist target
@@ -142,4 +142,4 @@ isOutdated ref target =
         targetTime <- getModificationTime target
         return (targetTime < refTime)
     else
-      return True
+      return onMissingTarget
