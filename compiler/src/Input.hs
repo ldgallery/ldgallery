@@ -34,10 +34,12 @@ import Control.Exception (Exception, throwIO)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Function ((&))
 import Data.Maybe (mapMaybe, catMaybes)
+import Data.Bool (bool)
 import Data.List (find)
 import Data.Yaml (ParseException, decodeFileEither)
 import Data.Aeson (FromJSON)
 import System.FilePath (isExtensionOf, dropExtension)
+import System.Directory (doesFileExist)
 
 import Files
 
@@ -76,15 +78,23 @@ emptySidecar = Sidecar
   , description = Nothing
   , tags = Nothing }
 
+sidecarExt :: String
+sidecarExt = "yaml"
+
+readSidecarFile :: FilePath -> IO Sidecar
+readSidecarFile filepath =
+  doesFileExist filepath
+  >>= bool (return Nothing) (decodeYamlFile filepath)
+  >>= return . maybe emptySidecar id
+
 
 readInputTree :: AnchoredFSNode -> IO InputTree
 readInputTree (AnchoredFSNode anchor root@Dir{}) = mkDirNode root
   where
     mkInputNode :: FSNode -> IO (Maybe InputTree)
-    mkInputNode (File path@(filename:pathto)) | ".yaml" `isExtensionOf` filename =
-      (decodeYamlFile (localPath $ anchor /> path) :: IO (Maybe Sidecar))
-      >>= return . maybe emptySidecar id
-      >>= return . InputFile ((dropExtension filename):pathto)
+    mkInputNode (File path@(filename:_)) | not (sidecarExt `isExtensionOf` filename) =
+      readSidecarFile (localPath $ anchor /> path <.> sidecarExt)
+      >>= return . InputFile path
       >>= return . Just
     mkInputNode File{} = return Nothing
     mkInputNode dir@Dir{} = mkDirNode dir >>= return . Just

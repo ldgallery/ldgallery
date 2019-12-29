@@ -23,7 +23,7 @@
 
 module Files
   ( FileName, LocalPath, WebPath, Path
-  , (</>), (</), (/>), localPath, webPath
+  , (</>), (</), (/>), (<.>), localPath, webPath
   , FSNode(..), AnchoredFSNode(..)
   , nodePath, nodeName, isHidden, flattenDir, filterDir, readDirectory
   , ensureParentDir, remove, isOutdated
@@ -61,6 +61,9 @@ path </ file = file:path
 
 (/>) :: FileName -> Path -> Path
 file /> path = path ++ [file]
+
+(<.>) :: Path -> String -> Path
+(filename:pathto) <.> ext = System.FilePath.addExtension filename ext : pathto
 
 localPath :: Path -> LocalPath
 localPath = System.FilePath.joinPath . reverse
