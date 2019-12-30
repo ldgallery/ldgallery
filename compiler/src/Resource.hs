@@ -100,7 +100,7 @@ outputDiff resources ref =
     resPaths resList = map resPath resList ++ thumbnailPaths resList
 
     thumbnailPaths :: [ResourceTree] -> [Path]
-    thumbnailPaths = (concatMap subsequences) . (mapMaybe thumbnailPath)
+    thumbnailPaths = (concatMap subPaths) . (mapMaybe thumbnailPath)
 
     fsPaths :: FSNode -> [Path]
     fsPaths = map nodePath . tail . flattenDir
@@ -109,6 +109,6 @@ cleanupResourceDir :: ResourceTree -> FileName -> IO ()
 cleanupResourceDir resourceTree outputDir =
   readDirectory outputDir
   >>= return . outputDiff resourceTree . root
-  >>= return . sortBy (flip $ comparing length) -- nested files before dirs
+  >>= return . sortBy (flip $ comparing pathLength) -- nested files before dirs
   >>= return . map (localPath . (/>) outputDir)
   >>= mapM_ remove

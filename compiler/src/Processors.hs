@@ -59,8 +59,8 @@ data Format =
   | Gif -- TODO: might be animated
   | Other
 
-formatFromExt :: String -> Format
-formatFromExt = aux . (map toLower)
+formatFromPath :: Path -> Format
+formatFromPath = aux . (map toLower) . fileName
   where
     aux ".bmp" = Bmp
     aux ".jpg" = Jpg
@@ -169,10 +169,9 @@ type ItemFileProcessor =
 
 itemFileProcessor :: Maybe Resolution -> Cache -> ItemFileProcessor
 itemFileProcessor maxRes cached inputBase outputBase resClass inputRes =
-  cached (processor maxRes (extOf inputRes)) inPath outPath
+  cached (processor maxRes (formatFromPath inputRes)) inPath outPath
   >> return relOutPath
   where
-    extOf = formatFromExt . takeExtension . head
     relOutPath = resClass /> inputRes
     inPath = localPath $ inputBase /> inputRes
     outPath = localPath $ outputBase /> relOutPath
@@ -196,10 +195,9 @@ type ThumbnailFileProcessor =
 
 thumbnailFileProcessor :: Resolution -> Cache -> ThumbnailFileProcessor
 thumbnailFileProcessor maxRes cached inputBase outputBase resClass inputRes =
-  cached <$> processor (extOf inputRes)
+  cached <$> processor (formatFromPath inputRes)
   & process
   where
-    extOf = formatFromExt . takeExtension . head
     relOutPath = resClass /> inputRes
     inPath = localPath $ inputBase /> inputRes
     outPath = localPath $ outputBase /> relOutPath

@@ -86,8 +86,8 @@ data GalleryItem = GalleryItem
   , date :: String -- TODO: checked ISO8601 date
   , description :: String
   , tags :: [Tag]
-  , path :: ResourcePath
-  , thumbnail :: Maybe ResourcePath
+  , path :: Path
+  , thumbnail :: Maybe Path
   , properties :: GalleryItemProps
   } deriving (Generic, Show)
 
@@ -97,30 +97,30 @@ instance ToJSON GalleryItem where
 
 
 buildGalleryTree :: ResourceTree -> GalleryItem
-buildGalleryTree (ItemResource sidecar path@(filename:_) thumbnail) =
+buildGalleryTree (ItemResource sidecar path thumbnail) =
   GalleryItem
-    { title = optMeta title filename
+    { title = optMeta title $ fileName path
     , date = optMeta date "" -- TODO: check and normalise dates
     , description = optMeta description ""
     , tags = optMeta tags []
-    , path = webPath path
-    , thumbnail = fmap webPath thumbnail
+    , path = path
+    , thumbnail = thumbnail
     , properties = Unknown } -- TODO
   where
     optMeta :: (Sidecar -> Maybe a) -> a -> a
     optMeta get fallback = fromMaybe fallback $ get sidecar
 
-buildGalleryTree (DirResource dirItems path@(dirname:_) thumbnail) =
+buildGalleryTree (DirResource dirItems path thumbnail) =
   map buildGalleryTree dirItems
   & \items -> GalleryItem
-    { title = dirname
+    { title = fileName path
       -- TODO: consider using the most recent item's date? what if empty?
     , date = ""
       -- TODO: consider allowing metadata sidecars for directories too
     , description = ""
     , tags = aggregateChildTags items
-    , path = webPath path
-    , thumbnail = fmap webPath thumbnail
+    , path = path
+    , thumbnail = thumbnail
     , properties = Directory items }
   where
     aggregateChildTags :: [GalleryItem] -> [Tag]

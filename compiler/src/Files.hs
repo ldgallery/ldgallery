@@ -23,7 +23,8 @@
 
 module Files
   ( FileName, LocalPath, WebPath, Path
-  , (</>), (</), (/>), (<.>), localPath, webPath
+  , (</>), (</), (/>), (<.>), fileName, subPaths, pathLength
+  , localPath, webPath
   , FSNode(..), AnchoredFSNode(..)
   , nodePath, nodeName, isHidden, flattenDir, filterDir, readDirectory
   , ensureParentDir, remove, isOutdated
@@ -32,8 +33,12 @@ module Files
 
 import Control.Monad (filterM, mapM)
 import Data.Bool (bool)
-import Data.List (isPrefixOf, length, deleteBy)
+import Data.List (isPrefixOf, length, deleteBy, subsequences)
 import Data.Function ((&))
+import Data.Text (pack)
+import Data.Aeson (ToJSON)
+import qualified Data.Aeson as JSON
+
 import System.Directory
   ( doesDirectoryExist
   , doesPathExist
@@ -51,25 +56,41 @@ type LocalPath = String
 type WebPath = String
 
  -- | Reversed path component list
-type Path = [FileName]
+data Path = Path [FileName] deriving Show
+
+instance ToJSON Path where
+  toJSON = JSON.String . pack . webPath
+
+instance Eq Path where
+  (Path left) == (Path right) = left == right
 
 (</>) :: Path -> Path -> Path
-l </> r = r ++ l
+(Path l) </> (Path r) = Path (r ++ l)
 
 (</) :: Path -> FileName -> Path
-path </ file = file:path
+(Path path) </ file = Path (file:path)
 
 (/>) :: FileName -> Path -> Path
-file /> path = path ++ [file]
+file /> (Path path) = Path (path ++ [file])
 
 (<.>) :: Path -> String -> Path
-(filename:pathto) <.> ext = System.FilePath.addExtension filename ext : pathto
+(Path (filename:pathto)) <.> ext =
+  Path $ System.FilePath.addExtension filename ext : pathto
+
+fileName :: Path -> FileName
+fileName (Path (name:_)) = name
+
+subPaths :: Path -> [Path]
+subPaths (Path path) = map (Path . subsequences) path
+
+pathLength :: Path -> Int
+pathLength (Path path) = Data.List.length path
 
 localPath :: Path -> LocalPath
-localPath = System.FilePath.joinPath . reverse
+localPath (Path path) = System.FilePath.joinPath $ reverse path
 
 webPath :: Path -> WebPath
-webPath = System.FilePath.Posix.joinPath . reverse
+webPath (Path path) = System.FilePath.Posix.joinPath $ reverse path
 
 
 data FSNode = File Path | Dir Path [FSNode] deriving Show
@@ -82,10 +103,10 @@ nodePath (File path) = path
 nodePath (Dir path _) = path
 
 nodeName :: FSNode -> FileName
-nodeName = head . nodePath
+nodeName = fileName . nodePath
 
 isHidden :: FSNode -> Bool
-isHidden node = "." `isPrefixOf` filename && length filename > 1
+isHidden node = "." `isPrefixOf` filename &&length filename > 1
   where filename = nodeName node
 
 -- | DFS with intermediate dirs first.
@@ -104,7 +125,7 @@ filterDir cond (AnchoredFSNode anchor root) =
     filter cond items & map filterNode & Dir path
 
 readDirectory :: LocalPath -> IO AnchoredFSNode
-readDirectory root = mkNode [] >>= return . AnchoredFSNode root
+readDirectory root = mkNode (Path []) >>= return . AnchoredFSNode root
   where
     mkNode :: Path -> IO FSNode
     mkNode path =
