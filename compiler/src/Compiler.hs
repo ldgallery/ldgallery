@@ -37,7 +37,7 @@ import qualified Data.Aeson as JSON
 
 import Config
 import Input (decodeYamlFile, readInputTree)
-import Resource (GalleryItem, buildGalleryTree, galleryCleanupResourceDir)
+import Resource (buildGalleryTree, galleryCleanupResourceDir)
 import Files
   ( FileName
   , FSNode(..)
@@ -48,11 +48,8 @@ import Files
   , ensureParentDir
   , isOutdated )
 import Processors
-  ( dirFileProcessor
-  , itemFileProcessor
-  , thumbnailFileProcessor
-  , skipCached
-  , withCached )
+  ( dirFileProcessor, itemFileProcessor, thumbnailFileProcessor
+  , skipCached, withCached )
 
 
 writeJSON :: ToJSON a => FileName -> a -> IO ()

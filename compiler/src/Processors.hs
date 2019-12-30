@@ -45,6 +45,9 @@ import Codec.Picture
 import Codec.Picture.Extra -- TODO: compare DCT and bilinear (and Lanczos, but it's not implemented)
 
 import Resource
+  ( DirProcessor, ItemProcessor, ThumbnailProcessor
+  , GalleryItemProps(..), Resolution(..) )
+
 import Files
 
 
@@ -54,7 +57,7 @@ instance Exception ProcessingException
 data Format =
     Bmp | Jpg | Png | Tiff | Hdr -- static images
   | Gif -- TODO: might be animated
-  | Other
+  | Unknown
 
 formatFromPath :: Path -> Format
 formatFromPath = aux . (map toLower) . takeExtension . fileName
@@ -66,7 +69,7 @@ formatFromPath = aux . (map toLower) . takeExtension . fileName
     aux ".tiff" = Tiff
     aux ".hdr" = Hdr
     aux ".gif" = Gif
-    aux _ = Other
+    aux _ = Unknown
 
 
 type FileProcessor =
@@ -163,22 +166,23 @@ type ItemFileProcessor =
 
 itemFileProcessor :: Maybe Resolution -> Cache -> ItemFileProcessor
 itemFileProcessor maxRes cached inputBase outputBase resClass inputRes =
-  cached (processor maxRes (formatFromPath inputRes)) inPath outPath
-  >> return relOutPath
+  cached processor inPath outPath
+  >> return (relOutPath, props)
   where
     relOutPath = resClass /> inputRes
     inPath = localPath $ inputBase /> inputRes
     outPath = localPath $ outputBase /> relOutPath
+    (processor, props) = formatProcessor maxRes $ formatFromPath inputRes
 
-    processor :: Maybe Resolution -> Format -> FileProcessor
-    processor Nothing _ = copyFileProcessor
-    processor (Just maxRes) Bmp = resizeStaticImageUpTo Bmp maxRes
-    processor (Just maxRes) Jpg = resizeStaticImageUpTo Jpg maxRes
-    processor (Just maxRes) Png = resizeStaticImageUpTo Png maxRes
-    processor (Just maxRes) Tiff = resizeStaticImageUpTo Tiff maxRes
-    processor (Just maxRes) Hdr = resizeStaticImageUpTo Hdr maxRes
-    processor _ Gif = copyFileProcessor -- TODO: handle animated gif resizing
-    processor _ Other = copyFileProcessor -- TODO: handle video reencoding and others?
+    formatProcessor :: Maybe Resolution -> Format -> (FileProcessor, GalleryItemProps)
+    formatProcessor Nothing _ = (copyFileProcessor, Other)
+    formatProcessor (Just maxRes) Bmp = (resizeStaticImageUpTo Bmp maxRes, Picture)
+    formatProcessor (Just maxRes) Jpg = (resizeStaticImageUpTo Jpg maxRes, Picture)
+    formatProcessor (Just maxRes) Png = (resizeStaticImageUpTo Png maxRes, Picture)
+    formatProcessor (Just maxRes) Tiff = (resizeStaticImageUpTo Tiff maxRes, Picture)
+    formatProcessor (Just maxRes) Hdr = (resizeStaticImageUpTo Hdr maxRes, Picture)
+    formatProcessor _ Gif = (copyFileProcessor, Other) -- TODO: handle animated gif resizing
+    formatProcessor _ Unknown = (copyFileProcessor, Other) -- TODO: handle video reencoding and others?
 
 
 type ThumbnailFileProcessor =

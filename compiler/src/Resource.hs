@@ -25,7 +25,7 @@
 
 module Resource
   ( DirProcessor, ItemProcessor, ThumbnailProcessor
-  , GalleryItem, GalleryItemProps, Resolution(..)
+  , GalleryItem(..), GalleryItemProps(..), Resolution(..)
   , buildGalleryTree, galleryCleanupResourceDir
   ) where
 
@@ -99,7 +99,7 @@ instance ToJSON GalleryItem where
 
 
 type DirProcessor = Path -> IO Path
-type ItemProcessor = Path -> IO Path
+type ItemProcessor = Path -> IO (Path, GalleryItemProps)
 type ThumbnailProcessor = Path -> IO (Maybe Path)
 
 
@@ -115,16 +115,16 @@ buildGalleryTree processDir processItem processThumbnail galleryName inputTree =
     mkGalleryItem :: InputTree -> IO GalleryItem
     mkGalleryItem InputFile{path, sidecar} =
       do
-        processedItem <- processItem path
+        (processedItemPath, properties) <- processItem path
         processedThumbnail <- processThumbnail path
         return GalleryItem
           { title = optMeta title $ fileName path
           , date = optMeta date "" -- TODO: check and normalise dates
           , description = optMeta description ""
           , tags = optMeta tags []
-          , path = processedItem
+          , path = processedItemPath
           , thumbnail = processedThumbnail
-          , properties = Other } -- TODO
+          , properties = properties } -- TODO
       where
         optMeta :: (Sidecar -> Maybe a) -> a -> a
         optMeta get fallback = fromMaybe fallback $ get sidecar
