@@ -37,8 +37,7 @@ import qualified Data.Aeson as JSON
 
 import Config
 import Input (decodeYamlFile, readInputTree)
-import Resource (ResourceTree, buildResourceTree, cleanupResourceDir)
-import Gallery (buildGallery)
+import Resource (GalleryItem, buildGalleryTree, galleryCleanupResourceDir)
 import Files
   ( FileName
   , FSNode(..)
@@ -75,17 +74,15 @@ compileGallery inputDirPath outputDirPath rebuildAll =
 
     invalidateCache <- isOutdated False inputGalleryConf outputIndex
     let cache = if invalidateCache || rebuildAll then skipCached else withCached
+
     let itemProc = itemProcessor (pictureMaxResolution config) cache
     let thumbnailProc = thumbnailProcessor (thumbnailResolution config) cache
-    resourceTree <- buildResourceTree dirProcessor itemProc thumbnailProc inputTree
+    let galleryBuilder = buildGalleryTree dirProcessor itemProc thumbnailProc
+    resources <- galleryBuilder (galleryName config) inputTree
 
-    cleanupResourceDir resourceTree outputDirPath
-
-    buildGallery (galleryName config) resourceTree
-      & writeJSON outputIndex
-
-    viewer fullConfig
-      & writeJSON outputViewerConf
+    galleryCleanupResourceDir resources outputDirPath
+    writeJSON outputIndex resources
+    writeJSON outputViewerConf $ viewer fullConfig
 
   where
     galleryConf = "gallery.yaml"

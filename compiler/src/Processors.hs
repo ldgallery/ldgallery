@@ -37,9 +37,6 @@ import Data.Function ((&))
 import Data.Ratio ((%))
 import Data.Char (toLower)
 
-import GHC.Generics (Generic)
-import Data.Aeson (FromJSON)
-
 import System.Directory hiding (copyFile)
 import qualified System.Directory
 import System.FilePath
@@ -60,7 +57,7 @@ data Format =
   | Other
 
 formatFromPath :: Path -> Format
-formatFromPath = aux . (map toLower) . fileName
+formatFromPath = aux . (map toLower) . takeExtension . fileName
   where
     aux ".bmp" = Bmp
     aux ".jpg" = Jpg
@@ -71,9 +68,6 @@ formatFromPath = aux . (map toLower) . fileName
     aux ".gif" = Gif
     aux _ = Other
 
-data Resolution = Resolution
-  { width :: Int
-  , height :: Int } deriving (Show, Generic, FromJSON)
 
 type FileProcessor =
      FileName        -- ^ Input path

@@ -20,15 +20,13 @@
     DuplicateRecordFields
   , DeriveGeneric
   , DeriveAnyClass
+  , NamedFieldPuns
 #-}
 
 module Resource
-  ( ResourceTree(..)
-  , DirProcessor
-  , ItemProcessor
-  , ThumbnailProcessor
-  , buildResourceTree
-  , cleanupResourceDir
+  ( DirProcessor, ItemProcessor, ThumbnailProcessor
+  , GalleryItem, GalleryItemProps, Resolution(..)
+  , buildGalleryTree, galleryCleanupResourceDir
   ) where
 
 
@@ -36,79 +34,152 @@ import Control.Concurrent.ParallelIO.Global (parallel)
 import Data.Function ((&))
 import Data.List ((\\), subsequences, sortBy)
 import Data.Ord (comparing)
-import Data.Maybe (mapMaybe)
+import Data.Char (toLower)
+import Data.Maybe (mapMaybe, fromMaybe)
+import qualified Data.Set as Set
+
+import GHC.Generics (Generic)
+import Data.Aeson (FromJSON, ToJSON, genericToJSON, genericToEncoding)
+import qualified Data.Aeson as JSON
+
 import Files
-import Input (InputTree(..), Sidecar)
+import Input (InputTree(..), Sidecar(..))
 
 
--- | Tree representing the compiled gallery resources.
-data ResourceTree =
-    ItemResource
-      { sidecar :: Sidecar
-      , resPath :: Path
-      , thumbnailPath :: Maybe Path }
-  | DirResource
-      { items :: [ResourceTree]
-      , resPath :: Path
-      , thumbnailPath :: Maybe Path }
-  deriving Show
+encodingOptions :: JSON.Options
+encodingOptions = JSON.defaultOptions
+  { JSON.fieldLabelModifier = map toLower
+  , JSON.constructorTagModifier = map toLower
+  , JSON.sumEncoding = JSON.defaultTaggedObject
+      { JSON.tagFieldName = "type"
+      , JSON.contentsFieldName = "contents"
+      }
+  }
+
+
+
+type Tag = String
+type FileSizeKB = Int
+
+
+data Resolution = Resolution
+  { width :: Int
+  , height :: Int
+  } deriving (Generic, Show, FromJSON)
+
+instance ToJSON Resolution where
+  toJSON = genericToJSON encodingOptions
+  toEncoding = genericToEncoding encodingOptions
+
+
+data GalleryItemProps =
+    Directory { items :: [GalleryItem] }
+  | Picture
+  | Other
+  deriving (Generic, Show)
+
+instance ToJSON GalleryItemProps where
+  toJSON = genericToJSON encodingOptions
+  toEncoding = genericToEncoding encodingOptions
+
+
+data GalleryItem = GalleryItem
+  { title :: String
+  , date :: String -- TODO: checked ISO8601 date
+  , description :: String
+  , tags :: [Tag]
+  , path :: Path
+  , thumbnail :: Maybe Path
+  , properties :: GalleryItemProps
+  } deriving (Generic, Show)
+
+instance ToJSON GalleryItem where
+  toJSON = genericToJSON encodingOptions
+  toEncoding = genericToEncoding encodingOptions
 
 
 type DirProcessor = Path -> IO Path
 type ItemProcessor = Path -> IO Path
 type ThumbnailProcessor = Path -> IO (Maybe Path)
 
-buildResourceTree ::
-     DirProcessor -> ItemProcessor -> ThumbnailProcessor -> InputTree
-  -> IO ResourceTree
-buildResourceTree processDir processItem processThumbnail = resNode
+
+buildGalleryTree ::
+     DirProcessor -> ItemProcessor -> ThumbnailProcessor
+  -> String -> InputTree -> IO GalleryItem
+buildGalleryTree processDir processItem processThumbnail galleryName inputTree =
+  mkGalleryItem inputTree >>= return . named galleryName
   where
-    resNode (InputFile path sidecar) =
+    named :: String -> GalleryItem -> GalleryItem
+    named name item = item { title = name }
+
+    mkGalleryItem :: InputTree -> IO GalleryItem
+    mkGalleryItem InputFile{path, sidecar} =
       do
         processedItem <- processItem path
         processedThumbnail <- processThumbnail path
-        return ItemResource
-          { sidecar = sidecar
-          , resPath = processedItem
-          , thumbnailPath = processedThumbnail }
+        return GalleryItem
+          { title = optMeta title $ fileName path
+          , date = optMeta date "" -- TODO: check and normalise dates
+          , description = optMeta description ""
+          , tags = optMeta tags []
+          , path = processedItem
+          , thumbnail = processedThumbnail
+          , properties = Other } -- TODO
+      where
+        optMeta :: (Sidecar -> Maybe a) -> a -> a
+        optMeta get fallback = fromMaybe fallback $ get sidecar
 
-    resNode (InputDir path thumbnailPath items) =
+    mkGalleryItem InputDir{path, dirThumbnailPath, items} =
       do
         processedDir <- processDir path
-        processedThumbnail <- maybeThumbnail thumbnailPath
-        dirItems <- parallel $ map resNode items
-        return DirResource
-          { items = dirItems
-          , resPath = processedDir
-          , thumbnailPath = processedThumbnail }
+        processedThumbnail <- maybeThumbnail dirThumbnailPath
+        processedItems <- parallel $ map mkGalleryItem items
+        return GalleryItem
+          { title = fileName path
+            -- TODO: consider using the most recent item's date? what if empty?
+          , date = ""
+            -- TODO: consider allowing metadata sidecars for directories too
+          , description = ""
+          , tags = aggregateChildTags processedItems
+          , path = processedDir
+          , thumbnail = processedThumbnail
+          , properties = Directory processedItems }
+      where
+        maybeThumbnail :: Maybe Path -> IO (Maybe Path)
+        maybeThumbnail Nothing = return Nothing
+        maybeThumbnail (Just path) = processThumbnail path
 
-    maybeThumbnail :: Maybe Path -> IO (Maybe Path)
-    maybeThumbnail Nothing = return Nothing
-    maybeThumbnail (Just path) = processThumbnail path
+        aggregateChildTags :: [GalleryItem] -> [Tag]
+        aggregateChildTags = unique . concatMap (\item -> tags (item::GalleryItem))
+
+        unique :: Ord a => [a] -> [a]
+        unique = Set.toList . Set.fromList
 
 
-flattenResourceTree :: ResourceTree -> [ResourceTree]
-flattenResourceTree item@ItemResource{} = [item]
-flattenResourceTree dir@(DirResource items _ _) =
-  dir:(concatMap flattenResourceTree items)
+flattenGalleryTree :: GalleryItem -> [GalleryItem]
+flattenGalleryTree dir@(GalleryItem _ _ _ _ _ _ (Directory items)) =
+  dir : concatMap flattenGalleryTree items
+flattenGalleryTree simple = [simple]
 
-outputDiff :: ResourceTree -> FSNode -> [Path]
-outputDiff resources ref =
-  (fsPaths ref) \\ (resPaths $ flattenResourceTree resources)
+
+galleryOutputDiff :: GalleryItem -> FSNode -> [Path]
+galleryOutputDiff resources ref =
+  (fsPaths ref) \\ (resPaths $ flattenGalleryTree resources)
   where
-    resPaths :: [ResourceTree] -> [Path]
-    resPaths resList = map resPath resList ++ thumbnailPaths resList
+    resPaths :: [GalleryItem] -> [Path]
+    resPaths resList = map (path::(GalleryItem->Path)) resList ++ thumbnailPaths resList
 
-    thumbnailPaths :: [ResourceTree] -> [Path]
-    thumbnailPaths = (concatMap subPaths) . (mapMaybe thumbnailPath)
+    thumbnailPaths :: [GalleryItem] -> [Path]
+    thumbnailPaths = (concatMap subPaths) . (mapMaybe thumbnail)
 
     fsPaths :: FSNode -> [Path]
     fsPaths = map nodePath . tail . flattenDir
 
-cleanupResourceDir :: ResourceTree -> FileName -> IO ()
-cleanupResourceDir resourceTree outputDir =
+
+galleryCleanupResourceDir :: GalleryItem -> FileName -> IO ()
+galleryCleanupResourceDir resourceTree outputDir =
   readDirectory outputDir
-  >>= return . outputDiff resourceTree . root
+  >>= return . galleryOutputDiff resourceTree . root
   >>= return . sortBy (flip $ comparing pathLength) -- nested files before dirs
   >>= return . map (localPath . (/>) outputDir)
   >>= mapM_ remove

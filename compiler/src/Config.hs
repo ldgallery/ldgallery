@@ -37,7 +37,7 @@ import qualified Data.Aeson as JSON
 
 import Files (FileName)
 import Input (decodeYamlFile)
-import Processors (Resolution(..))
+import Resource (Resolution(..))
 
 
 data CompilerConfig = CompilerConfig

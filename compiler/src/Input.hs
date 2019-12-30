@@ -24,7 +24,7 @@
 
 module Input
   ( decodeYamlFile
-  , Sidecar, title, date, description, tags
+  , Sidecar(..)
   , InputTree(..), readInputTree
   ) where
 
