@@ -81,7 +81,7 @@ fileName :: Path -> FileName
 fileName (Path (name:_)) = name
 
 subPaths :: Path -> [Path]
-subPaths (Path path) = map (Path . subsequences) path
+subPaths (Path path) = map Path $ subsequences path
 
 pathLength :: Path -> Int
 pathLength (Path path) = Data.List.length path
