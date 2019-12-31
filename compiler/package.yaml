@@ -27,6 +27,9 @@ dependencies:
 - JuicyPixels-extra
 - parallel-io
 
+data-dir: data
+data-files: ["**/*"]
+
 library:
   source-dirs: src
 

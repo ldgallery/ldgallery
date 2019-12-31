@@ -19,6 +19,7 @@
 {-# LANGUAGE
     DuplicateRecordFields
   , DeriveGeneric
+  , NamedFieldPuns
 #-}
 
 module Files
@@ -27,7 +28,8 @@ module Files
   , fileName, maybeFileName, subPaths, pathLength
   , localPath, webPath
   , FSNode(..), AnchoredFSNode(..)
-  , nodePath, nodeName, isHidden, flattenDir, filterDir, readDirectory
+  , nodePath, nodeName, isHidden, flattenDir, filterDir
+  , readDirectory, copyTo
   , ensureParentDir, remove, isOutdated
   ) where
 
@@ -46,7 +48,8 @@ import System.Directory
   , getModificationTime
   , listDirectory
   , createDirectoryIfMissing
-  , removePathForcibly )
+  , removePathForcibly
+  , copyFile )
 
 import qualified System.FilePath
 import qualified System.FilePath.Posix
@@ -146,6 +149,16 @@ readDirectory root = mkNode (Path []) >>= return . AnchoredFSNode root
       >>= mapM (mkNode . ((</) path))
       >>= return . Dir path
 
+copyTo :: FilePath -> AnchoredFSNode -> IO ()
+copyTo target AnchoredFSNode{anchor, root} = copyNode root
+  where
+    copyNode :: FSNode -> IO ()
+    copyNode (File path) =
+      copyFile (localPath $ anchor /> path) (localPath $ target /> path)
+
+    copyNode (Dir path items) =
+      createDirectoryIfMissing True (localPath $ target /> path)
+      >> mapM_ copyNode items
 
 ensureParentDir :: (FileName -> a -> IO b) -> FileName -> a -> IO b
 ensureParentDir writer filePath a =

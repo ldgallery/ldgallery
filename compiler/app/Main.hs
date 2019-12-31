@@ -22,37 +22,73 @@
 
 module Main where
 
-import Paths_ldgallery_compiler (version)
+import Paths_ldgallery_compiler (version, getDataFileName)
 import Data.Version (showVersion)
+import System.FilePath ((</>))
 import System.Console.CmdArgs
+
 import Compiler
+import Files (readDirectory, copyTo)
 
 
 data Options = Options
   { inputDir :: String
   , outputDir :: String
-  , rebuild :: Bool
+  , rebuilAll :: Bool
+  , withViewer :: Bool
   } deriving (Show, Data, Typeable)
 
 options = Options
   { inputDir = "./"
       &= typDir
+      &= explicit
+      &= name "i"
+      &= name "input-dir"
       &= help "Gallery source directory (default=./)"
   , outputDir = "./out"
       &= typDir
+      &= explicit
+      &= name "o"
+      &= name "output-dir"
       &= help "Generated gallery output path (default=./out)"
-  , rebuild = False
+  , rebuilAll = False
+      &= explicit
+      &= name "r"
+      &= name "rebuild-all"
       &= help "Invalidate cache and recompile everything"
+  , withViewer = False
+      &= explicit
+      &= name "w"
+      &= name "with-viewer"
+      &= help "Include the static web viewer in the output"
   }
-    &= summary ("ldgallery v" ++ (showVersion version) ++ " - a static gallery generator with tags")
-    &= program "ldgallery"
-    &= help "Compile a gallery"
-    &= helpArg [explicit, name "h", name "help"]
-    &= versionArg [explicit, name "v", name "version"]
+
+  &= summary ("ldgallery v" ++ (showVersion version) ++ " - a static gallery generator with tags")
+  &= program "ldgallery"
+  &= help "Compile a gallery"
+  &= helpArg [explicit, name "h", name "help"]
+  &= versionArg [explicit, name "version"]
 
 
 main :: IO ()
 main =
   do
     opts <- cmdArgs options
-    compileGallery (inputDir opts) (outputDir opts) (rebuild opts)
+    compileGallery (inputDir opts) (galleryOutputDir "gallery" opts) (rebuilAll opts)
+    if (withViewer opts) then copyViewer (outputDir opts) else noop
+
+  where
+    galleryOutputDir :: FilePath -> Options -> FilePath
+    galleryOutputDir gallerySubdir opts =
+      if withViewer opts then outputBase </> gallerySubdir else outputBase
+      where outputBase = outputDir opts
+
+    copyViewer :: FilePath -> IO ()
+    copyViewer target =
+      putStrLn "Copying viewer webapp"
+      >>  getDataFileName "viewer"
+      >>= readDirectory
+      >>= copyTo target
+
+    noop :: IO ()
+    noop = return ()
