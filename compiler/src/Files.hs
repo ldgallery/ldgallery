@@ -23,7 +23,8 @@
 
 module Files
   ( FileName, LocalPath, WebPath, Path
-  , (</>), (</), (/>), (<.>), fileName, subPaths, pathLength
+  , (</>), (</), (/>), (<.>)
+  , fileName, maybeFileName, subPaths, pathLength
   , localPath, webPath
   , FSNode(..), AnchoredFSNode(..)
   , nodePath, nodeName, isHidden, flattenDir, filterDir, readDirectory
@@ -79,6 +80,10 @@ file /> (Path path) = Path (path ++ [file])
 
 fileName :: Path -> FileName
 fileName (Path (name:_)) = name
+
+maybeFileName :: Path -> Maybe FileName
+maybeFileName (Path (name:_)) = Just name
+maybeFileName _ = Nothing
 
 subPaths :: Path -> [Path]
 subPaths (Path path) = map Path $ subsequences path

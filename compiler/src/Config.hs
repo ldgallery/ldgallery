@@ -42,6 +42,7 @@ import Resource (Resolution(..))
 
 data CompilerConfig = CompilerConfig
   { galleryName :: String
+  , implicitDirectoryTag :: Bool
   , thumbnailResolution :: Resolution
   , pictureMaxResolution :: Maybe Resolution
   } deriving (Generic, Show)
@@ -49,6 +50,7 @@ data CompilerConfig = CompilerConfig
 instance FromJSON CompilerConfig where
   parseJSON = withObject "CompilerConfig" $ \v -> CompilerConfig
     <$> v .:? "galleryName" .!= "Gallery"
+    <*> v .:? "implicitDirectoryTag" .!= False
     <*> v .:? "thumbnailResolution" .!= (Resolution 400 400)
     <*> v .:? "pictureMaxResolution"
 

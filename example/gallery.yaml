@@ -1,6 +1,8 @@
 compiler:
   galleryName: Example gallery
 
+  #implicitDirectoryTag: false # default
+
   #thumbnailResolution:
   #  width: 400  # default
   #  height: 400 # default

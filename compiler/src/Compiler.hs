@@ -74,7 +74,7 @@ compileGallery inputDirPath outputDirPath rebuildAll =
 
     let itemProc = itemProcessor (pictureMaxResolution config) cache
     let thumbnailProc = thumbnailProcessor (thumbnailResolution config) cache
-    let galleryBuilder = buildGalleryTree dirProcessor itemProc thumbnailProc
+    let galleryBuilder = buildGalleryTree dirProcessor itemProc thumbnailProc (implicitDirectoryTag config)
     resources <- galleryBuilder (galleryName config) inputTree
 
     galleryCleanupResourceDir resources outputDirPath

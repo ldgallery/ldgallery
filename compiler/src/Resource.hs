@@ -105,15 +105,15 @@ type ThumbnailProcessor = Path -> IO (Maybe Path)
 
 buildGalleryTree ::
      DirProcessor -> ItemProcessor -> ThumbnailProcessor
-  -> String -> InputTree -> IO GalleryItem
-buildGalleryTree processDir processItem processThumbnail galleryName inputTree =
-  mkGalleryItem inputTree >>= return . named galleryName
+  -> Bool -> String -> InputTree -> IO GalleryItem
+buildGalleryTree processDir processItem processThumbnail addDirTag galleryName inputTree =
+  mkGalleryItem Nothing inputTree >>= return . named galleryName
   where
     named :: String -> GalleryItem -> GalleryItem
     named name item = item { title = name }
 
-    mkGalleryItem :: InputTree -> IO GalleryItem
-    mkGalleryItem InputFile{path, sidecar} =
+    mkGalleryItem :: Maybe String -> InputTree -> IO GalleryItem
+    mkGalleryItem parent InputFile{path, sidecar} =
       do
         (processedItemPath, properties) <- processItem path
         processedThumbnail <- processThumbnail path
@@ -121,7 +121,7 @@ buildGalleryTree processDir processItem processThumbnail galleryName inputTree =
           { title = optMeta title $ fileName path
           , date = optMeta date "" -- TODO: check and normalise dates
           , description = optMeta description ""
-          , tags = optMeta tags []
+          , tags = (optMeta tags []) ++ implicitParentTag parent
           , path = processedItemPath
           , thumbnail = processedThumbnail
           , properties = properties } -- TODO
@@ -129,18 +129,18 @@ buildGalleryTree processDir processItem processThumbnail galleryName inputTree =
         optMeta :: (Sidecar -> Maybe a) -> a -> a
         optMeta get fallback = fromMaybe fallback $ get sidecar
 
-    mkGalleryItem InputDir{path, dirThumbnailPath, items} =
+    mkGalleryItem parent InputDir{path, dirThumbnailPath, items} =
       do
         processedDir <- processDir path
         processedThumbnail <- maybeThumbnail dirThumbnailPath
-        processedItems <- parallel $ map mkGalleryItem items
+        processedItems <- parallel $ map (mkGalleryItem $ maybeFileName path) items
         return GalleryItem
           { title = fileName path
             -- TODO: consider using the most recent item's date? what if empty?
           , date = ""
             -- TODO: consider allowing metadata sidecars for directories too
           , description = ""
-          , tags = aggregateChildTags processedItems
+          , tags = (aggregateChildTags processedItems) ++ implicitParentTag parent
           , path = processedDir
           , thumbnail = processedThumbnail
           , properties = Directory processedItems }
@@ -154,6 +154,10 @@ buildGalleryTree processDir processItem processThumbnail galleryName inputTree =
 
         unique :: Ord a => [a] -> [a]
         unique = Set.toList . Set.fromList
+
+    implicitParentTag :: Maybe String -> [Tag]
+    implicitParentTag Nothing = []
+    implicitParentTag (Just parent) = if addDirTag then [parent] else []
 
 
 flattenGalleryTree :: GalleryItem -> [GalleryItem]
