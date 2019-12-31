@@ -69,6 +69,8 @@ Proposed configuration file, named `gallery.yaml` at the root of the source dire
 ```yaml
 compiler:
   galleryName: My Little Gallery
+  ignoreFiles: .*\.txt # to ignore text files
+  implicitDirectoryTag: false # default
 
   thumbnailResolution:
     width: 400  # default
@@ -147,14 +149,11 @@ Serialised item structure:
   "_comment": "type-dependent",
 
   "properties": {
-    "type": "image",
-    "filesize": 12345,
-    "resolution": { "width": 123, "height": 456 }
+    "type": "picture"
   },
 
   "properties": {
-    "type": "video",
-    "filesize": 12345
+    "type": "video"
   },
 
   "properties": {
