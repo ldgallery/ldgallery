@@ -1,11 +1,11 @@
 compiler:
   galleryName: Example gallery
+  ignoreFiles: .*\.md
+  implicitDirectoryTag: false # default
 
-  #implicitDirectoryTag: false # default
-
-  #thumbnailResolution:
-  #  width: 400  # default
-  #  height: 400 # default
+  thumbnailResolution:
+    width: 400  # default
+    height: 400 # default
 
   pictureMaxResolution:
     width: 1024

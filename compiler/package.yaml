@@ -26,6 +26,7 @@ dependencies:
 - JuicyPixels
 - JuicyPixels-extra
 - parallel-io
+- regex-compat
 
 data-dir: data
 data-files: ["**/*"]

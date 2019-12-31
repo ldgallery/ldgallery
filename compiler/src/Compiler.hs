@@ -30,6 +30,8 @@ module Compiler
 import Control.Monad (liftM2)
 import Data.Function ((&))
 import Data.List (any)
+import Data.Maybe (isJust)
+import Text.Regex (Regex, mkRegex, matchRegex)
 import System.FilePath ((</>))
 
 import Data.Aeson (ToJSON)
@@ -52,11 +54,41 @@ import Processors
   , skipCached, withCached )
 
 
+galleryConf = "gallery.yaml"
+indexFile = "index.json"
+viewerMainFile = "index.html"
+viewerConfFile = "viewer.json"
+itemsDir = "items"
+thumbnailsDir = "thumbnails"
+
+
 writeJSON :: ToJSON a => FileName -> a -> IO ()
 writeJSON outputPath object =
   do
     putStrLn $ "Generating:\t" ++ outputPath
     ensureParentDir JSON.encodeFile outputPath object
+
+
+galleryDirFilter :: Regex -> FSNode -> Bool
+galleryDirFilter excludeRegex =
+      (not . isHidden)
+  &&& (not . isConfigFile)
+  &&& (not . containsOutputGallery)
+  &&& (not . excludedName)
+
+  where
+    (&&&) = liftM2 (&&)
+    (|||) = liftM2 (||)
+
+    isConfigFile = (galleryConf ==) . nodeName
+
+    isGalleryIndex = (indexFile ==)
+    isViewerIndex = (viewerMainFile ==)
+    containsOutputGallery (File _) = False
+    containsOutputGallery (Dir _ items) =
+      any ((isGalleryIndex ||| isViewerIndex) . nodeName) items
+
+    excludedName = isJust . matchRegex excludeRegex . nodeName
 
 
 compileGallery :: FilePath -> FilePath -> Bool -> IO ()
@@ -66,7 +98,8 @@ compileGallery inputDirPath outputDirPath rebuildAll =
     let config = compiler fullConfig
 
     inputDir <- readDirectory inputDirPath
-    let sourceTree = filterDir galleryDirFilter inputDir
+    let sourceFilter = galleryDirFilter (mkRegex $ ignoreFiles config)
+    let sourceTree = filterDir sourceFilter inputDir
     inputTree <- readInputTree sourceTree
 
     invalidateCache <- isOutdated False inputGalleryConf outputIndex
@@ -82,21 +115,9 @@ compileGallery inputDirPath outputDirPath rebuildAll =
     writeJSON outputViewerConf $ viewer fullConfig
 
   where
-    galleryConf = "gallery.yaml"
-    indexFile = "index.json"
-    viewerConfFile = "viewer.json"
-    itemsDir = "items"
-    thumbnailsDir = "thumbnails"
-
     inputGalleryConf = inputDirPath </> galleryConf
     outputIndex = outputDirPath </> indexFile
     outputViewerConf = outputDirPath </> viewerConfFile
-
-    (&&&) = liftM2 (&&)
-    galleryDirFilter = (not . containsOutputGallery) &&& (not . isConfigFile) &&& (not . isHidden)
-    isConfigFile = (==) galleryConf . nodeName
-    containsOutputGallery (File _) = False
-    containsOutputGallery (Dir _ items) = any ((==) indexFile . nodeName) items
 
     dirProcessor = dirFileProcessor inputDirPath outputDirPath itemsDir
     itemProcessor maxRes cache =
