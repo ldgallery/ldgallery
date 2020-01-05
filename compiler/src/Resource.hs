@@ -27,7 +27,7 @@ import Control.Concurrent.ParallelIO.Global (parallel)
 import Data.List ((\\), sortBy)
 import Data.Ord (comparing)
 import Data.Char (toLower)
-import Data.Maybe (mapMaybe, fromMaybe, maybeToList)
+import Data.Maybe (mapMaybe, fromMaybe)
 import Data.Function ((&))
 import qualified Data.Set as Set
 
@@ -94,15 +94,12 @@ type ThumbnailProcessor = Path -> IO (Maybe Path)
 
 buildGalleryTree ::
      ItemProcessor -> ThumbnailProcessor
-  -> Bool -> String -> InputTree -> IO GalleryItem
-buildGalleryTree processItem processThumbnail addDirTag galleryName inputTree =
-  mkGalleryItem (Path []) inputTree >>= return . named galleryName
+  -> Int -> String -> InputTree -> IO GalleryItem
+buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName inputTree =
+  mkGalleryItem (Just galleryName) (Path []) inputTree
   where
-    named :: String -> GalleryItem -> GalleryItem
-    named name item = item { title = name }
-
-    mkGalleryItem :: Path -> InputTree -> IO GalleryItem
-    mkGalleryItem parents InputFile{path, sidecar} =
+    mkGalleryItem :: Maybe String -> Path -> InputTree -> IO GalleryItem
+    mkGalleryItem _ parents InputFile{path, sidecar} =
       do
         properties <- processItem path
         processedThumbnail <- processThumbnail path
@@ -110,7 +107,7 @@ buildGalleryTree processItem processThumbnail addDirTag galleryName inputTree =
           { title = itemTitle
           , date = optMeta date "" -- TODO: check and normalise dates
           , description = optMeta description ""
-          , tags = (optMeta tags []) ++ implicitParentTag parents
+          , tags = (optMeta tags []) ++ implicitParentTags parents
           , path = parents </ itemTitle
           , thumbnail = processedThumbnail
           , properties = properties } -- TODO
@@ -121,23 +118,23 @@ buildGalleryTree processItem processThumbnail addDirTag galleryName inputTree =
         optMeta :: (Sidecar -> Maybe a) -> a -> a
         optMeta get fallback = fromMaybe fallback $ get sidecar
 
-    mkGalleryItem parents InputDir{path, dirThumbnailPath, items} =
+    mkGalleryItem rootTitle parents InputDir{path, dirThumbnailPath, items} =
       do
         processedThumbnail <- maybeThumbnail dirThumbnailPath
-        processedItems <- parallel $ map (mkGalleryItem itemPath) items
+        processedItems <- parallel $ map (mkGalleryItem Nothing itemPath) items
         return GalleryItem
           { title = itemTitle
             -- TODO: consider using the most recent item's date? what if empty?
           , date = ""
             -- TODO: consider allowing metadata sidecars for directories too
           , description = ""
-          , tags = (aggregateChildTags processedItems) ++ implicitParentTag parents
+          , tags = (aggregateChildTags processedItems) ++ implicitParentTags parents
           , path = itemPath
           , thumbnail = processedThumbnail
           , properties = Directory processedItems }
       where
         itemTitle :: String
-        itemTitle = fromMaybe "" $ fileName path
+        itemTitle = flip fromMaybe rootTitle (fromMaybe "" $ fileName path)
 
         itemPath :: Path
         itemPath = parents </ itemTitle
@@ -152,10 +149,8 @@ buildGalleryTree processItem processThumbnail addDirTag galleryName inputTree =
         unique :: Ord a => [a] -> [a]
         unique = Set.toList . Set.fromList
 
-    implicitParentTag :: Path -> [Tag]
-    implicitParentTag parents
-      | addDirTag = maybeToList $ fileName parents
-      | otherwise = []
+    implicitParentTags :: Path -> [Tag]
+    implicitParentTags (Path elements) = take tagsFromDirectories elements
 
 
 flattenGalleryTree :: GalleryItem -> [GalleryItem]

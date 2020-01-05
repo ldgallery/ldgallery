@@ -1,7 +1,8 @@
 compiler:
   galleryName: Example gallery
   ignoreFiles: .*\.md
-  implicitDirectoryTag: false # default
+
+  tagsFromDirectories: 0 # default
 
   thumbnailMaxResolution:
     width: 400  # default

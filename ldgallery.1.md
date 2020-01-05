@@ -93,8 +93,8 @@ compiler.galleryName
 compiler.ignoreFiles
 : Regular expression matching the name of files to ignore.
 
-compiler.implicitDirectoryTag
-: Whether to implicitely tag items with the name of their immediate parent directory. 
+compiler.tagsFromDirectories
+: How far to look at parent directories to add implicit tags.  Defaults to 0.
 
 compiler.thumbnailMaxResolution.width
 : Maximum width in pixels of the item thumbnails, 400 by default.
