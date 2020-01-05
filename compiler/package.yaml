@@ -38,6 +38,7 @@ default-extensions:
 - OverloadedStrings
 
 ghc-options:
+- -Werror
 - -Wall
 - -Wcompat
 - -Widentities
