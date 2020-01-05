@@ -31,10 +31,10 @@ module Input
 
 
 import GHC.Generics (Generic)
-import Control.Exception (Exception, throwIO)
+import Control.Exception (Exception, AssertionFailed(..), throw, throwIO)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Function ((&))
-import Data.Maybe (mapMaybe, catMaybes)
+import Data.Maybe (catMaybes)
 import Data.Bool (bool)
 import Data.List (find)
 import Data.Yaml (ParseException, decodeFileEither)
@@ -90,6 +90,8 @@ readSidecarFile filepath =
 
 
 readInputTree :: AnchoredFSNode -> IO InputTree
+readInputTree (AnchoredFSNode _ File{}) =
+  throw $ AssertionFailed "Input directory is a file"
 readInputTree (AnchoredFSNode anchor root@Dir{}) = mkDirNode root
   where
     mkInputNode :: FSNode -> IO (Maybe InputTree)
@@ -101,7 +103,8 @@ readInputTree (AnchoredFSNode anchor root@Dir{}) = mkDirNode root
     mkInputNode dir@Dir{} = mkDirNode dir >>= return . Just
 
     mkDirNode :: FSNode -> IO InputTree
-    mkDirNode (Dir path items) =
+    mkDirNode File{} = throw $ AssertionFailed "Input directory is a file"
+    mkDirNode Dir{path, items} =
       mapM mkInputNode items
       >>= return . catMaybes
       >>= return . InputDir path (findThumbnail items)

@@ -1,7 +1,7 @@
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019  Pacien TRAN-GIRARD
+-- Copyright (C) 2019-2020  Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -30,9 +30,8 @@ module Config
   ) where
 
 
-import Data.Text (Text)
 import GHC.Generics (Generic)
-import Data.Aeson (ToJSON, FromJSON, withObject, (.:?), (.!=))
+import Data.Aeson (FromJSON, withObject, (.:?), (.!=))
 import qualified Data.Aeson as JSON
 
 import Files (FileName)

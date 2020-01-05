@@ -31,8 +31,7 @@ module Resource
 
 
 import Control.Concurrent.ParallelIO.Global (parallel)
-import Data.Function ((&))
-import Data.List ((\\), subsequences, sortBy)
+import Data.List ((\\), sortBy)
 import Data.Ord (comparing)
 import Data.Char (toLower)
 import Data.Maybe (mapMaybe, fromMaybe)
@@ -57,10 +56,7 @@ encodingOptions = JSON.defaultOptions
   }
 
 
-
 type Tag = String
-type FileSizeKB = Int
-
 
 data Resolution = Resolution
   { width :: Int
@@ -147,7 +143,7 @@ buildGalleryTree processDir processItem processThumbnail addDirTag galleryName i
       where
         maybeThumbnail :: Maybe Path -> IO (Maybe Path)
         maybeThumbnail Nothing = return Nothing
-        maybeThumbnail (Just path) = processThumbnail path
+        maybeThumbnail (Just thumbnailPath) = processThumbnail thumbnailPath
 
         aggregateChildTags :: [GalleryItem] -> [Tag]
         aggregateChildTags = unique . concatMap (\item -> tags (item::GalleryItem))

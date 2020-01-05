@@ -29,7 +29,6 @@ module Compiler
 
 
 import Control.Monad (liftM2)
-import Data.Function ((&))
 import Data.List (any)
 import Data.Maybe (isJust, fromMaybe)
 import Text.Regex (Regex, mkRegex, matchRegex)
@@ -39,7 +38,7 @@ import Data.Aeson (ToJSON)
 import qualified Data.Aeson as JSON
 
 import Config
-import Input (decodeYamlFile, readInputTree)
+import Input (readInputTree)
 import Resource (buildGalleryTree, galleryCleanupResourceDir)
 import Files
   ( FileName
@@ -55,11 +54,22 @@ import Processors
   , skipCached, withCached )
 
 
+galleryConf :: String
 galleryConf = "gallery.yaml"
+
+indexFile :: String
 indexFile = "index.json"
+
+viewerMainFile :: String
 viewerMainFile = "index.html"
+
+viewerConfFile :: String
 viewerConfFile = "viewer.json"
+
+itemsDir :: String
 itemsDir = "items"
+
+thumbnailsDir :: String
 thumbnailsDir = "thumbnails"
 
 

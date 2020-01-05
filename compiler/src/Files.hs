@@ -34,9 +34,9 @@ module Files
   ) where
 
 
-import Control.Monad (filterM, mapM)
+import Control.Monad (mapM)
 import Data.Bool (bool)
-import Data.List (isPrefixOf, length, deleteBy, subsequences)
+import Data.List (isPrefixOf, length, subsequences)
 import Data.Function ((&))
 import Data.Text (pack)
 import Data.Aeson (ToJSON)
@@ -80,6 +80,7 @@ file /> (Path path) = Path (path ++ [file])
 (<.>) :: Path -> String -> Path
 (Path (filename:pathto)) <.> ext =
   Path $ System.FilePath.addExtension filename ext : pathto
+(Path _) <.> ext = Path [ext]
 
 fileName :: Path -> Maybe FileName
 fileName (Path (name:_)) = Just name

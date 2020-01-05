@@ -32,7 +32,7 @@ module Processors
   ) where
 
 
-import Control.Exception (Exception, throwIO)
+import Control.Exception (Exception, PatternMatchFail(..), throw, throwIO)
 import Data.Function ((&))
 import Data.Ratio ((%))
 import Data.Char (toLower)
@@ -90,12 +90,13 @@ resizeStaticImageUpTo Jpg = resizeStaticGeneric readJpeg (saveJpgImage 80)
 resizeStaticImageUpTo Png = resizeStaticGeneric readPng savePngImage
 resizeStaticImageUpTo Tiff = resizeStaticGeneric readTiff saveTiffImage
 resizeStaticImageUpTo Hdr = resizeStaticGeneric readHDR saveRadianceImage
-resizeStaticImageUpTo Gif = resizeStaticGeneric readGif writeGifImage
+resizeStaticImageUpTo Gif = resizeStaticGeneric readGif saveGifImage'
   where
-    writeGifImage :: StaticImageWriter
-    writeGifImage outputPath image =
+    saveGifImage' :: StaticImageWriter
+    saveGifImage' outputPath image =
       saveGifImage outputPath image
       & either (throwIO . ProcessingException outputPath) id
+resizeStaticImageUpTo _ = throw $ PatternMatchFail "Unhandled format"
 
 
 type StaticImageReader = FilePath -> IO (Either String DynamicImage)
@@ -166,14 +167,14 @@ type ItemFileProcessor =
   -> ItemProcessor
 
 itemFileProcessor :: Maybe Resolution -> Cache -> ItemFileProcessor
-itemFileProcessor maxRes cached inputBase outputBase resClass inputRes =
+itemFileProcessor maxResolution cached inputBase outputBase resClass inputRes =
   cached processor inPath outPath
   >> return (relOutPath, props)
   where
     relOutPath = resClass /> inputRes
     inPath = localPath $ inputBase /> inputRes
     outPath = localPath $ outputBase /> relOutPath
-    (processor, props) = formatProcessor maxRes $ formatFromPath inputRes
+    (processor, props) = formatProcessor maxResolution $ formatFromPath inputRes
 
     formatProcessor :: Maybe Resolution -> Format -> (FileProcessor, GalleryItemProps)
     formatProcessor Nothing _ = (copyFileProcessor, Other)
@@ -203,8 +204,8 @@ thumbnailFileProcessor maxRes cached inputBase outputBase resClass inputRes =
 
     process :: Maybe FileProcessor -> IO (Maybe Path)
     process Nothing = return Nothing
-    process (Just processor) =
-      processor inPath outPath
+    process (Just proc) =
+      proc inPath outPath
       >> return (Just relOutPath)
 
     processor :: Format -> Maybe FileProcessor

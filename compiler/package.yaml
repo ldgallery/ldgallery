@@ -28,6 +28,13 @@ dependencies:
 - parallel-io
 - regex-compat
 
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-uni-patterns
+- -Wredundant-constraints
+
 data-dir: data
 data-files: ["**/*"]
 
