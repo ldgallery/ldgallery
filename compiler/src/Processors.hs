@@ -18,14 +18,13 @@
 
 module Processors
   ( Resolution(..)
-  , DirFileProcessor, dirFileProcessor
   , ItemFileProcessor, itemFileProcessor
   , ThumbnailFileProcessor, thumbnailFileProcessor
   , skipCached, withCached
   ) where
 
 
-import Control.Exception (Exception, PatternMatchFail(..), throw, throwIO)
+import Control.Exception (Exception, throwIO)
 import Data.Function ((&))
 import Data.Ratio ((%))
 import Data.Char (toLower)
@@ -38,7 +37,7 @@ import Codec.Picture
 import Codec.Picture.Extra -- TODO: compare DCT and bilinear (and Lanczos, but it's not implemented)
 
 import Resource
-  ( DirProcessor, ItemProcessor, ThumbnailProcessor
+  ( ItemProcessor, ThumbnailProcessor
   , GalleryItemProps(..), Resolution(..) )
 
 import Files
@@ -47,22 +46,27 @@ import Files
 data ProcessingException = ProcessingException FilePath String deriving Show
 instance Exception ProcessingException
 
-data Format =
-    Bmp | Jpg | Png | Tiff | Hdr -- static images
-  | Gif -- TODO: might be animated
-  | Unknown
+
+data PictureFileFormat = Bmp | Jpg | Png | Tiff | Hdr | Gif
+
+-- TODO: handle video, music, text...
+data Format = PictureFormat PictureFileFormat | Unknown
 
 formatFromPath :: Path -> Format
-formatFromPath = maybe Unknown fromExt . fmap (map toLower) . fmap takeExtension . fileName
+formatFromPath =
+  maybe Unknown fromExt
+  . fmap (map toLower)
+  . fmap takeExtension
+  . fileName
   where
     fromExt :: String -> Format
-    fromExt ".bmp" = Bmp
-    fromExt ".jpg" = Jpg
-    fromExt ".jpeg" = Jpg
-    fromExt ".png" = Png
-    fromExt ".tiff" = Tiff
-    fromExt ".hdr" = Hdr
-    fromExt ".gif" = Gif
+    fromExt ".bmp" = PictureFormat Bmp
+    fromExt ".jpg" = PictureFormat Jpg
+    fromExt ".jpeg" = PictureFormat Jpg
+    fromExt ".png" = PictureFormat Png
+    fromExt ".tiff" = PictureFormat Tiff
+    fromExt ".hdr" = PictureFormat Hdr
+    fromExt ".gif" = PictureFormat Gif
     fromExt _ = Unknown
 
 
@@ -76,7 +80,7 @@ copyFileProcessor inputPath outputPath =
   (putStrLn $ "Copying:\t" ++ outputPath)
   >> ensureParentDir (flip System.Directory.copyFile) outputPath inputPath
 
-resizeStaticImageUpTo :: Format -> Resolution -> FileProcessor
+resizeStaticImageUpTo :: PictureFileFormat -> Resolution -> FileProcessor
 resizeStaticImageUpTo Bmp = resizeStaticGeneric readBitmap saveBmpImage
 -- TODO: parameterise export quality for jpg
 resizeStaticImageUpTo Jpg = resizeStaticGeneric readJpeg (saveJpgImage 80)
@@ -89,7 +93,6 @@ resizeStaticImageUpTo Gif = resizeStaticGeneric readGif saveGifImage'
     saveGifImage' outputPath image =
       saveGifImage outputPath image
       & either (throwIO . ProcessingException outputPath) id
-resizeStaticImageUpTo _ = throw $ PatternMatchFail "Unhandled format"
 
 
 type StaticImageReader = FilePath -> IO (Either String DynamicImage)
@@ -143,16 +146,6 @@ withCached processor inputPath outputPath =
     skip = putStrLn $ "Skipping:\t" ++ outputPath
 
 
-type DirFileProcessor =
-     FileName        -- ^ Input base path
-  -> FileName        -- ^ Output base path
-  -> FileName        -- ^ Output class (subdir)
-  -> DirProcessor
-
-dirFileProcessor :: DirFileProcessor
-dirFileProcessor _ _ = (.) return . (/>)
-
-
 type ItemFileProcessor =
      FileName        -- ^ Input base path
   -> FileName        -- ^ Output base path
@@ -162,22 +155,22 @@ type ItemFileProcessor =
 itemFileProcessor :: Maybe Resolution -> Cache -> ItemFileProcessor
 itemFileProcessor maxResolution cached inputBase outputBase resClass inputRes =
   cached processor inPath outPath
-  >> return (relOutPath, props)
+  >> return (props relOutPath)
   where
     relOutPath = resClass /> inputRes
     inPath = localPath $ inputBase /> inputRes
     outPath = localPath $ outputBase /> relOutPath
-    (processor, props) = formatProcessor maxResolution $ formatFromPath inputRes
+    (processor, props) = processorFor maxResolution $ formatFromPath inputRes
 
-    formatProcessor :: Maybe Resolution -> Format -> (FileProcessor, GalleryItemProps)
-    formatProcessor Nothing _ = (copyFileProcessor, Other)
-    formatProcessor (Just maxRes) Bmp = (resizeStaticImageUpTo Bmp maxRes, Picture)
-    formatProcessor (Just maxRes) Jpg = (resizeStaticImageUpTo Jpg maxRes, Picture)
-    formatProcessor (Just maxRes) Png = (resizeStaticImageUpTo Png maxRes, Picture)
-    formatProcessor (Just maxRes) Tiff = (resizeStaticImageUpTo Tiff maxRes, Picture)
-    formatProcessor (Just maxRes) Hdr = (resizeStaticImageUpTo Hdr maxRes, Picture)
-    formatProcessor _ Gif = (copyFileProcessor, Other) -- TODO: handle animated gif resizing
-    formatProcessor _ Unknown = (copyFileProcessor, Other) -- TODO: handle video reencoding and others?
+    processorFor :: Maybe Resolution -> Format -> (FileProcessor, Path -> GalleryItemProps)
+    processorFor Nothing _ =
+      (copyFileProcessor, Other)
+    processorFor _ (PictureFormat Gif) =
+      (copyFileProcessor, Picture) -- TODO: handle animated gif resizing
+    processorFor (Just maxRes) (PictureFormat picFormat) =
+      (resizeStaticImageUpTo picFormat maxRes, Picture)
+    processorFor _ Unknown =
+      (copyFileProcessor, Other) -- TODO: handle video reencoding and others?
 
 
 type ThumbnailFileProcessor =
@@ -188,7 +181,7 @@ type ThumbnailFileProcessor =
 
 thumbnailFileProcessor :: Resolution -> Cache -> ThumbnailFileProcessor
 thumbnailFileProcessor maxRes cached inputBase outputBase resClass inputRes =
-  cached <$> processor (formatFromPath inputRes)
+  cached <$> processorFor (formatFromPath inputRes)
   & process
   where
     relOutPath = resClass /> inputRes
@@ -201,11 +194,8 @@ thumbnailFileProcessor maxRes cached inputBase outputBase resClass inputRes =
       proc inPath outPath
       >> return (Just relOutPath)
 
-    processor :: Format -> Maybe FileProcessor
-    processor Bmp = Just $ resizeStaticImageUpTo Bmp maxRes
-    processor Jpg = Just $ resizeStaticImageUpTo Jpg maxRes
-    processor Png = Just $ resizeStaticImageUpTo Png maxRes
-    processor Tiff = Just $ resizeStaticImageUpTo Tiff maxRes
-    processor Hdr = Just $ resizeStaticImageUpTo Hdr maxRes
-    processor Gif = Just $ resizeStaticImageUpTo Gif maxRes -- static thumbnail from first frame
-    processor _ = Nothing
+    processorFor :: Format -> Maybe FileProcessor
+    processorFor (PictureFormat picFormat) =
+      Just $ resizeStaticImageUpTo picFormat maxRes
+    processorFor _ =
+      Nothing

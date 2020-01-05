@@ -17,7 +17,7 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 module Resource
-  ( DirProcessor, ItemProcessor, ThumbnailProcessor
+  ( ItemProcessor, ThumbnailProcessor
   , GalleryItem(..), GalleryItemProps(..), Resolution(..)
   , buildGalleryTree, galleryCleanupResourceDir
   ) where
@@ -27,7 +27,8 @@ import Control.Concurrent.ParallelIO.Global (parallel)
 import Data.List ((\\), sortBy)
 import Data.Ord (comparing)
 import Data.Char (toLower)
-import Data.Maybe (mapMaybe, fromMaybe)
+import Data.Maybe (mapMaybe, fromMaybe, maybeToList)
+import Data.Function ((&))
 import qualified Data.Set as Set
 
 import GHC.Generics (Generic)
@@ -63,8 +64,8 @@ instance ToJSON Resolution where
 
 data GalleryItemProps =
     Directory { items :: [GalleryItem] }
-  | Picture
-  | Other
+  | Picture { resource :: Path }
+  | Other { resource :: Path }
   deriving (Generic, Show)
 
 instance ToJSON GalleryItemProps where
@@ -87,53 +88,60 @@ instance ToJSON GalleryItem where
   toEncoding = genericToEncoding encodingOptions
 
 
-type DirProcessor = Path -> IO Path
-type ItemProcessor = Path -> IO (Path, GalleryItemProps)
+type ItemProcessor = Path -> IO GalleryItemProps
 type ThumbnailProcessor = Path -> IO (Maybe Path)
 
 
 buildGalleryTree ::
-     DirProcessor -> ItemProcessor -> ThumbnailProcessor
+     ItemProcessor -> ThumbnailProcessor
   -> Bool -> String -> InputTree -> IO GalleryItem
-buildGalleryTree processDir processItem processThumbnail addDirTag galleryName inputTree =
-  mkGalleryItem Nothing inputTree >>= return . named galleryName
+buildGalleryTree processItem processThumbnail addDirTag galleryName inputTree =
+  mkGalleryItem (Path []) inputTree >>= return . named galleryName
   where
     named :: String -> GalleryItem -> GalleryItem
     named name item = item { title = name }
 
-    mkGalleryItem :: Maybe String -> InputTree -> IO GalleryItem
-    mkGalleryItem parent InputFile{path, sidecar} =
+    mkGalleryItem :: Path -> InputTree -> IO GalleryItem
+    mkGalleryItem parents InputFile{path, sidecar} =
       do
-        (processedItemPath, properties) <- processItem path
+        properties <- processItem path
         processedThumbnail <- processThumbnail path
         return GalleryItem
-          { title = optMeta title $ fromMaybe "" $ fileName path
+          { title = itemTitle
           , date = optMeta date "" -- TODO: check and normalise dates
           , description = optMeta description ""
-          , tags = (optMeta tags []) ++ implicitParentTag parent
-          , path = processedItemPath
+          , tags = (optMeta tags []) ++ implicitParentTag parents
+          , path = parents </ itemTitle
           , thumbnail = processedThumbnail
           , properties = properties } -- TODO
       where
+        itemTitle :: String
+        itemTitle = optMeta title $ fromMaybe "" $ fileName path
+
         optMeta :: (Sidecar -> Maybe a) -> a -> a
         optMeta get fallback = fromMaybe fallback $ get sidecar
 
-    mkGalleryItem parent InputDir{path, dirThumbnailPath, items} =
+    mkGalleryItem parents InputDir{path, dirThumbnailPath, items} =
       do
-        processedDir <- processDir path
         processedThumbnail <- maybeThumbnail dirThumbnailPath
-        processedItems <- parallel $ map (mkGalleryItem $ fileName path) items
+        processedItems <- parallel $ map (mkGalleryItem itemPath) items
         return GalleryItem
-          { title = fromMaybe "" $ fileName path
+          { title = itemTitle
             -- TODO: consider using the most recent item's date? what if empty?
           , date = ""
             -- TODO: consider allowing metadata sidecars for directories too
           , description = ""
-          , tags = (aggregateChildTags processedItems) ++ implicitParentTag parent
-          , path = processedDir
+          , tags = (aggregateChildTags processedItems) ++ implicitParentTag parents
+          , path = itemPath
           , thumbnail = processedThumbnail
           , properties = Directory processedItems }
       where
+        itemTitle :: String
+        itemTitle = fromMaybe "" $ fileName path
+
+        itemPath :: Path
+        itemPath = parents </ itemTitle
+
         maybeThumbnail :: Maybe Path -> IO (Maybe Path)
         maybeThumbnail Nothing = return Nothing
         maybeThumbnail (Just thumbnailPath) = processThumbnail thumbnailPath
@@ -144,9 +152,10 @@ buildGalleryTree processDir processItem processThumbnail addDirTag galleryName i
         unique :: Ord a => [a] -> [a]
         unique = Set.toList . Set.fromList
 
-    implicitParentTag :: Maybe String -> [Tag]
-    implicitParentTag Nothing = []
-    implicitParentTag (Just parent) = if addDirTag then [parent] else []
+    implicitParentTag :: Path -> [Tag]
+    implicitParentTag parents
+      | addDirTag = maybeToList $ fileName parents
+      | otherwise = []
 
 
 flattenGalleryTree :: GalleryItem -> [GalleryItem]
@@ -157,16 +166,25 @@ flattenGalleryTree simple = [simple]
 
 galleryOutputDiff :: GalleryItem -> FSNode -> [Path]
 galleryOutputDiff resources ref =
-  (fsPaths ref) \\ (resPaths $ flattenGalleryTree resources)
+  (filesystemPaths ref) \\ (compiledPaths $ flattenGalleryTree resources)
   where
-    resPaths :: [GalleryItem] -> [Path]
-    resPaths resList = map (path::(GalleryItem->Path)) resList ++ thumbnailPaths resList
+    filesystemPaths :: FSNode -> [Path]
+    filesystemPaths = map Files.path . tail . flattenDir
+
+    compiledPaths :: [GalleryItem] -> [Path]
+    compiledPaths items =
+      resourcePaths items ++ thumbnailPaths items
+      & concatMap subPaths
+
+    resourcePaths :: [GalleryItem] -> [Path]
+    resourcePaths = mapMaybe (resourcePath . properties)
+
+    resourcePath :: GalleryItemProps -> Maybe Path
+    resourcePath Directory{} = Nothing
+    resourcePath resourceProps = Just $ resource resourceProps
 
     thumbnailPaths :: [GalleryItem] -> [Path]
-    thumbnailPaths = (concatMap subPaths) . (mapMaybe thumbnail)
-
-    fsPaths :: FSNode -> [Path]
-    fsPaths = map Files.path . tail . flattenDir
+    thumbnailPaths = mapMaybe thumbnail
 
 
 galleryCleanupResourceDir :: GalleryItem -> FileName -> IO ()

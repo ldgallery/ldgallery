@@ -149,11 +149,13 @@ Serialised item structure:
   "_comment": "type-dependent",
 
   "properties": {
-    "type": "picture"
+    "type": "picture",
+    "resource": "[resource url]"
   },
 
   "properties": {
-    "type": "video"
+    "type": "other",
+    "resource": "[resource url]"
   },
 
   "properties": {

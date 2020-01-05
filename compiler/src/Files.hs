@@ -17,7 +17,7 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 module Files
-  ( FileName, LocalPath, WebPath, Path
+  ( FileName, LocalPath, WebPath, Path(..)
   , (</>), (</), (/>), (<.>)
   , fileName, subPaths, pathLength
   , localPath, webPath

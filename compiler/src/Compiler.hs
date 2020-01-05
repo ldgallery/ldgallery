@@ -43,7 +43,7 @@ import Files
   , ensureParentDir
   , isOutdated )
 import Processors
-  ( dirFileProcessor, itemFileProcessor, thumbnailFileProcessor
+  ( itemFileProcessor, thumbnailFileProcessor
   , skipCached, withCached )
 
 
@@ -111,7 +111,7 @@ compileGallery inputDirPath outputDirPath rebuildAll =
 
     let itemProc = itemProcessor (pictureMaxResolution config) cache
     let thumbnailProc = thumbnailProcessor (thumbnailMaxResolution config) cache
-    let galleryBuilder = buildGalleryTree dirProcessor itemProc thumbnailProc (implicitDirectoryTag config)
+    let galleryBuilder = buildGalleryTree itemProc thumbnailProc (implicitDirectoryTag config)
     resources <- galleryBuilder (galleryName config) inputTree
 
     galleryCleanupResourceDir resources outputDirPath
@@ -123,7 +123,6 @@ compileGallery inputDirPath outputDirPath rebuildAll =
     outputIndex = outputDirPath </> indexFile
     outputViewerConf = outputDirPath </> viewerConfFile
 
-    dirProcessor = dirFileProcessor inputDirPath outputDirPath itemsDir
     itemProcessor maxRes cache =
       itemFileProcessor maxRes cache inputDirPath outputDirPath itemsDir
     thumbnailProcessor thumbRes cache =
