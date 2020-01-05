@@ -27,6 +27,8 @@ dependencies:
 - JuicyPixels-extra
 - parallel-io
 - Glob
+- safe
+- time >= 1.9.3 && < 1.10
 
 default-extensions:
 - DuplicateRecordFields

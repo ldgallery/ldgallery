@@ -30,6 +30,10 @@ import Data.Char (toLower)
 import Data.Maybe (mapMaybe, fromMaybe)
 import Data.Function ((&))
 import qualified Data.Set as Set
+import Data.Time.LocalTime (ZonedTime, utc, utcToZonedTime, zonedTimeToUTC)
+import Data.Time.Format.ISO8601 (iso8601ParseM)
+import System.Directory (getModificationTime)
+import Safe.Foldable (maximumByMay)
 
 import GHC.Generics (Generic)
 import Data.Aeson (FromJSON, ToJSON, genericToJSON, genericToEncoding)
@@ -75,7 +79,7 @@ instance ToJSON GalleryItemProps where
 
 data GalleryItem = GalleryItem
   { title :: String
-  , date :: String -- TODO: checked ISO8601 date
+  , date :: ZonedTime
   , description :: String
   , tags :: [Tag]
   , path :: Path
@@ -103,17 +107,21 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName in
       do
         properties <- processItem path
         processedThumbnail <- processThumbnail path
+        fileModTime <- lastModTime path
         return GalleryItem
           { title = itemTitle
-          , date = optMeta date "" -- TODO: check and normalise dates
+          , date = fromMaybe fileModTime itemDate
           , description = optMeta description ""
           , tags = (optMeta tags []) ++ implicitParentTags parents
           , path = parents </ itemTitle
           , thumbnail = processedThumbnail
-          , properties = properties } -- TODO
+          , properties = properties }
       where
         itemTitle :: String
         itemTitle = optMeta title $ fromMaybe "" $ fileName path
+
+        itemDate :: Maybe ZonedTime
+        itemDate = Input.date sidecar >>= iso8601ParseM
 
         optMeta :: (Sidecar -> Maybe a) -> a -> a
         optMeta get fallback = fromMaybe fallback $ get sidecar
@@ -122,11 +130,10 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName in
       do
         processedThumbnail <- maybeThumbnail dirThumbnailPath
         processedItems <- parallel $ map (mkGalleryItem Nothing itemPath) items
+        dirModTime <- lastModTime path
         return GalleryItem
           { title = itemTitle
-            -- TODO: consider using the most recent item's date? what if empty?
-          , date = ""
-            -- TODO: consider allowing metadata sidecars for directories too
+          , date = fromMaybe dirModTime $ mostRecentChildModTime processedItems
           , description = ""
           , tags = (aggregateChildTags processedItems) ++ implicitParentTags parents
           , path = itemPath
@@ -143,6 +150,13 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName in
         maybeThumbnail Nothing = return Nothing
         maybeThumbnail (Just thumbnailPath) = processThumbnail thumbnailPath
 
+        mostRecentChildModTime :: [GalleryItem] -> Maybe ZonedTime
+        mostRecentChildModTime =
+          maximumByMay comparingDates . map (date::(GalleryItem -> ZonedTime))
+
+        comparingDates :: ZonedTime -> ZonedTime -> Ordering
+        comparingDates l r = compare (zonedTimeToUTC l) (zonedTimeToUTC r)
+
         aggregateChildTags :: [GalleryItem] -> [Tag]
         aggregateChildTags = unique . concatMap (\item -> tags (item::GalleryItem))
 
@@ -151,6 +165,12 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName in
 
     implicitParentTags :: Path -> [Tag]
     implicitParentTags (Path elements) = take tagsFromDirectories elements
+
+    lastModTime :: Path -> IO ZonedTime
+    lastModTime path =
+      localPath path
+      &   getModificationTime
+      >>= return . utcToZonedTime utc
 
 
 flattenGalleryTree :: GalleryItem -> [GalleryItem]
