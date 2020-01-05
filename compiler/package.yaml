@@ -28,6 +28,15 @@ dependencies:
 - parallel-io
 - regex-compat
 
+default-extensions:
+- DuplicateRecordFields
+- DeriveGeneric
+- DeriveDataTypeable
+- DeriveAnyClass
+- FlexibleContexts
+- NamedFieldPuns
+- OverloadedStrings
+
 ghc-options:
 - -Wall
 - -Wcompat
