@@ -106,7 +106,7 @@ compileGallery inputDirPath outputDirPath rebuildAll =
     let cache = if invalidateCache || rebuildAll then skipCached else withCached
 
     let itemProc = itemProcessor (pictureMaxResolution config) cache
-    let thumbnailProc = thumbnailProcessor (thumbnailResolution config) cache
+    let thumbnailProc = thumbnailProcessor (thumbnailMaxResolution config) cache
     let galleryBuilder = buildGalleryTree dirProcessor itemProc thumbnailProc (implicitDirectoryTag config)
     resources <- galleryBuilder (galleryName config) inputTree
 

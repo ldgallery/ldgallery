@@ -72,7 +72,7 @@ compiler:
   ignoreFiles: .*\.txt # to ignore text files
   implicitDirectoryTag: false # default
 
-  thumbnailResolution:
+  thumbnailMaxResolution:
     width: 400  # default
     height: 400 # default
 

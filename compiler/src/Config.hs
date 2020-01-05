@@ -44,7 +44,7 @@ data CompilerConfig = CompilerConfig
   { galleryName :: String
   , ignoreFiles :: String
   , implicitDirectoryTag :: Bool
-  , thumbnailResolution :: Resolution
+  , thumbnailMaxResolution :: Resolution
   , pictureMaxResolution :: Maybe Resolution
   } deriving (Generic, Show)
 
@@ -53,7 +53,7 @@ instance FromJSON CompilerConfig where
     <$> v .:? "galleryName" .!= "Gallery"
     <*> v .:? "ignoreFiles" .!= ".^"
     <*> v .:? "implicitDirectoryTag" .!= False
-    <*> v .:? "thumbnailResolution" .!= (Resolution 400 400)
+    <*> v .:? "thumbnailMaxResolution" .!= (Resolution 400 400)
     <*> v .:? "pictureMaxResolution"
 
 
