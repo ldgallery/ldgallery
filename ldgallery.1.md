@@ -74,7 +74,7 @@ title
 : Title of the item.  Defaults to the name of the file.
 
 date
-: ISO 8601-formatted date and time.
+: ISO 8601-formatted date and time.  Defaults to the last modification time of the file.
 
 description
 : Description for the item.
