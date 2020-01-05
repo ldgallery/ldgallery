@@ -41,29 +41,29 @@ data Options = Options
 options = Options
   { inputDir = "./"
       &= typDir
-      &= explicit
       &= name "i"
       &= name "input-dir"
+      &= explicit
       &= help "Gallery source directory (default=./)"
   , outputDir = "./out"
       &= typDir
-      &= explicit
       &= name "o"
       &= name "output-dir"
+      &= explicit
       &= help "Generated gallery output path (default=./out)"
   , rebuilAll = False
-      &= explicit
       &= name "r"
       &= name "rebuild-all"
+      &= explicit
       &= help "Invalidate cache and recompile everything"
   , withViewer = False
-      &= explicit
       &= name "w"
       &= name "with-viewer"
+      &= explicit
       &= help "Include the static web viewer in the output"
   }
 
-  &= summary ("ldgallery v" ++ (showVersion version) ++ " - a static gallery generator with tags")
+  &= summary ("ldgallery v" ++ (showVersion version) ++ " - a static web gallery generator with tags")
   &= program "ldgallery"
   &= help "Compile a gallery"
   &= helpArg [explicit, name "h", name "help"]

@@ -3,7 +3,7 @@ compiler:
   ignoreFiles: .*\.md
   implicitDirectoryTag: false # default
 
-  thumbnailResolution:
+  thumbnailMaxResolution:
     width: 400  # default
     height: 400 # default
 
