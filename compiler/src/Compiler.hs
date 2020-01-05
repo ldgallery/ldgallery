@@ -1,7 +1,7 @@
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019  Pacien TRAN-GIRARD
+-- Copyright (C) 2019-2020  Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -20,6 +20,7 @@
     DuplicateRecordFields
   , DeriveGeneric
   , DeriveAnyClass
+  , NamedFieldPuns
 #-}
 
 module Compiler
@@ -30,7 +31,7 @@ module Compiler
 import Control.Monad (liftM2)
 import Data.Function ((&))
 import Data.List (any)
-import Data.Maybe (isJust)
+import Data.Maybe (isJust, fromMaybe)
 import Text.Regex (Regex, mkRegex, matchRegex)
 import System.FilePath ((</>))
 
@@ -80,15 +81,15 @@ galleryDirFilter excludeRegex =
     (&&&) = liftM2 (&&)
     (|||) = liftM2 (||)
 
-    isConfigFile = (galleryConf ==) . nodeName
+    matchName :: (FileName -> Bool) -> FSNode -> Bool
+    matchName cond = maybe False cond . nodeName
 
-    isGalleryIndex = (indexFile ==)
-    isViewerIndex = (viewerMainFile ==)
-    containsOutputGallery (File _) = False
-    containsOutputGallery (Dir _ items) =
-      any ((isGalleryIndex ||| isViewerIndex) . nodeName) items
-
-    excludedName = isJust . matchRegex excludeRegex . nodeName
+    isConfigFile = matchName (== galleryConf)
+    isGalleryIndex = matchName (== indexFile)
+    isViewerIndex = matchName (== viewerMainFile)
+    containsOutputGallery File{} = False
+    containsOutputGallery Dir{items} = any (isGalleryIndex ||| isViewerIndex) items
+    excludedName = isJust . matchRegex excludeRegex . fromMaybe "" . nodeName
 
 
 compileGallery :: FilePath -> FilePath -> Bool -> IO ()

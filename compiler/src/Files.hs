@@ -1,7 +1,7 @@
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019  Pacien TRAN-GIRARD
+-- Copyright (C) 2019-2020  Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -25,10 +25,10 @@
 module Files
   ( FileName, LocalPath, WebPath, Path
   , (</>), (</), (/>), (<.>)
-  , fileName, maybeFileName, subPaths, pathLength
+  , fileName, subPaths, pathLength
   , localPath, webPath
   , FSNode(..), AnchoredFSNode(..)
-  , nodePath, nodeName, isHidden, flattenDir, filterDir
+  , nodeName, isHidden, flattenDir, filterDir
   , readDirectory, copyTo
   , ensureParentDir, remove, isOutdated
   ) where
@@ -81,12 +81,9 @@ file /> (Path path) = Path (path ++ [file])
 (Path (filename:pathto)) <.> ext =
   Path $ System.FilePath.addExtension filename ext : pathto
 
-fileName :: Path -> FileName
-fileName (Path (name:_)) = name
-
-maybeFileName :: Path -> Maybe FileName
-maybeFileName (Path (name:_)) = Just name
-maybeFileName _ = Nothing
+fileName :: Path -> Maybe FileName
+fileName (Path (name:_)) = Just name
+fileName _ = Nothing
 
 subPaths :: Path -> [Path]
 subPaths (Path path) = map Path $ subsequences path
@@ -101,21 +98,25 @@ webPath :: Path -> WebPath
 webPath (Path path) = System.FilePath.Posix.joinPath $ reverse path
 
 
-data FSNode = File Path | Dir Path [FSNode] deriving Show
+data FSNode =
+    File { path :: Path }
+  | Dir { path :: Path, items :: [FSNode] }
+  deriving Show
+
 data AnchoredFSNode = AnchoredFSNode
   { anchor :: LocalPath
-  , root :: FSNode } deriving Show
+  , root :: FSNode }
+  deriving Show
 
-nodePath :: FSNode -> Path
-nodePath (File path) = path
-nodePath (Dir path _) = path
-
-nodeName :: FSNode -> FileName
-nodeName = fileName . nodePath
+nodeName :: FSNode -> Maybe FileName
+nodeName = fileName . path
 
 isHidden :: FSNode -> Bool
-isHidden node = "." `isPrefixOf` filename &&length filename > 1
-  where filename = nodeName node
+isHidden = hiddenName . nodeName
+  where
+    hiddenName :: Maybe FileName -> Bool
+    hiddenName Nothing = False
+    hiddenName (Just filename) = "." `isPrefixOf` filename && length filename > 1
 
 -- | DFS with intermediate dirs first.
 flattenDir :: FSNode -> [FSNode]

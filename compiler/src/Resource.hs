@@ -1,7 +1,7 @@
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019  Pacien TRAN-GIRARD
+-- Copyright (C) 2019-2020  Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -118,7 +118,7 @@ buildGalleryTree processDir processItem processThumbnail addDirTag galleryName i
         (processedItemPath, properties) <- processItem path
         processedThumbnail <- processThumbnail path
         return GalleryItem
-          { title = optMeta title $ fileName path
+          { title = optMeta title $ fromMaybe "" $ fileName path
           , date = optMeta date "" -- TODO: check and normalise dates
           , description = optMeta description ""
           , tags = (optMeta tags []) ++ implicitParentTag parent
@@ -133,9 +133,9 @@ buildGalleryTree processDir processItem processThumbnail addDirTag galleryName i
       do
         processedDir <- processDir path
         processedThumbnail <- maybeThumbnail dirThumbnailPath
-        processedItems <- parallel $ map (mkGalleryItem $ maybeFileName path) items
+        processedItems <- parallel $ map (mkGalleryItem $ fileName path) items
         return GalleryItem
-          { title = fileName path
+          { title = fromMaybe "" $ fileName path
             -- TODO: consider using the most recent item's date? what if empty?
           , date = ""
             -- TODO: consider allowing metadata sidecars for directories too
@@ -177,7 +177,7 @@ galleryOutputDiff resources ref =
     thumbnailPaths = (concatMap subPaths) . (mapMaybe thumbnail)
 
     fsPaths :: FSNode -> [Path]
-    fsPaths = map nodePath . tail . flattenDir
+    fsPaths = map Files.path . tail . flattenDir
 
 
 galleryCleanupResourceDir :: GalleryItem -> FileName -> IO ()

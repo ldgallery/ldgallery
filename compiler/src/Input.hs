@@ -1,7 +1,7 @@
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019  Pacien TRAN-GIRARD
+-- Copyright (C) 2019-2020  Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -20,6 +20,7 @@
     DuplicateRecordFields
   , DeriveGeneric
   , DeriveAnyClass
+  , NamedFieldPuns
 #-}
 
 module Input
@@ -92,7 +93,7 @@ readInputTree :: AnchoredFSNode -> IO InputTree
 readInputTree (AnchoredFSNode anchor root@Dir{}) = mkDirNode root
   where
     mkInputNode :: FSNode -> IO (Maybe InputTree)
-    mkInputNode (File path) | not (sidecarExt `isExtensionOf` (fileName path)) =
+    mkInputNode file@File{path} | not $ isSidecar file =
       readSidecarFile (localPath $ anchor /> path <.> sidecarExt)
       >>= return . InputFile path
       >>= return . Just
@@ -104,10 +105,19 @@ readInputTree (AnchoredFSNode anchor root@Dir{}) = mkDirNode root
       mapM mkInputNode items
       >>= return . catMaybes
       >>= return . InputDir path (findThumbnail items)
-      where
-        findThumbnail :: [FSNode] -> Maybe Path
-        findThumbnail = (fmap nodePath) . (find matchThumbnail)
 
-        matchThumbnail :: FSNode -> Bool
-        matchThumbnail Dir{} = False
-        matchThumbnail (File path) = (dropExtension $ fileName path) == "thumbnail"
+    isSidecar :: FSNode -> Bool
+    isSidecar Dir{} = False
+    isSidecar File{path} =
+      fileName path
+      & (maybe False $ isExtensionOf sidecarExt)
+
+    isThumbnail :: FSNode -> Bool
+    isThumbnail Dir{} = False
+    isThumbnail File{path} =
+      fileName path
+      & fmap dropExtension
+      & (maybe False ("thumbnail" ==))
+
+    findThumbnail :: [FSNode] -> Maybe Path
+    findThumbnail = (fmap Files.path) . (find isThumbnail)

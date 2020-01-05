@@ -1,7 +1,7 @@
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019  Pacien TRAN-GIRARD
+-- Copyright (C) 2019-2020  Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -60,16 +60,17 @@ data Format =
   | Unknown
 
 formatFromPath :: Path -> Format
-formatFromPath = aux . (map toLower) . takeExtension . fileName
+formatFromPath = maybe Unknown fromExt . fmap (map toLower) . fmap takeExtension . fileName
   where
-    aux ".bmp" = Bmp
-    aux ".jpg" = Jpg
-    aux ".jpeg" = Jpg
-    aux ".png" = Png
-    aux ".tiff" = Tiff
-    aux ".hdr" = Hdr
-    aux ".gif" = Gif
-    aux _ = Unknown
+    fromExt :: String -> Format
+    fromExt ".bmp" = Bmp
+    fromExt ".jpg" = Jpg
+    fromExt ".jpeg" = Jpg
+    fromExt ".png" = Png
+    fromExt ".tiff" = Tiff
+    fromExt ".hdr" = Hdr
+    fromExt ".gif" = Gif
+    fromExt _ = Unknown
 
 
 type FileProcessor =
