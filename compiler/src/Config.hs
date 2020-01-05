@@ -34,7 +34,8 @@ import Resource (Resolution(..))
 
 data CompilerConfig = CompilerConfig
   { galleryName :: String
-  , ignoreFiles :: String
+  , includeFiles :: [String]
+  , excludeFiles :: [String]
   , tagsFromDirectories :: Int
   , thumbnailMaxResolution :: Resolution
   , pictureMaxResolution :: Maybe Resolution
@@ -43,7 +44,8 @@ data CompilerConfig = CompilerConfig
 instance FromJSON CompilerConfig where
   parseJSON = withObject "CompilerConfig" $ \v -> CompilerConfig
     <$> v .:? "galleryName" .!= "Gallery"
-    <*> v .:? "ignoreFiles" .!= ".^"
+    <*> v .:? "includeFiles" .!= ["*"]
+    <*> v .:? "excludeFiles" .!= []
     <*> v .:? "tagsFromDirectories" .!= 0
     <*> v .:? "thumbnailMaxResolution" .!= (Resolution 400 400)
     <*> v .:? "pictureMaxResolution"

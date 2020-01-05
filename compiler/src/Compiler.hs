@@ -23,9 +23,8 @@ module Compiler
 
 import Control.Monad (liftM2)
 import Data.List (any)
-import Data.Maybe (isJust, fromMaybe)
-import Text.Regex (Regex, mkRegex, matchRegex)
 import System.FilePath ((</>))
+import qualified System.FilePath.Glob as Glob
 
 import Data.Aeson (ToJSON)
 import qualified Data.Aeson as JSON
@@ -73,26 +72,30 @@ writeJSON outputPath object =
     ensureParentDir JSON.encodeFile outputPath object
 
 
-galleryDirFilter :: Regex -> FSNode -> Bool
-galleryDirFilter excludeRegex =
+galleryDirFilter :: ([Glob.Pattern], [Glob.Pattern]) -> FSNode -> Bool
+galleryDirFilter (inclusionPatterns, exclusionPatterns) =
       (not . isHidden)
+  &&& (matchName True $ anyPattern inclusionPatterns)
   &&& (not . isConfigFile)
   &&& (not . containsOutputGallery)
-  &&& (not . excludedName)
+  &&& (not . (matchName False $ anyPattern exclusionPatterns))
 
   where
     (&&&) = liftM2 (&&)
     (|||) = liftM2 (||)
 
-    matchName :: (FileName -> Bool) -> FSNode -> Bool
-    matchName cond = maybe False cond . nodeName
+    matchName :: Bool -> (FileName -> Bool) -> FSNode -> Bool
+    matchName matchDir _ Dir{} = matchDir
+    matchName _ cond file@File{} = maybe False cond $ nodeName file
 
-    isConfigFile = matchName (== galleryConf)
-    isGalleryIndex = matchName (== indexFile)
-    isViewerIndex = matchName (== viewerMainFile)
+    anyPattern :: [Glob.Pattern] -> FileName -> Bool
+    anyPattern patterns filename = any (flip Glob.match filename) patterns
+
+    isConfigFile = matchName False (== galleryConf)
+    isGalleryIndex = matchName False (== indexFile)
+    isViewerIndex = matchName False (== viewerMainFile)
     containsOutputGallery File{} = False
     containsOutputGallery Dir{items} = any (isGalleryIndex ||| isViewerIndex) items
-    excludedName = isJust . matchRegex excludeRegex . fromMaybe "" . nodeName
 
 
 compileGallery :: FilePath -> FilePath -> Bool -> IO ()
@@ -102,7 +105,9 @@ compileGallery inputDirPath outputDirPath rebuildAll =
     let config = compiler fullConfig
 
     inputDir <- readDirectory inputDirPath
-    let sourceFilter = galleryDirFilter (mkRegex $ ignoreFiles config)
+    let inclusionPatterns = map Glob.compile $ includeFiles config
+    let exclusionPatterns = map Glob.compile $ excludeFiles config
+    let sourceFilter = galleryDirFilter (inclusionPatterns, exclusionPatterns)
     let sourceTree = filterDir sourceFilter inputDir
     inputTree <- readInputTree sourceTree
 

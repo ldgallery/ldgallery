@@ -1,6 +1,11 @@
 compiler:
   galleryName: Example gallery
-  ignoreFiles: .*\.md
+
+  includeFiles:
+  - "*.jpg"
+
+  #excludeFiles:
+  #- "*.md"
 
   tagsFromDirectories: 0 # default
 

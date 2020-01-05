@@ -26,7 +26,7 @@ dependencies:
 - JuicyPixels
 - JuicyPixels-extra
 - parallel-io
-- regex-compat
+- Glob
 
 default-extensions:
 - DuplicateRecordFields
