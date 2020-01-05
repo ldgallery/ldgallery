@@ -88,10 +88,11 @@ readInputTree (AnchoredFSNode _ File{}) =
 readInputTree (AnchoredFSNode anchor root@Dir{}) = mkDirNode root
   where
     mkInputNode :: FSNode -> IO (Maybe InputTree)
-    mkInputNode file@File{path} | not $ isSidecar file =
-      readSidecarFile (localPath $ anchor /> path <.> sidecarExt)
-      >>= return . InputFile path
-      >>= return . Just
+    mkInputNode file@File{path}
+      | (not $ isSidecar file) && (not $ isThumbnail file) =
+        readSidecarFile (localPath $ anchor /> path <.> sidecarExt)
+        >>= return . InputFile path
+        >>= return . Just
     mkInputNode File{} = return Nothing
     mkInputNode dir@Dir{} = mkDirNode dir >>= return . Just
 
