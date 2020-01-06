@@ -31,7 +31,6 @@ import Data.Maybe (mapMaybe, fromMaybe)
 import Data.Function ((&))
 import qualified Data.Set as Set
 import Data.Time.LocalTime (ZonedTime, utc, utcToZonedTime, zonedTimeToUTC)
-import Data.Time.Format.ISO8601 (iso8601ParseM)
 import System.Directory (getModificationTime)
 import Safe.Foldable (maximumByMay)
 
@@ -110,7 +109,7 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName in
         fileModTime <- lastModTime path
         return GalleryItem
           { title = itemTitle
-          , date = fromMaybe fileModTime itemDate
+          , date = fromMaybe fileModTime $ Input.date sidecar
           , description = optMeta description ""
           , tags = (optMeta tags []) ++ implicitParentTags parents
           , path = parents </ itemTitle
@@ -119,9 +118,6 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName in
       where
         itemTitle :: String
         itemTitle = optMeta title $ fromMaybe "" $ fileName path
-
-        itemDate :: Maybe ZonedTime
-        itemDate = Input.date sidecar >>= iso8601ParseM
 
         optMeta :: (Sidecar -> Maybe a) -> a -> a
         optMeta get fallback = fromMaybe fallback $ get sidecar

@@ -30,6 +30,7 @@ import Data.Function ((&))
 import Data.Maybe (catMaybes)
 import Data.Bool (bool)
 import Data.List (find)
+import Data.Time.LocalTime (ZonedTime)
 import Data.Yaml (ParseException, decodeFileEither)
 import Data.Aeson (FromJSON)
 import System.FilePath (isExtensionOf, dropExtension)
@@ -60,7 +61,7 @@ data InputTree =
 
 data Sidecar = Sidecar
   { title :: Maybe String
-  , date :: Maybe String
+  , date :: Maybe ZonedTime
   , description :: Maybe String
   , tags :: Maybe [String]
   } deriving (Generic, FromJSON, Show)

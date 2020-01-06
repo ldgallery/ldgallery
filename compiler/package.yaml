@@ -28,7 +28,7 @@ dependencies:
 - parallel-io
 - Glob
 - safe
-- time >= 1.9.3 && < 1.10
+- time
 
 default-extensions:
 - DuplicateRecordFields
