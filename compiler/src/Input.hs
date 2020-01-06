@@ -61,7 +61,7 @@ data InputTree =
 
 data Sidecar = Sidecar
   { title :: Maybe String
-  , date :: Maybe ZonedTime
+  , datetime :: Maybe ZonedTime
   , description :: Maybe String
   , tags :: Maybe [String]
   } deriving (Generic, FromJSON, Show)
@@ -69,7 +69,7 @@ data Sidecar = Sidecar
 emptySidecar :: Sidecar
 emptySidecar = Sidecar
   { title = Nothing
-  , date = Nothing
+  , datetime = Nothing
   , description = Nothing
   , tags = Nothing }
 

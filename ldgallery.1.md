@@ -73,7 +73,7 @@ Metadata contained within item files themselves (e.g. Exif fields for pictures) 
 title
 : Title of the item.  Defaults to the name of the file.
 
-date
+datetime
 : ISO 8601 zoned date and time.  Defaults to the last modification time of the file.
 
 description

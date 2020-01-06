@@ -78,7 +78,7 @@ instance ToJSON GalleryItemProps where
 
 data GalleryItem = GalleryItem
   { title :: String
-  , date :: ZonedTime
+  , datetime :: ZonedTime
   , description :: String
   , tags :: [Tag]
   , path :: Path
@@ -109,7 +109,7 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName in
         fileModTime <- lastModTime path
         return GalleryItem
           { title = itemTitle
-          , date = fromMaybe fileModTime $ Input.date sidecar
+          , datetime = fromMaybe fileModTime $ Input.datetime sidecar
           , description = optMeta description ""
           , tags = (optMeta tags []) ++ implicitParentTags parents
           , path = parents </ itemTitle
@@ -129,7 +129,7 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName in
         dirModTime <- lastModTime path
         return GalleryItem
           { title = itemTitle
-          , date = fromMaybe dirModTime $ mostRecentChildModTime processedItems
+          , datetime = fromMaybe dirModTime $ mostRecentChildModTime processedItems
           , description = ""
           , tags = (aggregateChildTags processedItems) ++ implicitParentTags parents
           , path = itemPath
@@ -148,10 +148,10 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName in
 
         mostRecentChildModTime :: [GalleryItem] -> Maybe ZonedTime
         mostRecentChildModTime =
-          maximumByMay comparingDates . map (date::(GalleryItem -> ZonedTime))
+          maximumByMay comparingTime . map (datetime::(GalleryItem -> ZonedTime))
 
-        comparingDates :: ZonedTime -> ZonedTime -> Ordering
-        comparingDates l r = compare (zonedTimeToUTC l) (zonedTimeToUTC r)
+        comparingTime :: ZonedTime -> ZonedTime -> Ordering
+        comparingTime l r = compare (zonedTimeToUTC l) (zonedTimeToUTC r)
 
         aggregateChildTags :: [GalleryItem] -> [Tag]
         aggregateChildTags = unique . concatMap (\item -> tags (item::GalleryItem))
