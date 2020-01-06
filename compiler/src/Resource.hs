@@ -30,8 +30,8 @@ import Data.Char (toLower)
 import Data.Maybe (mapMaybe, fromMaybe)
 import Data.Function ((&))
 import qualified Data.Set as Set
+import Data.Time.Clock (UTCTime)
 import Data.Time.LocalTime (ZonedTime, utc, utcToZonedTime, zonedTimeToUTC)
-import System.Directory (getModificationTime)
 import Safe.Foldable (maximumByMay)
 
 import GHC.Generics (Generic)
@@ -102,14 +102,13 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName in
   mkGalleryItem (Just galleryName) (Path []) inputTree
   where
     mkGalleryItem :: Maybe String -> Path -> InputTree -> IO GalleryItem
-    mkGalleryItem _ parents InputFile{path, sidecar} =
+    mkGalleryItem _ parents InputFile{path, modTime, sidecar} =
       do
         properties <- processItem path
         processedThumbnail <- processThumbnail path
-        fileModTime <- lastModTime path
         return GalleryItem
           { title = itemTitle
-          , datetime = fromMaybe fileModTime $ Input.datetime sidecar
+          , datetime = fromMaybe (toZonedTime modTime) (Input.datetime sidecar)
           , description = optMeta description ""
           , tags = (optMeta tags []) ++ implicitParentTags parents
           , path = parents </ itemTitle
@@ -122,14 +121,13 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName in
         optMeta :: (Sidecar -> Maybe a) -> a -> a
         optMeta get fallback = fromMaybe fallback $ get sidecar
 
-    mkGalleryItem rootTitle parents InputDir{path, dirThumbnailPath, items} =
+    mkGalleryItem rootTitle parents InputDir{path, modTime, dirThumbnailPath, items} =
       do
         processedThumbnail <- maybeThumbnail dirThumbnailPath
         processedItems <- parallel $ map (mkGalleryItem Nothing itemPath) items
-        dirModTime <- lastModTime path
         return GalleryItem
           { title = itemTitle
-          , datetime = fromMaybe dirModTime $ mostRecentChildModTime processedItems
+          , datetime = fromMaybe (toZonedTime modTime) (mostRecentChildModTime processedItems)
           , description = ""
           , tags = (aggregateChildTags processedItems) ++ implicitParentTags parents
           , path = itemPath
@@ -162,11 +160,8 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName in
     implicitParentTags :: Path -> [Tag]
     implicitParentTags (Path elements) = take tagsFromDirectories elements
 
-    lastModTime :: Path -> IO ZonedTime
-    lastModTime path =
-      localPath path
-      &   getModificationTime
-      >>= return . utcToZonedTime utc
+    toZonedTime :: UTCTime -> ZonedTime
+    toZonedTime = utcToZonedTime utc
 
 
 flattenGalleryTree :: GalleryItem -> [GalleryItem]

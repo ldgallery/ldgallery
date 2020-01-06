@@ -30,11 +30,12 @@ import Data.Function ((&))
 import Data.Maybe (catMaybes)
 import Data.Bool (bool)
 import Data.List (find)
+import Data.Time.Clock (UTCTime)
 import Data.Time.LocalTime (ZonedTime)
 import Data.Yaml (ParseException, decodeFileEither)
 import Data.Aeson (FromJSON)
 import System.FilePath (isExtensionOf, dropExtension)
-import System.Directory (doesFileExist)
+import System.Directory (doesFileExist, getModificationTime)
 
 import Files
 
@@ -52,9 +53,11 @@ decodeYamlFile path =
 data InputTree =
     InputFile
       { path :: Path
+      , modTime :: UTCTime
       , sidecar :: Sidecar }
     | InputDir
       { path :: Path
+      , modTime :: UTCTime
       , dirThumbnailPath :: Maybe Path
       , items :: [InputTree] }
   deriving Show
@@ -91,18 +94,20 @@ readInputTree (AnchoredFSNode anchor root@Dir{}) = mkDirNode root
     mkInputNode :: FSNode -> IO (Maybe InputTree)
     mkInputNode file@File{path}
       | (not $ isSidecar file) && (not $ isThumbnail file) =
-        readSidecarFile (localPath $ anchor /> path <.> sidecarExt)
-        >>= return . InputFile path
-        >>= return . Just
+        do
+          sidecar <- readSidecarFile $ localPath (anchor /> path <.> sidecarExt)
+          modTime <- getModificationTime $ localPath (anchor /> path)
+          return $ Just $ InputFile path modTime sidecar
     mkInputNode File{} = return Nothing
     mkInputNode dir@Dir{} = mkDirNode dir >>= return . Just
 
     mkDirNode :: FSNode -> IO InputTree
     mkDirNode File{} = throw $ AssertionFailed "Input directory is a file"
     mkDirNode Dir{path, items} =
-      mapM mkInputNode items
-      >>= return . catMaybes
-      >>= return . InputDir path (findThumbnail items)
+      do
+        dirItems <- mapM mkInputNode items
+        modTime <- getModificationTime $ localPath (anchor /> path)
+        return $ InputDir path modTime (findThumbnail items) (catMaybes dirItems)
 
     isSidecar :: FSNode -> Bool
     isSidecar Dir{} = False
