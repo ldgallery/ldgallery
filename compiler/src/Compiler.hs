@@ -39,8 +39,7 @@ import Files
   , isHidden
   , nodeName
   , filterDir
-  , ensureParentDir
-  , isOutdated )
+  , ensureParentDir )
 import Processors
   ( itemFileProcessor, thumbnailFileProcessor
   , skipCached, withCached )
@@ -111,9 +110,7 @@ compileGallery inputDirPath outputDirPath rebuildAll =
     let sourceTree = filterDir sourceFilter inputDir
     inputTree <- readInputTree sourceTree
 
-    invalidateCache <- isOutdated False inputGalleryConf outputIndex
-    let cache = if invalidateCache || rebuildAll then skipCached else withCached
-
+    let cache = if rebuildAll then skipCached else withCached
     let itemProc = itemProcessor (pictureMaxResolution config) cache
     let thumbnailProc = thumbnailProcessor (thumbnailMaxResolution config) cache
     let galleryBuilder = buildGalleryTree itemProc thumbnailProc (tagsFromDirectories config)
