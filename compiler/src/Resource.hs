@@ -99,66 +99,60 @@ buildGalleryTree ::
      ItemProcessor -> ThumbnailProcessor
   -> Int -> String -> InputTree -> IO GalleryItem
 buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName inputTree =
-  mkGalleryItem (Just galleryName) (Path []) inputTree
+  mkGalleryItem [galleryName] inputTree
   where
-    mkGalleryItem :: Maybe String -> Path -> InputTree -> IO GalleryItem
-    mkGalleryItem _ parents InputFile{path, modTime, sidecar} =
+    mkGalleryItem :: [String] -> InputTree -> IO GalleryItem
+    mkGalleryItem parentTitles InputFile{path, modTime, sidecar} =
       do
         properties <- processItem path
         processedThumbnail <- processThumbnail path
         return GalleryItem
-          { title = itemTitle
+          { title = optMeta title $ fromMaybe "" $ fileName path
           , datetime = fromMaybe (toZonedTime modTime) (Input.datetime sidecar)
           , description = optMeta description ""
-          , tags = (optMeta tags []) ++ implicitParentTags parents
-          , path = parents </ itemTitle
+          , tags = unique ((optMeta tags []) ++ implicitParentTags parentTitles)
+          , path = path
           , thumbnail = processedThumbnail
           , properties = properties }
       where
-        itemTitle :: String
-        itemTitle = optMeta title $ fromMaybe "" $ fileName path
-
         optMeta :: (Sidecar -> Maybe a) -> a -> a
         optMeta get fallback = fromMaybe fallback $ get sidecar
 
-    mkGalleryItem rootTitle parents InputDir{path, modTime, dirThumbnailPath, items} =
+    mkGalleryItem parentTitles InputDir{path, modTime, dirThumbnailPath, items} =
       do
         processedThumbnail <- maybeThumbnail dirThumbnailPath
-        processedItems <- parallel $ map (mkGalleryItem Nothing itemPath) items
+        processedItems <- parallel $ map (mkGalleryItem $ itemTitle:parentTitles) items
         return GalleryItem
           { title = itemTitle
-          , datetime = fromMaybe (toZonedTime modTime) (mostRecentChildModTime processedItems)
+          , datetime = fromMaybe (toZonedTime modTime) (mostRecentModTime processedItems)
           , description = ""
-          , tags = (aggregateChildTags processedItems) ++ implicitParentTags parents
-          , path = itemPath
+          , tags = unique (aggregateTags processedItems ++ implicitParentTags parentTitles)
+          , path = path
           , thumbnail = processedThumbnail
           , properties = Directory processedItems }
       where
         itemTitle :: String
-        itemTitle = flip fromMaybe rootTitle (fromMaybe "" $ fileName path)
-
-        itemPath :: Path
-        itemPath = parents </ itemTitle
+        itemTitle = fromMaybe (head parentTitles) (fileName path)
 
         maybeThumbnail :: Maybe Path -> IO (Maybe Path)
         maybeThumbnail Nothing = return Nothing
         maybeThumbnail (Just thumbnailPath) = processThumbnail thumbnailPath
 
-        mostRecentChildModTime :: [GalleryItem] -> Maybe ZonedTime
-        mostRecentChildModTime =
+        mostRecentModTime :: [GalleryItem] -> Maybe ZonedTime
+        mostRecentModTime =
           maximumByMay comparingTime . map (datetime::(GalleryItem -> ZonedTime))
 
         comparingTime :: ZonedTime -> ZonedTime -> Ordering
         comparingTime l r = compare (zonedTimeToUTC l) (zonedTimeToUTC r)
 
-        aggregateChildTags :: [GalleryItem] -> [Tag]
-        aggregateChildTags = unique . concatMap (\item -> tags (item::GalleryItem))
+        aggregateTags :: [GalleryItem] -> [Tag]
+        aggregateTags = concatMap (\item -> tags (item::GalleryItem))
 
-        unique :: Ord a => [a] -> [a]
-        unique = Set.toList . Set.fromList
+    unique :: Ord a => [a] -> [a]
+    unique = Set.toList . Set.fromList
 
-    implicitParentTags :: Path -> [Tag]
-    implicitParentTags (Path elements) = take tagsFromDirectories elements
+    implicitParentTags :: [String] -> [Tag]
+    implicitParentTags = take tagsFromDirectories
 
     toZonedTime :: UTCTime -> ZonedTime
     toZonedTime = utcToZonedTime utc
