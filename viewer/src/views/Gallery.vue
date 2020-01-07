@@ -3,6 +3,7 @@
     <gallery-search v-if="$uiStore.isModeSearch" :items="currentSearch" />
     <gallery-directory v-else-if="isDirectory" :directory="currentItem" />
     <gallery-image v-else-if="isImage" :image="currentItem" />
+    <div v-else>Unknown type</div>
   </div>
 </template>
 
