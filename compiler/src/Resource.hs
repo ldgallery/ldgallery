@@ -27,7 +27,7 @@ import Control.Concurrent.ParallelIO.Global (parallel)
 import Data.List ((\\), sortBy)
 import Data.Ord (comparing)
 import Data.Char (toLower)
-import Data.Maybe (mapMaybe, fromMaybe)
+import Data.Maybe (mapMaybe, fromMaybe, maybeToList)
 import Data.Function ((&))
 import qualified Data.Set as Set
 import Data.Time.Clock (UTCTime)
@@ -99,7 +99,7 @@ buildGalleryTree ::
      ItemProcessor -> ThumbnailProcessor
   -> Int -> String -> InputTree -> IO GalleryItem
 buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName inputTree =
-  mkGalleryItem [galleryName] inputTree
+  mkGalleryItem [] inputTree
   where
     mkGalleryItem :: [String] -> InputTree -> IO GalleryItem
     mkGalleryItem parentTitles InputFile{path, modTime, sidecar} =
@@ -107,46 +107,48 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName in
         properties <- processItem path
         processedThumbnail <- processThumbnail path
         return GalleryItem
-          { title = optMeta title $ fromMaybe "" $ fileName path
+          { title = fromMeta title $ fromMaybe "" $ fileName path
           , datetime = fromMaybe (toZonedTime modTime) (Input.datetime sidecar)
-          , description = optMeta description ""
-          , tags = unique ((optMeta tags []) ++ implicitParentTags parentTitles)
+          , description = fromMeta description ""
+          , tags = unique ((fromMeta tags []) ++ implicitParentTags parentTitles)
           , path = "/" /> path
           , thumbnail = processedThumbnail
           , properties = properties }
+
       where
-        optMeta :: (Sidecar -> Maybe a) -> a -> a
-        optMeta get fallback = fromMaybe fallback $ get sidecar
+        fromMeta :: (Sidecar -> Maybe a) -> a -> a
+        fromMeta get fallback = fromMaybe fallback $ get sidecar
 
     mkGalleryItem parentTitles InputDir{path, modTime, dirThumbnailPath, items} =
       do
         processedThumbnail <- maybeThumbnail dirThumbnailPath
-        processedItems <- parallel $ map (mkGalleryItem $ itemTitle:parentTitles) items
+        processedItems <- parallel $ map (mkGalleryItem subItemsParents) items
         return GalleryItem
-          { title = itemTitle
+          { title = fromMaybe galleryName (fileName path)
           , datetime = fromMaybe (toZonedTime modTime) (mostRecentModTime processedItems)
           , description = ""
           , tags = unique (aggregateTags processedItems ++ implicitParentTags parentTitles)
           , path = "/" /> path
           , thumbnail = processedThumbnail
           , properties = Directory processedItems }
+
       where
-        itemTitle :: String
-        itemTitle = fromMaybe (head parentTitles) (fileName path)
+        subItemsParents :: [String]
+        subItemsParents = (maybeToList $ fileName path) ++ parentTitles
 
-        maybeThumbnail :: Maybe Path -> IO (Maybe Path)
-        maybeThumbnail Nothing = return Nothing
-        maybeThumbnail (Just thumbnailPath) = processThumbnail thumbnailPath
+    maybeThumbnail :: Maybe Path -> IO (Maybe Path)
+    maybeThumbnail Nothing = return Nothing
+    maybeThumbnail (Just thumbnailPath) = processThumbnail thumbnailPath
 
-        mostRecentModTime :: [GalleryItem] -> Maybe ZonedTime
-        mostRecentModTime =
-          maximumByMay comparingTime . map (datetime::(GalleryItem -> ZonedTime))
+    mostRecentModTime :: [GalleryItem] -> Maybe ZonedTime
+    mostRecentModTime =
+      maximumByMay comparingTime . map (datetime::(GalleryItem -> ZonedTime))
 
-        comparingTime :: ZonedTime -> ZonedTime -> Ordering
-        comparingTime l r = compare (zonedTimeToUTC l) (zonedTimeToUTC r)
+    comparingTime :: ZonedTime -> ZonedTime -> Ordering
+    comparingTime l r = compare (zonedTimeToUTC l) (zonedTimeToUTC r)
 
-        aggregateTags :: [GalleryItem] -> [Tag]
-        aggregateTags = concatMap (\item -> tags (item::GalleryItem))
+    aggregateTags :: [GalleryItem] -> [Tag]
+    aggregateTags = concatMap (\item -> tags (item::GalleryItem))
 
     unique :: Ord a => [a] -> [a]
     unique = Set.toList . Set.fromList
