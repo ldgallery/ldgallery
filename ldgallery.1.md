@@ -1,6 +1,9 @@
-% LDGALLERY(1) ldgallery user manual
-% Pacien TRAN-GIRARD, Guillaume FOUET
-% 2020-01-05 (v0.1.0.0-SNAPSHOT)
+---
+pagetitle: User manual - ldgallery
+title: LDGALLERY(1) ldgallery user manual
+author: Pacien TRAN-GIRARD, Guillaume FOUET
+date: 2020-01-05 (v0.1.0.0-SNAPSHOT)
+---
 
 
 # NAME
