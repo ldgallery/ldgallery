@@ -111,7 +111,7 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName in
           , datetime = fromMaybe (toZonedTime modTime) (Input.datetime sidecar)
           , description = optMeta description ""
           , tags = unique ((optMeta tags []) ++ implicitParentTags parentTitles)
-          , path = path
+          , path = "/" /> path
           , thumbnail = processedThumbnail
           , properties = properties }
       where
@@ -127,7 +127,7 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName in
           , datetime = fromMaybe (toZonedTime modTime) (mostRecentModTime processedItems)
           , description = ""
           , tags = unique (aggregateTags processedItems ++ implicitParentTags parentTitles)
-          , path = path
+          , path = "/" /> path
           , thumbnail = processedThumbnail
           , properties = Directory processedItems }
       where
