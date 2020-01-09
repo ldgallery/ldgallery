@@ -16,7 +16,7 @@ import GalleryThumbnail from "./GalleryThumbnail.vue";
 @Component({
   components: { GalleryThumbnail },
 })
-export default class GalleryImage extends Vue {
+export default class GalleryPicture extends Vue {
   @Prop({ required: true }) readonly items!: Gallery.Item[];
 }
 </script>

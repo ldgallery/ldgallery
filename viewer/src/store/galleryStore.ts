@@ -9,6 +9,7 @@ export default class GalleryStore extends VuexModule {
 
     galleryItemsRoot: Gallery.Item | null = null;
     tags: Tag.Index = {};
+    currentPath: string = "/";
 
     // ---
 
@@ -18,6 +19,22 @@ export default class GalleryStore extends VuexModule {
 
     @mutation private setTags(tags: Tag.Index) {
         this.tags = tags;
+    }
+
+    @mutation setCurrentPath(currentPath: string) {
+        this.currentPath = currentPath;
+    }
+
+    get currentItemPath(): Gallery.Item[] {
+        const galleryItemsRoot = this.galleryItemsRoot;
+        if (galleryItemsRoot)
+            return GalleryStore.searchCurrentItemPath(galleryItemsRoot, this.currentPath);
+        return [];
+    }
+
+    get currentItem(): Gallery.Item | null {
+        const currentItemPath = this.currentItemPath;
+        return currentItemPath.length > 0 ? currentItemPath[currentItemPath.length - 1] : null;
     }
 
     // ---
@@ -61,14 +78,14 @@ export default class GalleryStore extends VuexModule {
     }
 
     // Searches for an item by path from a root item (navigation)
-    static searchCurrentItem(item: Gallery.Item, path: string): Gallery.Item | null {
-        if (path === item.path) return item;
+    private static searchCurrentItemPath(item: Gallery.Item, path: string): Gallery.Item[] {
+        if (path === item.path) return [item];
         if (item.properties.type === "directory" && path.startsWith(item.path)) {
-            const itemFound = item.properties.items
-                .map(item => this.searchCurrentItem(item, path))
-                .find(item => Boolean(item));
-            return itemFound ?? null;
+            const itemChain = item.properties.items
+                .map(item => this.searchCurrentItemPath(item, path))
+                .find(itemChain => itemChain.length > 0);
+            if (itemChain) return [item, ...itemChain];
         }
-        return null;
+        return [];
     }
 }

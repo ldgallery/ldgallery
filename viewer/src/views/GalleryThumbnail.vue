@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img v-if="item.thumbnail" class="thumbnail" :src="imageSrc" :title="item.path" />
+    <img v-if="item.thumbnail" class="thumbnail" :src="pictureSrc" :title="item.path" />
     <div v-else class="flex-column flex-center">
       <fa-icon icon="folder" class="fa-4x" />
       {{item.path}}
@@ -15,7 +15,7 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 export default class GalleryThumbnail extends Vue {
   @Prop({ required: true }) readonly item!: Gallery.Item;
 
-  get imageSrc() {
+  get pictureSrc() {
     return `${process.env.VUE_APP_DATA_URL}${this.item.thumbnail}`;
   }
 }

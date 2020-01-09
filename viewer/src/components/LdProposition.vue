@@ -13,7 +13,6 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { Operation } from "@/@types/tag/Operation";
-import Gallery from '../views/Gallery.vue';
 
 @Component
 export default class LdTagInput extends Vue {

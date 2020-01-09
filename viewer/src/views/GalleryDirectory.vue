@@ -1,6 +1,5 @@
 <template>
   <div>
-    <strong>Directory: {{directory.path}}</strong>
     <div class="flex">
       <div v-for="(item) in directory.properties.items" :key="item.path">
         <router-link :to="item.path">

@@ -9,6 +9,7 @@ import {
     faTag,
     faPlus,
     faMinus,
+    faImage,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -18,6 +19,7 @@ library.add(
     faTag,
     faPlus,
     faMinus,
+    faImage,
 );
 
 Vue.component("fa-icon", FontAwesomeIcon);

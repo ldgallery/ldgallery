@@ -6,5 +6,6 @@
   "mode.navigation": "Navigation",
   "mode.search": "Search",
   "search.no-results": "No results",
-  "panelLeft.propositions": "Proposed tags"
+  "panelLeft.propositions": "Proposed tags",
+  "gallery.unknowntype": "Unknown item type"
 }

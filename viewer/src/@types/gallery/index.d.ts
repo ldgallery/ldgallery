@@ -1,28 +1,22 @@
 declare namespace Gallery {
-    interface Image extends Item {
-        properties: ImageProperties,
+    interface Picture extends Item {
+        properties: PictureProperties,
     }
     interface Directory extends Item {
         properties: DirectoryProperties,
     }
     interface Item {
         title: string,
-        date: string,
+        datetime: string,
         description: string,
         tags: RawTag[],
         path: string,
-        thumbnail: {
-            path: string,
-        },
-        properties: ImageProperties | DirectoryProperties,
+        thumbnail?: string,
+        properties: PictureProperties | DirectoryProperties,
     }
-    interface ImageProperties {
-        type: "image",
-        filesize: number,
-        resolution: {
-            width: number,
-            height: number,
-        }
+    interface PictureProperties {
+        type: "picture",
+        resource: string,
     }
     interface DirectoryProperties {
         type: "directory",

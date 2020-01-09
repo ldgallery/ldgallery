@@ -1,6 +1,6 @@
 <template>
   <div :class="{fullscreen: $uiStore.fullscreen}">
-    <div class="layout layout-top">header</div>
+    <panel-top class="layout layout-top" />
     <panel-left class="layout layout-left" />
     <router-view class="layout layout-content" />
     <ld-button-fullscreen />
@@ -11,9 +11,10 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import PanelLeft from "./PanelLeft.vue";
+import PanelTop from "./PanelTop.vue";
 
 @Component({
-  components: { PanelLeft },
+  components: { PanelLeft, PanelTop },
 })
 export default class MainLayout extends Vue {
   isLoading: boolean = false;
@@ -44,8 +45,7 @@ export default class MainLayout extends Vue {
 </script>
 
 <style lang="scss">
-$layout-top: 30px;
-$layout-left: 250px;
+@import "@/assets/scss/theme.scss";
 
 body,
 html {
@@ -86,18 +86,17 @@ html {
   }
 }
 
-// temp colors
 .layout {
   &.layout-top {
-    background-color: darkslategray;
-    color: white;
+    background-color: $panel-top-bgcolor;
+    color: $panel-top-txtcolor;
   }
   &.layout-left {
-    background-color: darkblue;
-    color: white;
+    background-color: $panel-left-bgcolor;
+    color: $panel-left-txtcolor;
   }
   &.layout-content {
-    background-color: lightcyan;
+    background-color: $content-bgcolor;
   }
 }
 </style>

@@ -1,32 +1,41 @@
 <template>
   <div>
     <gallery-search v-if="$uiStore.isModeSearch" :items="currentSearch" />
-    <gallery-directory v-else-if="isDirectory" :directory="currentItem" />
-    <gallery-image v-else-if="isImage" :image="currentItem" />
-    <div v-else>Unknown type</div>
+    <gallery-directory v-else-if="isDirectory" :directory="$galleryStore.currentItem" />
+    <gallery-picture v-else-if="isPicture" :picture="$galleryStore.currentItem" />
+    <div v-else>{{$t("gallery.unknowntype")}}</div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import { Operation } from '@/@types/tag/Operation';
 import GallerySearch from "./GallerySearch.vue";
 import GalleryDirectory from "./GalleryDirectory.vue";
-import GalleryImage from "./GalleryImage.vue";
-import GalleryStore from "../store/galleryStore";
+import GalleryPicture from "./GalleryPicture.vue";
 
 @Component({
-  components: { GallerySearch, GalleryDirectory, GalleryImage },
+  components: { GallerySearch, GalleryDirectory, GalleryPicture },
 })
 export default class Gallery extends Vue {
   @Prop(String) readonly pathMatch!: string;
+
+  mounted() {
+    this.pathChanged()
+  }
+
+  @Watch("pathMatch")
+  pathChanged() {
+    console.log("Path: ", this.pathMatch);
+    this.$galleryStore.setCurrentPath(this.pathMatch);
+  }
 
   get isDirectory(): boolean {
     return this.checkType("directory");
   }
 
-  get isImage(): boolean {
-    return this.checkType("image");
+  get isPicture(): boolean {
+    return this.checkType("picture");
   }
 
   // Results of the search (by tags)
@@ -37,17 +46,10 @@ export default class Gallery extends Vue {
     return this.aggregateAll(byOperation, intersection, substraction);
   }
 
-  // Item pointed by the URL (navigation)
-  get currentItem(): Gallery.Item | null {
-    const galleryItemsRoot = this.$galleryStore.galleryItemsRoot;
-    if (galleryItemsRoot) return GalleryStore.searchCurrentItem(galleryItemsRoot, this.pathMatch);
-    return null;
-  }
-
   // ---
 
   private checkType(type: string): boolean {
-    return this.currentItem?.properties.type === type ?? false;
+    return this.$galleryStore.currentItem?.properties.type === type ?? false;
   }
 
   private extractTagsByOperation(currentTags: Tag.Search[]): Tag.SearchByOperation {
