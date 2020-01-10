@@ -1,0 +1,21 @@
+compiler:
+  galleryName: Example gallery
+
+  includeFiles:
+  - "*.jpg"
+
+  #excludeFiles:
+  #- "*.md"
+
+  tagsFromDirectories: 0 # default
+
+  thumbnailMaxResolution:
+    width: 400  # default
+    height: 400 # default
+
+  pictureMaxResolution:
+    width: 1024
+    height: 768
+
+
+viewer: {}
