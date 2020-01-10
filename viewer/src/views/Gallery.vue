@@ -1,8 +1,8 @@
 <template>
   <div>
     <gallery-search v-if="$uiStore.isModeSearch" :items="currentSearch" />
-    <gallery-directory v-else-if="isDirectory" :directory="$galleryStore.currentItem" />
-    <gallery-picture v-else-if="isPicture" :picture="$galleryStore.currentItem" />
+    <gallery-directory v-else-if="checkType('directory')" :directory="$galleryStore.currentItem" />
+    <gallery-picture v-else-if="checkType('picture')" :picture="$galleryStore.currentItem" />
     <div v-else>{{$t("gallery.unknowntype")}}</div>
   </div>
 </template>
@@ -28,14 +28,6 @@ export default class Gallery extends Vue {
   pathChanged() {
     console.log("Path: ", this.pathMatch);
     this.$galleryStore.setCurrentPath(this.pathMatch);
-  }
-
-  get isDirectory(): boolean {
-    return this.checkType("directory");
-  }
-
-  get isPicture(): boolean {
-    return this.checkType("picture");
   }
 
   // Results of the search (by tags)

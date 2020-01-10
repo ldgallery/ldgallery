@@ -40,7 +40,7 @@ export default class LdTagInput extends Vue {
     return `${option.display} (${option.items.length})`;
   }
 
-  extractOperation(filter: string) {
+  extractOperation(filter: string): Operation {
     const first = filter.slice(0, 1);
     switch (first) {
       case Operation.ADDITION:
