@@ -71,30 +71,35 @@ writeJSON outputPath object =
     ensureParentDir JSON.encodeFile outputPath object
 
 
-galleryDirFilter :: ([Glob.Pattern], [Glob.Pattern]) -> FSNode -> Bool
-galleryDirFilter (inclusionPatterns, exclusionPatterns) =
+galleryDirFilter :: CompilerConfig -> FSNode -> Bool
+galleryDirFilter config =
       (not . isHidden)
-  &&& (matchName True $ anyPattern inclusionPatterns)
-  &&& (not . isConfigFile)
+  &&& (not . matchesFile (== galleryConf))
   &&& (not . containsOutputGallery)
-  &&& (not . (matchName False $ anyPattern exclusionPatterns))
+  &&& ((matchesDir $ anyPattern $ includedDirectories config) |||
+       (matchesFile $ anyPattern $ includedFiles config))
+  &&& (not . ((matchesDir $ anyPattern $ excludedDirectories config) |||
+              (matchesFile $ anyPattern $ excludedFiles config)))
 
   where
     (&&&) = liftM2 (&&)
     (|||) = liftM2 (||)
 
-    matchName :: Bool -> (FileName -> Bool) -> FSNode -> Bool
-    matchName matchDir _ Dir{} = matchDir
-    matchName _ cond file@File{} = maybe False cond $ nodeName file
+    matchesDir :: (FileName -> Bool) -> FSNode -> Bool
+    matchesDir cond dir@Dir{} = maybe False cond $ nodeName dir
+    matchesDir _ File{} = False
 
-    anyPattern :: [Glob.Pattern] -> FileName -> Bool
-    anyPattern patterns filename = any (flip Glob.match filename) patterns
+    matchesFile :: (FileName -> Bool) -> FSNode -> Bool
+    matchesFile cond file@File{} = maybe False cond $ nodeName file
+    matchesFile _ Dir{} = False
 
-    isConfigFile = matchName False (== galleryConf)
-    isGalleryIndex = matchName False (== indexFile)
-    isViewerIndex = matchName False (== viewerMainFile)
+    anyPattern :: [String] -> FileName -> Bool
+    anyPattern patterns filename = any (flip Glob.match filename) (map Glob.compile patterns)
+
+    containsOutputGallery :: FSNode -> Bool
     containsOutputGallery File{} = False
-    containsOutputGallery Dir{items} = any (isGalleryIndex ||| isViewerIndex) items
+    containsOutputGallery Dir{items} =
+      any (matchesFile (== indexFile) ||| matchesFile (== viewerMainFile)) items
 
 
 compileGallery :: FilePath -> FilePath -> Bool -> IO ()
@@ -104,9 +109,7 @@ compileGallery inputDirPath outputDirPath rebuildAll =
     let config = compiler fullConfig
 
     inputDir <- readDirectory inputDirPath
-    let inclusionPatterns = map Glob.compile $ includeFiles config
-    let exclusionPatterns = map Glob.compile $ excludeFiles config
-    let sourceFilter = galleryDirFilter (inclusionPatterns, exclusionPatterns)
+    let sourceFilter = galleryDirFilter config
     let sourceTree = filterDir sourceFilter inputDir
     inputTree <- readInputTree sourceTree
 
