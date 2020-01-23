@@ -20,5 +20,7 @@ compiler:
     width: 1024
     height: 768
 
+  #jpegExportQuality: 80 # default
+
 
 viewer: {}

@@ -114,8 +114,8 @@ compileGallery inputDirPath outputDirPath rebuildAll =
     inputTree <- readInputTree sourceTree
 
     let cache = if rebuildAll then skipCached else withCached
-    let itemProc = itemProcessor (pictureMaxResolution config) cache
-    let thumbnailProc = thumbnailProcessor (thumbnailMaxResolution config) cache
+    let itemProc = itemProcessor config cache
+    let thumbnailProc = thumbnailProcessor config cache
     let galleryBuilder = buildGalleryTree itemProc thumbnailProc (tagsFromDirectories config)
     resources <- galleryBuilder (galleryName config) inputTree
 
@@ -128,7 +128,11 @@ compileGallery inputDirPath outputDirPath rebuildAll =
     outputIndex = outputDirPath </> indexFile
     outputViewerConf = outputDirPath </> viewerConfFile
 
-    itemProcessor maxRes cache =
-      itemFileProcessor maxRes cache inputDirPath outputDirPath itemsDir
-    thumbnailProcessor thumbRes cache =
-      thumbnailFileProcessor thumbRes cache inputDirPath outputDirPath thumbnailsDir
+    itemProcessor config cache =
+      itemFileProcessor
+        (pictureMaxResolution config) (jpegExportQuality config) cache
+        inputDirPath outputDirPath itemsDir
+    thumbnailProcessor config cache =
+      thumbnailFileProcessor
+        (thumbnailMaxResolution config) (jpegExportQuality config) cache
+        inputDirPath outputDirPath thumbnailsDir
