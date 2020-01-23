@@ -1,10 +1,13 @@
 compiler:
   galleryName: Example gallery
 
-  includeFiles:
+  #includedDirectories: ["*"]
+  #excludedDirectories: []
+
+  includedFiles:
   - "*.jpg"
 
-  #excludeFiles:
+  #excludedFiles:
   #- "*.md"
 
   tagsFromDirectories: 0 # default

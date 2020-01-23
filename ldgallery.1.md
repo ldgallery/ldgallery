@@ -93,10 +93,16 @@ The gallery settings reside in a file named "gallery.yaml" located at the root o
 compiler.galleryName
 : Name of the gallery.  Defaults to "Gallery".
 
-compiler.includeFiles[]
+compiler.includedDirectories[]
+: Glob patterns of directory names to include in the gallery.  Defaults to ["*"] (matches all directory names).
+
+compiler.excludedDirectories[]
+: Glob patterns of directory names to exclude from the gallery.  Defaults to [] (none).
+
+compiler.includedFiles[]
 : Glob patterns of file names to include in the gallery.  Defaults to ["*"] (matches all file names).
 
-compiler.excludeFiles[]
+compiler.excludedFiles[]
 : Glob patterns of file names to exclude from the gallery.  Defaults to [] (none).
 
 compiler.tagsFromDirectories
