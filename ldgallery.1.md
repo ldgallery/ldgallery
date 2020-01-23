@@ -120,6 +120,9 @@ compiler.pictureMaxResolution.width
 compiler.pictureMaxResolution.height
 : Maximum height in pixels of the picture items, unlimited by default.
 
+compiler.jpegExportQuality
+: JPEG export quality percentage as an integer, 80 by default.
+
 viewer.defaultSearchMode [TODO]
 : Default search view mode ("highlight" or "filter").  Defaults to "filter".
 
