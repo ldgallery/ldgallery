@@ -38,7 +38,7 @@ import Codec.Picture.Extra -- TODO: compare DCT and bilinear (and Lanczos, but i
 
 import Resource
   ( ItemProcessor, ThumbnailProcessor
-  , GalleryItemProps(..), Resolution(..) )
+  , GalleryItemProps(..), Resolution(..), Resource(..) )
 
 import Files
 
@@ -150,6 +150,10 @@ withCached processor inputPath outputPath =
     skip = putStrLn $ "Skipping:\t" ++ outputPath
 
 
+resourceAt :: FilePath -> Path -> IO Resource
+resourceAt fsPath resPath = getModificationTime fsPath >>= return . Resource resPath
+
+
 type ItemFileProcessor =
      FileName        -- ^ Input base path
   -> FileName        -- ^ Output base path
@@ -159,14 +163,15 @@ type ItemFileProcessor =
 itemFileProcessor :: Maybe Resolution -> LossyExportQuality -> Cache -> ItemFileProcessor
 itemFileProcessor maxResolution jpegExportQuality cached inputBase outputBase resClass inputRes =
   cached processor inPath outPath
-  >> return (props relOutPath)
+  >> resourceAt outPath relOutPath
+  >>= return . props
   where
     relOutPath = resClass /> inputRes
     inPath = localPath $ inputBase /> inputRes
     outPath = localPath $ outputBase /> relOutPath
     (processor, props) = processorFor maxResolution $ formatFromPath inputRes
 
-    processorFor :: Maybe Resolution -> Format -> (FileProcessor, Path -> GalleryItemProps)
+    processorFor :: Maybe Resolution -> Format -> (FileProcessor, Resource -> GalleryItemProps)
     processorFor Nothing _ =
       (copyFileProcessor, Other)
     processorFor _ (PictureFormat Gif) =
@@ -192,11 +197,12 @@ thumbnailFileProcessor maxRes jpegExportQuality cached inputBase outputBase resC
     inPath = localPath $ inputBase /> inputRes
     outPath = localPath $ outputBase /> relOutPath
 
-    process :: Maybe FileProcessor -> IO (Maybe Path)
+    process :: Maybe FileProcessor -> IO (Maybe Resource)
     process Nothing = return Nothing
     process (Just proc) =
       proc inPath outPath
-      >> return (Just relOutPath)
+      >> resourceAt outPath relOutPath
+      >>= return . Just
 
     processorFor :: Format -> Maybe FileProcessor
     processorFor (PictureFormat picFormat) =

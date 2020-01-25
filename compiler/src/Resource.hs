@@ -18,7 +18,7 @@
 
 module Resource
   ( ItemProcessor, ThumbnailProcessor
-  , GalleryItem(..), GalleryItemProps(..), Resolution(..)
+  , GalleryItem(..), GalleryItemProps(..), Resolution(..), Resource(..)
   , buildGalleryTree, galleryCleanupResourceDir
   ) where
 
@@ -30,8 +30,10 @@ import Data.Char (toLower)
 import Data.Maybe (mapMaybe, fromMaybe, maybeToList)
 import Data.Function ((&))
 import qualified Data.Set as Set
+import Data.Text (pack)
 import Data.Time.Clock (UTCTime)
 import Data.Time.LocalTime (ZonedTime, utc, utcToZonedTime, zonedTimeToUTC)
+import Data.Time.Format (formatTime, defaultTimeLocale)
 import Safe.Foldable (maximumByMay)
 
 import GHC.Generics (Generic)
@@ -65,10 +67,22 @@ instance ToJSON Resolution where
   toEncoding = genericToEncoding encodingOptions
 
 
+data Resource = Resource
+  { resourcePath :: Path
+  , modTime :: UTCTime
+  } deriving (Generic, Show)
+
+instance ToJSON Resource where
+  toJSON Resource{resourcePath, modTime} =
+    JSON.String $ pack (webPath resourcePath ++ "?" ++ timestamp)
+    where
+      timestamp = formatTime defaultTimeLocale "%s" modTime
+
+
 data GalleryItemProps =
     Directory { items :: [GalleryItem] }
-  | Picture { resource :: Path }
-  | Other { resource :: Path }
+  | Picture { resource :: Resource }
+  | Other { resource :: Resource }
   deriving (Generic, Show)
 
 instance ToJSON GalleryItemProps where
@@ -82,7 +96,7 @@ data GalleryItem = GalleryItem
   , description :: String
   , tags :: [Tag]
   , path :: Path
-  , thumbnail :: Maybe Path
+  , thumbnail :: Maybe Resource
   , properties :: GalleryItemProps
   } deriving (Generic, Show)
 
@@ -92,7 +106,7 @@ instance ToJSON GalleryItem where
 
 
 type ItemProcessor = Path -> IO GalleryItemProps
-type ThumbnailProcessor = Path -> IO (Maybe Path)
+type ThumbnailProcessor = Path -> IO (Maybe Resource)
 
 
 buildGalleryTree ::
@@ -136,7 +150,7 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName in
         subItemsParents :: [String]
         subItemsParents = (maybeToList $ fileName path) ++ parentTitles
 
-    maybeThumbnail :: Maybe Path -> IO (Maybe Path)
+    maybeThumbnail :: Maybe Path -> IO (Maybe Resource)
     maybeThumbnail Nothing = return Nothing
     maybeThumbnail (Just thumbnailPath) = processThumbnail thumbnailPath
 
@@ -175,18 +189,18 @@ galleryOutputDiff resources ref =
 
     compiledPaths :: [GalleryItem] -> [Path]
     compiledPaths items =
-      resourcePaths items ++ thumbnailPaths items
+      resPaths items ++ thumbnailPaths items
       & concatMap subPaths
 
-    resourcePaths :: [GalleryItem] -> [Path]
-    resourcePaths = mapMaybe (resourcePath . properties)
+    resPaths :: [GalleryItem] -> [Path]
+    resPaths = mapMaybe (resPath . properties)
 
-    resourcePath :: GalleryItemProps -> Maybe Path
-    resourcePath Directory{} = Nothing
-    resourcePath resourceProps = Just $ resource resourceProps
+    resPath :: GalleryItemProps -> Maybe Path
+    resPath Directory{} = Nothing
+    resPath resourceProps = Just (resourcePath $ resource resourceProps)
 
     thumbnailPaths :: [GalleryItem] -> [Path]
-    thumbnailPaths = mapMaybe thumbnail
+    thumbnailPaths = (map resourcePath) . (mapMaybe thumbnail)
 
 
 galleryCleanupResourceDir :: GalleryItem -> FileName -> IO ()
