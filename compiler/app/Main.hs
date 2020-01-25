@@ -18,13 +18,23 @@
 
 module Main where
 
+import GHC.Generics (Generic)
 import Paths_ldgallery_compiler (version, getDataFileName)
 import Data.Version (showVersion)
+import Data.Int (Int64)
+import Data.Aeson (ToJSON)
+import Data.Time.Clock.System (getSystemTime, systemSeconds)
 import System.FilePath ((</>))
 import System.Console.CmdArgs
 
 import Compiler
 import Files (readDirectory, copyTo)
+
+
+data ViewerConfig = ViewerConfig
+  { galleryRoot :: String
+  , generationTimestamp :: Int64
+  } deriving (Generic, Show, ToJSON)
 
 
 data Options = Options
@@ -77,25 +87,27 @@ main :: IO ()
 main =
   do
     opts <- cmdArgs options
-
     buildGallery opts
-
-    if (withViewer opts) then
+    if (withViewer opts) then do
+      writeViewerConfig (outputDir opts </> "config.json")
       copyViewer (outputDir opts)
     else
       return ()
 
   where
+    gallerySubdir :: String
+    gallerySubdir = "gallery/"
+
     buildGallery :: Options -> IO ()
     buildGallery opts =
       compileGallery
         (inputDir opts)
-        (galleryOutputDir "gallery" opts)
+        (galleryOutputDir opts)
         (rebuilAll opts)
         (cleanOutput opts)
 
-    galleryOutputDir :: FilePath -> Options -> FilePath
-    galleryOutputDir gallerySubdir opts =
+    galleryOutputDir :: Options -> FilePath
+    galleryOutputDir opts =
       if withViewer opts then outputBase </> gallerySubdir else outputBase
       where outputBase = outputDir opts
 
@@ -105,3 +117,9 @@ main =
       >>  getDataFileName "viewer"
       >>= readDirectory
       >>= copyTo target
+
+    writeViewerConfig :: FilePath -> IO ()
+    writeViewerConfig fileName =
+      getSystemTime
+      >>= return . ViewerConfig gallerySubdir . systemSeconds
+      >>= writeJSON fileName
