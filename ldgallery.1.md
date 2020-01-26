@@ -120,6 +120,9 @@ compiler.pictureMaxResolution.width
 compiler.pictureMaxResolution.height
 : Maximum height in pixels of the picture items, unlimited by default.
 
+compiler.pictureScalingMethod
+: Method to use to generate thumbnails and scaled down versions of pictures ("bilinear" or "dct").  Defaults to "dct".
+
 compiler.jpegExportQuality
 : JPEG export quality percentage as an integer, 80 by default.
 

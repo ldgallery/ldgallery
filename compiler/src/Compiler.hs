@@ -130,9 +130,9 @@ compileGallery inputDirPath outputDirPath rebuildAll =
 
     itemProcessor config cache =
       itemFileProcessor
-        (pictureMaxResolution config) (jpegExportQuality config) cache
+        (pictureScaling config) (pictureMaxResolution config) (jpegExportQuality config) cache
         inputDirPath outputDirPath itemsDir
     thumbnailProcessor config cache =
       thumbnailFileProcessor
-        (thumbnailMaxResolution config) (jpegExportQuality config) cache
+        (pictureScaling config) (thumbnailMaxResolution config) (jpegExportQuality config) cache
         inputDirPath outputDirPath thumbnailsDir

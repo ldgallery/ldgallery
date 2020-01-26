@@ -25,6 +25,7 @@ dependencies:
 - cmdargs
 - JuicyPixels
 - JuicyPixels-extra
+- JuicyPixels-scale-dct
 - parallel-io
 - Glob
 - safe

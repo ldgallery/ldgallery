@@ -19,17 +19,31 @@
 module Config
   ( GalleryConfig(..)
   , CompilerConfig(..)
+  , PictureScalingMethod, pictureScaling
   , readConfig
   ) where
 
 
 import GHC.Generics (Generic)
-import Data.Aeson (FromJSON, withObject, (.:?), (.!=))
+import Data.Aeson (FromJSON, withText, withObject, (.:?), (.!=))
 import qualified Data.Aeson as JSON
 
 import Files (FileName)
 import Input (decodeYamlFile)
 import Resource (Resolution(..))
+import Processors (PictureScaling(..))
+
+
+newtype PictureScalingMethod = PictureScalingMethod
+  { scaling :: PictureScaling
+  } deriving (Generic, Show)
+
+instance FromJSON PictureScalingMethod where
+  parseJSON = withText "PictureScalingMethod" $ \text ->
+    case text of
+      "bilinear" -> return $ PictureScalingMethod Bilinear
+      "dct" -> return $ PictureScalingMethod DCT
+      _ -> fail "Invalid picture scaling method"
 
 
 data CompilerConfig = CompilerConfig
@@ -41,8 +55,12 @@ data CompilerConfig = CompilerConfig
   , tagsFromDirectories :: Int
   , thumbnailMaxResolution :: Resolution
   , pictureMaxResolution :: Maybe Resolution
+  , pictureScalingMethod :: PictureScalingMethod
   , jpegExportQuality :: Int
   } deriving (Generic, Show)
+
+pictureScaling :: CompilerConfig -> PictureScaling
+pictureScaling = scaling . pictureScalingMethod
 
 instance FromJSON CompilerConfig where
   parseJSON = withObject "CompilerConfig" $ \v -> CompilerConfig
@@ -54,6 +72,7 @@ instance FromJSON CompilerConfig where
     <*> v .:? "tagsFromDirectories" .!= 0
     <*> v .:? "thumbnailMaxResolution" .!= (Resolution 400 400)
     <*> v .:? "pictureMaxResolution"
+    <*> v .:? "pictureScalingMethod" .!= PictureScalingMethod DCT
     <*> v .:? "jpegExportQuality" .!= 80
 
 

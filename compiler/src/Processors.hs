@@ -17,13 +17,14 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 module Processors
-  ( Resolution(..)
+  ( Resolution(..), PictureScaling(..)
   , ItemFileProcessor, itemFileProcessor
   , ThumbnailFileProcessor, thumbnailFileProcessor
   , skipCached, withCached
   ) where
 
 
+import GHC.Generics (Generic)
 import Control.Exception (Exception, throwIO)
 import Data.Function ((&))
 import Data.Ratio ((%))
@@ -34,7 +35,8 @@ import qualified System.Directory
 import System.FilePath
 
 import Codec.Picture
-import Codec.Picture.Extra -- TODO: compare DCT and bilinear (and Lanczos, but it's not implemented)
+import Codec.Picture.Extra (scaleBilinear)
+import qualified Codec.Picture.ScaleDCT as ScaleDCT (scale)
 
 import Resource
   ( ItemProcessor, ThumbnailProcessor
@@ -81,12 +83,13 @@ copyFileProcessor inputPath outputPath =
   >> ensureParentDir (flip System.Directory.copyFile) outputPath inputPath
 
 
+data PictureScaling = Bilinear | DCT deriving (Generic, Show)
 type LossyExportQuality = Int
 type StaticImageReader = FilePath -> IO (Either String DynamicImage)
 type StaticImageWriter = FilePath -> DynamicImage -> IO ()
 
-resizeStaticImageUpTo :: Resolution -> LossyExportQuality -> PictureFileFormat -> FileProcessor
-resizeStaticImageUpTo maxResolution jpegExportQuality pictureFormat =
+resizeStaticImageUpTo :: PictureScaling -> Resolution -> LossyExportQuality -> PictureFileFormat -> FileProcessor
+resizeStaticImageUpTo scaling maxResolution jpegExportQuality pictureFormat =
   resizerFor pictureFormat
   where
     resizerFor :: PictureFileFormat -> FileProcessor
@@ -113,7 +116,7 @@ resizeStaticImageUpTo maxResolution jpegExportQuality pictureFormat =
     fitDynamicImage :: Resolution -> DynamicImage -> DynamicImage
     fitDynamicImage (Resolution boxWidth boxHeight) image =
       convertRGBA8 image
-      & scaleBilinear targetWidth targetHeight
+      & scaler (targetWidth, targetHeight)
       & ImageRGBA8
       where
         picWidth = dynamicMap imageWidth image
@@ -121,6 +124,11 @@ resizeStaticImageUpTo maxResolution jpegExportQuality pictureFormat =
         resizeRatio = min (boxWidth % picWidth) (boxHeight % picHeight)
         targetWidth = floor $ resizeRatio * (picWidth % 1)
         targetHeight = floor $ resizeRatio * (picHeight % 1)
+
+    scaler :: (Int, Int) -> Image PixelRGBA8 -> Image PixelRGBA8
+    scaler = case scaling of
+      Bilinear -> uncurry scaleBilinear
+      DCT -> ScaleDCT.scale
 
 
 type Cache = FileProcessor -> FileProcessor
@@ -160,8 +168,8 @@ type ItemFileProcessor =
   -> FileName        -- ^ Output class (subdir)
   -> ItemProcessor
 
-itemFileProcessor :: Maybe Resolution -> LossyExportQuality -> Cache -> ItemFileProcessor
-itemFileProcessor maxResolution jpegExportQuality cached inputBase outputBase resClass inputRes =
+itemFileProcessor :: PictureScaling -> Maybe Resolution -> LossyExportQuality -> Cache -> ItemFileProcessor
+itemFileProcessor scaling maxResolution jpegExportQuality cached inputBase outputBase resClass inputRes =
   cached processor inPath outPath
   >> resourceAt outPath relOutPath
   >>= return . props
@@ -177,7 +185,7 @@ itemFileProcessor maxResolution jpegExportQuality cached inputBase outputBase re
     processorFor _ (PictureFormat Gif) =
       (copyFileProcessor, Picture) -- TODO: handle animated gif resizing
     processorFor (Just maxRes) (PictureFormat picFormat) =
-      (resizeStaticImageUpTo maxRes jpegExportQuality picFormat, Picture)
+      (resizeStaticImageUpTo scaling maxRes jpegExportQuality picFormat, Picture)
     processorFor _ Unknown =
       (copyFileProcessor, Other) -- TODO: handle video reencoding and others?
 
@@ -188,8 +196,8 @@ type ThumbnailFileProcessor =
   -> FileName        -- ^ Output class (subdir)
   -> ThumbnailProcessor
 
-thumbnailFileProcessor :: Resolution -> LossyExportQuality -> Cache -> ThumbnailFileProcessor
-thumbnailFileProcessor maxRes jpegExportQuality cached inputBase outputBase resClass inputRes =
+thumbnailFileProcessor :: PictureScaling -> Resolution -> LossyExportQuality -> Cache -> ThumbnailFileProcessor
+thumbnailFileProcessor scaling maxRes jpegExportQuality cached inputBase outputBase resClass inputRes =
   cached <$> processorFor (formatFromPath inputRes)
   & process
   where
@@ -206,6 +214,6 @@ thumbnailFileProcessor maxRes jpegExportQuality cached inputBase outputBase resC
 
     processorFor :: Format -> Maybe FileProcessor
     processorFor (PictureFormat picFormat) =
-      Just $ resizeStaticImageUpTo maxRes jpegExportQuality picFormat
+      Just $ resizeStaticImageUpTo scaling maxRes jpegExportQuality picFormat
     processorFor _ =
       Nothing
