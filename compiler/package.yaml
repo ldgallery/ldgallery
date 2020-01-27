@@ -23,12 +23,11 @@ dependencies:
 - aeson
 - yaml
 - cmdargs
-- JuicyPixels
-- JuicyPixels-extra
 - parallel-io
 - Glob
 - safe
 - time
+- process
 
 default-extensions:
 - DuplicateRecordFields

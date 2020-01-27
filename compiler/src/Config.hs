@@ -41,7 +41,6 @@ data CompilerConfig = CompilerConfig
   , tagsFromDirectories :: Int
   , thumbnailMaxResolution :: Resolution
   , pictureMaxResolution :: Maybe Resolution
-  , jpegExportQuality :: Int
   } deriving (Generic, Show)
 
 instance FromJSON CompilerConfig where
@@ -54,7 +53,6 @@ instance FromJSON CompilerConfig where
     <*> v .:? "tagsFromDirectories" .!= 0
     <*> v .:? "thumbnailMaxResolution" .!= (Resolution 400 400)
     <*> v .:? "pictureMaxResolution"
-    <*> v .:? "jpegExportQuality" .!= 80
 
 
 data GalleryConfig = GalleryConfig
