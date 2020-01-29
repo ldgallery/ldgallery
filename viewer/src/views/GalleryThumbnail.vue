@@ -18,8 +18,15 @@
 -->
 
 <template>
-  <div>
-    <img v-if="item.thumbnail" class="thumbnail" :src="pictureSrc" :title="item.path" />
+  <div class="forcedsize" :class="{preload: loading}">
+    <v-lazy-image
+      v-if="item.thumbnail"
+      class="thumbnail"
+      :src="pictureSrc"
+      :title="item.path"
+      @intersect="loading=true"
+      @load="loading=false"
+    />
     <div v-else class="flex-column flex-center">
       <fa-icon icon="folder" class="fa-4x" />
       {{item.path}}
@@ -34,6 +41,8 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 export default class GalleryThumbnail extends Vue {
   @Prop({ required: true }) readonly item!: Gallery.Item;
 
+  loading: boolean = false;
+
   get pictureSrc() {
     return `${process.env.VUE_APP_DATA_URL}${this.item.thumbnail}`;
   }
@@ -41,8 +50,29 @@ export default class GalleryThumbnail extends Vue {
 </script>
 
 <style lang="scss">
+@import "@/assets/scss/theme.scss";
+
 .thumbnail {
   max-width: 250px;
   max-height: 250px;
+}
+.preload {
+  background: linear-gradient(to right, rgba(0, 0, 0, 0) 8%, $loader-color 18%, rgba(0, 0, 0, 0) 33%);
+  background-size: 200% 50px;
+  animation: preloadAnimation 2s infinite linear;
+}
+@keyframes preloadAnimation {
+  from {
+    background-position: -200px 0;
+  }
+  to {
+    background-position: 200px 0;
+  }
+}
+// Temporary size until we get the true thumbnail size
+.forcedsize {
+  width: 250px;
+  height: 250px;
+  text-align: center;
 }
 </style>

@@ -22,6 +22,7 @@ import "@/assets/scss/global.scss";
 import "@/components"
 import "@/plugins/fontawesome";
 import "@/plugins/buefy";
+import "@/plugins/lazyimage";
 import store from '@/store'
 import i18n from "@/plugins/i18n";
 import router from "@/router";

@@ -18,6 +18,7 @@
 */
 
 // Global CSS
+@import "@/assets/scss/theme.scss";
 
 // === Forms
 
@@ -41,4 +42,39 @@
 }
 .flex-center {
   align-items: center;
+}
+
+// === Scrollbar styling
+
+.scrollbar {
+  overflow-y: auto;
+}
+.scrollbar::-webkit-scrollbar {
+  width: 12px;
+}
+.scrollbar::-webkit-scrollbar-thumb {
+  box-shadow: inset 0 0 6px black;
+  background-color: $toolbar-color;
+}
+
+// === Thumbnail tiles alignment
+
+.thumbnail-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  & > div {
+    margin: 1px;
+  }
+}
+
+// === Effect to apply on lazy-image loading
+
+.v-lazy-image {
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.v-lazy-image-loaded {
+  opacity: 1;
 }

@@ -21,7 +21,7 @@
   <div :class="{fullscreen: $uiStore.fullscreen}">
     <panel-top class="layout layout-top" />
     <panel-left class="layout layout-left" />
-    <router-view class="layout layout-content" />
+    <router-view class="layout layout-content scrollbar" />
     <ld-button-fullscreen />
     <b-loading :active="isLoading" is-full-page />
   </div>
@@ -93,6 +93,7 @@ html {
     top: var(--layout-top);
     left: var(--layout-left);
     z-index: 3;
+    overflow-x: hidden;
   }
 }
 .fullscreen {

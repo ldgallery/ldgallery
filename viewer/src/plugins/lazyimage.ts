@@ -1,4 +1,4 @@
-<!-- ldgallery - A static generator which turns a collection of tagged
+/* ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
 -- Copyright (C) 2019-2020  Guillaume FOUET
@@ -15,32 +15,9 @@
 --
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
--->
+*/
 
-<template>
-  <div class="thumbnail-tiles">
-    <div v-for="(item) in directory.properties.items" :key="item.path">
-      <router-link :to="item.path">
-        <gallery-thumbnail :item="item" />
-      </router-link>
-    </div>
-    <div>
-      <!-- Empty item for better flex layout -->
-    </div>
-  </div>
-</template>
+import Vue from "vue";
+import { VLazyImagePlugin } from "v-lazy-image";
 
-<script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
-import GalleryThumbnail from "./GalleryThumbnail.vue";
-
-@Component({
-  components: { GalleryThumbnail },
-})
-export default class GalleryDirectory extends Vue {
-  @Prop({ required: true }) readonly directory!: Gallery.Directory;
-}
-</script>
-
-<style lang="scss">
-</style>
+Vue.use(VLazyImagePlugin);

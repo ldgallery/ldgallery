@@ -18,13 +18,16 @@
 -->
 
 <template>
-  <div class="flex">
+  <div class="thumbnail-tiles">
     <div v-for="(item) in items" :key="item.path">
       <router-link :to="item.path" @click.native="$uiStore.setModeNavigation()">
         <gallery-thumbnail :item="item" />
       </router-link>
     </div>
     <div v-if="items.length===0">{{$t('search.no-results')}}</div>
+    <div>
+      <!-- Empty item for better flex layout -->
+    </div>
   </div>
 </template>
 
