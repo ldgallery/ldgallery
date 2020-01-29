@@ -24,17 +24,15 @@ module Processors
   ) where
 
 
-import Control.Exception (Exception, throwIO)
+import Control.Exception (Exception)
 import Data.Function ((&))
-import Data.Ratio ((%))
 import Data.Char (toLower)
 
 import System.Directory hiding (copyFile)
 import qualified System.Directory
 import System.FilePath
 
-import Codec.Picture
-import Codec.Picture.Extra -- TODO: compare DCT and bilinear (and Lanczos, but it's not implemented)
+import System.Process (callProcess)
 
 import Resource
   ( ItemProcessor, ThumbnailProcessor
@@ -47,10 +45,8 @@ data ProcessingException = ProcessingException FilePath String deriving Show
 instance Exception ProcessingException
 
 
-data PictureFileFormat = Bmp | Jpg | Png | Tiff | Hdr | Gif
-
 -- TODO: handle video, music, text...
-data Format = PictureFormat PictureFileFormat | Unknown
+data Format = PictureFormat | Unknown
 
 formatFromPath :: Path -> Format
 formatFromPath =
@@ -60,14 +56,15 @@ formatFromPath =
   . fileName
   where
     fromExt :: String -> Format
-    fromExt ".bmp" = PictureFormat Bmp
-    fromExt ".jpg" = PictureFormat Jpg
-    fromExt ".jpeg" = PictureFormat Jpg
-    fromExt ".png" = PictureFormat Png
-    fromExt ".tiff" = PictureFormat Tiff
-    fromExt ".hdr" = PictureFormat Hdr
-    fromExt ".gif" = PictureFormat Gif
-    fromExt _ = Unknown
+    fromExt ext = case ext of
+      ".bmp" -> PictureFormat
+      ".jpg" -> PictureFormat
+      ".jpeg" -> PictureFormat
+      ".png" -> PictureFormat
+      ".tiff" -> PictureFormat
+      ".hdr" -> PictureFormat
+      ".gif" -> PictureFormat
+      _ -> Unknown
 
 
 type FileProcessor =
@@ -80,47 +77,16 @@ copyFileProcessor inputPath outputPath =
   (putStrLn $ "Copying:\t" ++ outputPath)
   >> ensureParentDir (flip System.Directory.copyFile) outputPath inputPath
 
-
-type LossyExportQuality = Int
-type StaticImageReader = FilePath -> IO (Either String DynamicImage)
-type StaticImageWriter = FilePath -> DynamicImage -> IO ()
-
-resizeStaticImageUpTo :: Resolution -> LossyExportQuality -> PictureFileFormat -> FileProcessor
-resizeStaticImageUpTo maxResolution jpegExportQuality pictureFormat =
-  resizerFor pictureFormat
+resizePictureUpTo :: Resolution -> FileProcessor
+resizePictureUpTo maxResolution inputPath outputPath =
+  (putStrLn $ "Generating:\t" ++ outputPath)
+  >> ensureParentDir (flip resize) outputPath inputPath
   where
-    resizerFor :: PictureFileFormat -> FileProcessor
-    resizerFor Bmp = resizer readBitmap saveBmpImage
-    resizerFor Jpg = resizer readJpeg (saveJpgImage jpegExportQuality)
-    resizerFor Png = resizer readPng savePngImage
-    resizerFor Tiff = resizer readTiff saveTiffImage
-    resizerFor Hdr = resizer readHDR saveRadianceImage
-    resizerFor Gif = resizer readGif saveGifImage'
-      where
-        saveGifImage' :: StaticImageWriter
-        saveGifImage' outputPath image =
-          saveGifImage outputPath image
-          & either (throwIO . ProcessingException outputPath) id
+    maxSize :: Resolution -> String
+    maxSize Resolution{width, height} = show width ++ "x" ++ show height ++ ">"
 
-    resizer :: StaticImageReader -> StaticImageWriter -> FileProcessor
-    resizer reader writer inputPath outputPath =
-      (putStrLn $ "Generating:\t" ++ outputPath)
-      >>  reader inputPath
-      >>= either (throwIO . ProcessingException inputPath) return
-      >>= return . (fitDynamicImage maxResolution)
-      >>= ensureParentDir writer outputPath
-
-    fitDynamicImage :: Resolution -> DynamicImage -> DynamicImage
-    fitDynamicImage (Resolution boxWidth boxHeight) image =
-      convertRGBA8 image
-      & scaleBilinear targetWidth targetHeight
-      & ImageRGBA8
-      where
-        picWidth = dynamicMap imageWidth image
-        picHeight = dynamicMap imageHeight image
-        resizeRatio = min (boxWidth % picWidth) (boxHeight % picHeight)
-        targetWidth = floor $ resizeRatio * (picWidth % 1)
-        targetHeight = floor $ resizeRatio * (picHeight % 1)
+    resize :: FileName -> FileName -> IO ()
+    resize input output = callProcess "magick" [input, "-resize", maxSize maxResolution, output]
 
 
 type Cache = FileProcessor -> FileProcessor
@@ -160,8 +126,8 @@ type ItemFileProcessor =
   -> FileName        -- ^ Output class (subdir)
   -> ItemProcessor
 
-itemFileProcessor :: Maybe Resolution -> LossyExportQuality -> Cache -> ItemFileProcessor
-itemFileProcessor maxResolution jpegExportQuality cached inputBase outputBase resClass inputRes =
+itemFileProcessor :: Maybe Resolution -> Cache -> ItemFileProcessor
+itemFileProcessor maxResolution cached inputBase outputBase resClass inputRes =
   cached processor inPath outPath
   >> resourceAt outPath relOutPath
   >>= return . props
@@ -172,14 +138,9 @@ itemFileProcessor maxResolution jpegExportQuality cached inputBase outputBase re
     (processor, props) = processorFor maxResolution $ formatFromPath inputRes
 
     processorFor :: Maybe Resolution -> Format -> (FileProcessor, Resource -> GalleryItemProps)
-    processorFor Nothing _ =
-      (copyFileProcessor, Other)
-    processorFor _ (PictureFormat Gif) =
-      (copyFileProcessor, Picture) -- TODO: handle animated gif resizing
-    processorFor (Just maxRes) (PictureFormat picFormat) =
-      (resizeStaticImageUpTo maxRes jpegExportQuality picFormat, Picture)
-    processorFor _ Unknown =
-      (copyFileProcessor, Other) -- TODO: handle video reencoding and others?
+    processorFor (Just maxRes) PictureFormat = (resizePictureUpTo maxRes, Picture)
+    processorFor Nothing PictureFormat = (copyFileProcessor, Picture)
+    processorFor _ Unknown = (copyFileProcessor, Other) -- TODO: handle video reencoding and others?
 
 
 type ThumbnailFileProcessor =
@@ -188,8 +149,8 @@ type ThumbnailFileProcessor =
   -> FileName        -- ^ Output class (subdir)
   -> ThumbnailProcessor
 
-thumbnailFileProcessor :: Resolution -> LossyExportQuality -> Cache -> ThumbnailFileProcessor
-thumbnailFileProcessor maxRes jpegExportQuality cached inputBase outputBase resClass inputRes =
+thumbnailFileProcessor :: Resolution -> Cache -> ThumbnailFileProcessor
+thumbnailFileProcessor maxRes cached inputBase outputBase resClass inputRes =
   cached <$> processorFor (formatFromPath inputRes)
   & process
   where
@@ -205,7 +166,5 @@ thumbnailFileProcessor maxRes jpegExportQuality cached inputBase outputBase resC
       >>= return . Just
 
     processorFor :: Format -> Maybe FileProcessor
-    processorFor (PictureFormat picFormat) =
-      Just $ resizeStaticImageUpTo maxRes jpegExportQuality picFormat
-    processorFor _ =
-      Nothing
+    processorFor PictureFormat = Just $ resizePictureUpTo maxRes
+    processorFor _ = Nothing
