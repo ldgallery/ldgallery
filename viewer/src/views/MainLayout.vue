@@ -70,6 +70,7 @@ body,
 html {
   height: 100%;
   overflow: hidden;
+  background-color: $content-bgcolor;
   --layout-top: #{$layout-top};
   --layout-left: #{$layout-left};
 }
