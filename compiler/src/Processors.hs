@@ -138,8 +138,8 @@ itemFileProcessor maxResolution cached inputBase outputBase resClass inputRes =
     (processor, props) = processorFor maxResolution $ formatFromPath inputRes
 
     processorFor :: Maybe Resolution -> Format -> (FileProcessor, Resource -> GalleryItemProps)
-    processorFor Nothing _ = (copyFileProcessor, Other)
     processorFor (Just maxRes) PictureFormat = (resizePictureUpTo maxRes, Picture)
+    processorFor Nothing PictureFormat = (copyFileProcessor, Picture)
     processorFor _ Unknown = (copyFileProcessor, Other) -- TODO: handle video reencoding and others?
 
 
