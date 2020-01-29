@@ -19,9 +19,9 @@
 
 <template>
   <div :class="{fullscreen: $uiStore.fullscreen}">
-    <panel-top class="layout layout-top" />
-    <panel-left class="layout layout-left" />
-    <router-view class="layout layout-content scrollbar" />
+    <panel-top v-if="!isLoading" class="layout layout-top" />
+    <panel-left v-if="!isLoading" class="layout layout-left" />
+    <router-view v-if="!isLoading" class="layout layout-content scrollbar" />
     <b-loading :active="isLoading" is-full-page />
   </div>
 </template>
@@ -35,7 +35,7 @@ import PanelTop from "./PanelTop.vue";
   components: { PanelLeft, PanelTop },
 })
 export default class MainLayout extends Vue {
-  isLoading: boolean = false;
+  isLoading: boolean = true;
 
   mounted() {
     this.fetchGalleryItems();

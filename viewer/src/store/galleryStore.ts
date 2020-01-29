@@ -61,7 +61,7 @@ export default class GalleryStore extends VuexModule {
 
     // Fetches the gallery's JSON metadata
     @action async fetchGalleryItems(url: string) {
-        fetch(url)
+        return fetch(url)
             .then(response => response.json())
             .then(this.setGalleryItemsRoot)
             .then(this.indexTags);
