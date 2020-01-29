@@ -42,6 +42,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { Operation } from "@/@types/tag/Operation";
+import Tools from "@/tools";
 
 @Component
 export default class LdTagInput extends Vue {
@@ -92,18 +93,20 @@ export default class LdTagInput extends Vue {
     category: string,
     disambiguation: string
   ): Tag.Search[] {
+    disambiguation = Tools.normalize(disambiguation);
     return Object.values(tags)
       .filter(node => node.tag.includes(category))
       .flatMap(node =>
         Object.values(node.children)
-          .filter(child => child.tag.includes(disambiguation))
+          .filter(child => child.tagfiltered.includes(disambiguation))
           .map(child => ({ ...child, parent: node, operation, display: `${operation}${node.tag}:${child.tag}` }))
       );
   }
 
   searchTagsFromFilter(tags: Tag.Index, operation: Operation, filter: string): Tag.Search[] {
+    filter = Tools.normalize(filter);
     return Object.values(tags)
-      .filter(node => node.tag.includes(filter))
+      .filter(node => node.tagfiltered.includes(filter))
       .map(node => ({ ...node, operation, display: `${operation}${node.tag}` }));
   }
 

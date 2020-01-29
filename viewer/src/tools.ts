@@ -17,18 +17,14 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-declare namespace Tag {
-    interface Node {
-        tag: Gallery.RawTag;
-        tagfiltered: Gallery.RawTag;
-        items: Gallery.Item[];
-        children: Index;
-    }
-    interface Search extends Node {
-        parent?: Node;
-        operation: string; // Enum Operation
-        display: string;
-    }
-    type SearchByOperation = { [index: string]: Tag.Search[] };
-    type Index = { [index: string]: Node };
+export default class Tools {
+
+  // Normalize a string to lowercase, no-accents
+  public static normalize(value: string) {
+    return value
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+  }
+
 }
