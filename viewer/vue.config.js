@@ -33,8 +33,11 @@ module.exports = {
     before: (app, server, compiler) => {
       app.get(`${process.env.VUE_APP_DATA_URL}*`, (req, res) => {
         const fs = require("fs");
-        const fileName = `${process.env.VUE_APP_EXAMPLE_PROJECT}${req.url.slice(process.env.VUE_APP_DATA_URL.length)}`;
-        const file = fs.readFileSync(decodeURIComponent(fileName));
+        const url = req.url.slice(process.env.VUE_APP_DATA_URL.length);
+        const paramIdx = url.indexOf('?');
+        const filepath = paramIdx < 0 ? url : url.substring(0, paramIdx);
+        const fullpath = `${process.env.VUE_APP_EXAMPLE_PROJECT}${decodeURIComponent(filepath)}`;
+        const file = fs.readFileSync(fullpath);
         res.end(file);
       });
     }
