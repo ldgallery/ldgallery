@@ -18,7 +18,13 @@
 -->
 
 <template>
-  <div>
+  <div
+    v-dragscroll
+    class="scrollbar"
+    :class="{fitToScreen: !$uiStore.fullscreen, originalSize: $uiStore.fullscreen}"
+    @click="onClick"
+    @dragscrollstart="dragging=true"
+  >
     <img :src="pictureSrc" />
   </div>
 </template>
@@ -30,11 +36,37 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 export default class GalleryPicture extends Vue {
   @Prop({ required: true }) readonly picture!: Gallery.Picture;
 
+  dragging: boolean = false;
+
   get pictureSrc() {
     return `${process.env.VUE_APP_DATA_URL}${this.picture.properties.resource}`;
+  }
+
+  onClick() {
+    if (!this.dragging) this.$uiStore.toggleFullscreen();
+    this.dragging = false;
   }
 }
 </script>
 
 <style lang="scss">
+.fitToScreen {
+  display: flex;
+  justify-content: space-around;
+  height: 100%;
+  & > img {
+    object-fit: contain;
+  }
+}
+.originalSize {
+  display: block;
+  text-align: center;
+  cursor: grab;
+  height: 100%;
+  & > img {
+    max-width: unset;
+    max-height: unset;
+    object-fit: none;
+  }
+}
 </style>
