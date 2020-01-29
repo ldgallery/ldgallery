@@ -18,6 +18,7 @@
 */
 
 import { createModule, mutation, action } from "vuex-class-component";
+import Tools from '@/tools';
 
 const VuexModule = createModule({
     namespaced: "galleryStore",
@@ -88,7 +89,7 @@ export default class GalleryStore extends VuexModule {
             const parts = tag.split('.');
             let lastPart: string | null = null;
             for (const part of parts) {
-                if (!index[part]) index[part] = { tag: part, items: [], children: {} };
+                if (!index[part]) index[part] = { tag: part, tagfiltered: Tools.normalize(part), items: [], children: {} };
                 if (!index[part].items.includes(item)) index[part].items.push(item);
                 if (lastPart) index[lastPart].children[part] = index[part];
                 lastPart = part;
