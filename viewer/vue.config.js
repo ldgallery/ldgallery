@@ -18,6 +18,7 @@
 */
 
 module.exports = {
+  publicPath: "./",
   pluginOptions: {
     i18n: {
       locale: "en",
@@ -31,7 +32,7 @@ module.exports = {
     port: 8085,
     serveIndex: true,
     before: (app, server, compiler) => {
-      app.get(`${process.env.VUE_APP_DATA_URL}*`, (req, res) => {
+      app.get(`/${process.env.VUE_APP_DATA_URL}*`, (req, res) => {
         const fs = require("fs");
         const url = req.url.slice(process.env.VUE_APP_DATA_URL.length);
         const paramIdx = url.indexOf('?');

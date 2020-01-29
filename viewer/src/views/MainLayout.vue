@@ -44,7 +44,7 @@ export default class MainLayout extends Vue {
   fetchGalleryItems() {
     this.isLoading = true;
     this.$galleryStore
-      .fetchGalleryItems(`${process.env.VUE_APP_DATA_URL}/index.json`)
+      .fetchGalleryItems(`${process.env.VUE_APP_DATA_URL}index.json`)
       .finally(() => (this.isLoading = false))
       .catch(this.displayError);
   }
