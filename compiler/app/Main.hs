@@ -31,6 +31,7 @@ data Options = Options
   { inputDir :: String
   , outputDir :: String
   , rebuilAll :: Bool
+  , cleanOutput :: Bool
   , withViewer :: Bool
   } deriving (Show, Data, Typeable)
 
@@ -53,6 +54,11 @@ options = Options
       &= name "rebuild-all"
       &= explicit
       &= help "Invalidate cache and recompile everything"
+  , cleanOutput = False
+      &= name "c"
+      &= name "clean-output"
+      &= explicit
+      &= help "Remove unnecessary files from the output directory"
   , withViewer = False
       &= name "w"
       &= name "with-viewer"
@@ -71,10 +77,23 @@ main :: IO ()
 main =
   do
     opts <- cmdArgs options
-    compileGallery (inputDir opts) (galleryOutputDir "gallery" opts) (rebuilAll opts)
-    if (withViewer opts) then copyViewer (outputDir opts) else noop
+
+    buildGallery opts
+
+    if (withViewer opts) then
+      copyViewer (outputDir opts)
+    else
+      return ()
 
   where
+    buildGallery :: Options -> IO ()
+    buildGallery opts =
+      compileGallery
+        (inputDir opts)
+        (galleryOutputDir "gallery" opts)
+        (rebuilAll opts)
+        (cleanOutput opts)
+
     galleryOutputDir :: FilePath -> Options -> FilePath
     galleryOutputDir gallerySubdir opts =
       if withViewer opts then outputBase </> gallerySubdir else outputBase
@@ -86,6 +105,3 @@ main =
       >>  getDataFileName "viewer"
       >>= readDirectory
       >>= copyTo target
-
-    noop :: IO ()
-    noop = return ()

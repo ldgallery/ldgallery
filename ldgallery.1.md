@@ -33,6 +33,9 @@ Available options are:
 -r, \--rebuild-all
 : Invalidate cache and recompile everything.
 
+-c, \--clean-output
+: Remove unnecessary files from the output directory.
+
 -w, \--with-viewer
 : Include the static web viewer in the output.
 
