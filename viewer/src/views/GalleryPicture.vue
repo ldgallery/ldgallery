@@ -25,7 +25,7 @@
     @click="onClick"
     @dragscrollstart="dragging=true"
   >
-    <img :src="pictureSrc" />
+    <v-lazy-image :src="pictureSrc" />
   </div>
 </template>
 
@@ -56,6 +56,7 @@ export default class GalleryPicture extends Vue {
   height: 100%;
   & > img {
     object-fit: contain;
+    cursor: zoom-in;
   }
 }
 .originalSize {
@@ -67,6 +68,7 @@ export default class GalleryPicture extends Vue {
     max-width: unset;
     max-height: unset;
     object-fit: none;
+    cursor: zoom-out;
   }
 }
 </style>
