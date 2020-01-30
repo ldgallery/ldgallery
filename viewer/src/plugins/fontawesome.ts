@@ -30,7 +30,7 @@ import {
     faImage,
     faHome,
     faArrowLeft,
-    faFilter,
+    faTags,
     faAngleRight,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -43,7 +43,7 @@ library.add(
     faImage,
     faHome,
     faArrowLeft,
-    faFilter,
+    faTags,
     faAngleRight,
 );
 

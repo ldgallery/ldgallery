@@ -32,6 +32,9 @@
 .nowrap {
   white-space: nowrap;
 }
+.no-scroll-x {
+  overflow-x: hidden;
+}
 
 .flex {
   display: flex;
@@ -50,7 +53,7 @@
   color: $link;
   cursor: pointer;
   text-decoration: none;
-  & :hover {
+  &:hover {
     color: $link-hover;
   }
 }

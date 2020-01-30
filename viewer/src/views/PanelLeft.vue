@@ -24,7 +24,7 @@
     <h1>{{$t('panelLeft.filters')}}</h1>
     <ld-tag-input />
     <h1>{{$t('panelLeft.propositions')}}</h1>
-    <ld-proposition class="scrollbar" />
+    <ld-proposition class="scrollbar no-scroll-x" />
   </div>
 </template>
 

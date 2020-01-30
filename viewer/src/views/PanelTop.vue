@@ -20,7 +20,7 @@
 <template>
   <div class="flex">
     <div class="command-btns">
-      <fa-icon icon="filter" size="lg" class="disabled" />
+      <fa-icon icon="tags" size="lg" class="disabled" />
       <router-link to="/" :class="{disabled: $galleryStore.currentItemPath.length <= 1}">
         <fa-icon icon="home" size="lg" />
       </router-link>
