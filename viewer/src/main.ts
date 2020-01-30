@@ -26,7 +26,7 @@ import "@/plugins/lazyimage";
 import "@/plugins/dragscroll";
 import store from '@/store'
 import i18n from "@/plugins/i18n";
-import router from "@/router";
+import router from "@/plugins/router";
 import MainLayout from "@/views/MainLayout.vue";
 
 Vue.config.productionTip = false;
