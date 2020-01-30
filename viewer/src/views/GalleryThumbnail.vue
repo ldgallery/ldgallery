@@ -29,7 +29,7 @@
     />
     <div v-else class="flex-column flex-center">
       <fa-icon icon="folder" size="4x" />
-      {{item.path}}
+      {{item.title}}
     </div>
   </div>
 </template>
