@@ -50,13 +50,14 @@
   overflow: auto;
 }
 .scrollbar::-webkit-scrollbar {
-  width: 12px;
+  width: 10px;
+  height: 10px;
 }
 .scrollbar::-webkit-scrollbar-corner {
   background-color: transparent;
 }
 .scrollbar::-webkit-scrollbar-thumb {
-  box-shadow: inset 0 0 6px black;
+  box-shadow: inset 0 0 1px black;
   background-color: $toolbar-color;
 }
 
