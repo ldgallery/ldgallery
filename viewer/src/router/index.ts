@@ -19,7 +19,7 @@
 
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Gallery from "@/views/Gallery.vue";
+import Gallery from "@/views/MainGallery.vue";
 
 Vue.use(VueRouter);
 

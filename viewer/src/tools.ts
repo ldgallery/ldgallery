@@ -27,4 +27,21 @@ export default class Tools {
       .toLowerCase();
   }
 
+
+  public static checkType(item: Gallery.Item | null, type: Gallery.ItemType): boolean {
+    return item?.properties.type === type ?? false;
+  }
+
+  public static directoriesFirst(items: Gallery.Item[]) {
+    return [
+      ...items
+        .filter(child => Tools.checkType(child, "directory"))
+        .sort((a, b) => a.title.localeCompare(b.title)),
+
+      ...items
+        .filter(child => !Tools.checkType(child, "directory")),
+    ];
+  }
+
+
 }
