@@ -102,8 +102,8 @@ galleryDirFilter config =
       any (matchesFile (== indexFile) ||| matchesFile (== viewerMainFile)) items
 
 
-compileGallery :: FilePath -> FilePath -> Bool -> IO ()
-compileGallery inputDirPath outputDirPath rebuildAll =
+compileGallery :: FilePath -> FilePath -> Bool -> Bool -> IO ()
+compileGallery inputDirPath outputDirPath rebuildAll cleanOutput =
   do
     fullConfig <- readConfig inputGalleryConf
     let config = compiler fullConfig
@@ -119,7 +119,11 @@ compileGallery inputDirPath outputDirPath rebuildAll =
     let galleryBuilder = buildGalleryTree itemProc thumbnailProc (tagsFromDirectories config)
     resources <- galleryBuilder (galleryName config) inputTree
 
-    galleryCleanupResourceDir resources outputDirPath
+    if cleanOutput then
+      galleryCleanupResourceDir resources outputDirPath
+    else
+      return ()
+
     writeJSON outputIndex resources
     writeJSON outputViewerConf $ viewer fullConfig
 
