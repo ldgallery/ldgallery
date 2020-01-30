@@ -28,7 +28,7 @@
       @load="loading=false"
     />
     <div v-else class="flex-column flex-center">
-      <fa-icon icon="folder" class="fa-4x" />
+      <fa-icon icon="folder" size="4x" />
       {{item.path}}
     </div>
   </div>

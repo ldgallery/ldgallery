@@ -19,7 +19,7 @@
 
 // === Theme
 
-$layout-top: 70px;
+$layout-top: 35px;
 $layout-left: 250px;
 
 $panel-top-bgcolor: #225;
@@ -27,7 +27,8 @@ $panel-top-txtcolor: white;
 $panel-left-bgcolor: $panel-top-bgcolor;
 $panel-left-txtcolor: $panel-top-txtcolor;
 $content-bgcolor: #1e1e1e;
-
 $toolbar-color: #d62929;
-
 $loader-color: #272727;
+$link: $panel-top-txtcolor;
+$link-hover: lightblue;
+$disabled-color: rgba($link, 0.3);

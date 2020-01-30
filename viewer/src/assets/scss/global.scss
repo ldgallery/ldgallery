@@ -44,6 +44,21 @@
   align-items: center;
 }
 
+// === Links
+
+.link {
+  color: $link;
+  cursor: pointer;
+  text-decoration: none;
+  & :hover {
+    color: $link-hover;
+  }
+}
+
+.disabled {
+  color: $disabled-color !important;
+}
+
 // === Scrollbar styling
 
 .scrollbar {

@@ -19,7 +19,7 @@
 
 <template>
   <div>
-    <div v-for="proposed in proposedTags" :key="proposed.rawTag" class="proposition">
+    <div v-for="proposed in proposedTags" :key="proposed.rawTag" class="proposition link">
       <fa-icon icon="minus" @click="add(Operation.SUBSTRACTION, proposed.rawTag)" />
       <span
         @click="add(Operation.INTERSECTION, proposed.rawTag)"
@@ -51,13 +51,12 @@ export default class LdTagInput extends Vue {
         .forEach(rawTag => (propositions[rawTag] = (propositions[rawTag] ?? 0) + 1));
     } else {
       // Tags count from the whole gallery
-      Object.entries(this.$galleryStore.tags)
-        .forEach(entry => (propositions[entry[0]] = entry[1].items.length));
+      Object.entries(this.$galleryStore.tags).forEach(entry => (propositions[entry[0]] = entry[1].items.length));
     }
-    
+
     return Object.entries(propositions)
-      .sort((a,b) => b[1] - a[1])
-      .map(entry => ({rawTag: entry[0], count: entry[1]}));
+      .sort((a, b) => b[1] - a[1])
+      .map(entry => ({ rawTag: entry[0], count: entry[1] }));
   }
 
   extractDistinctItems(currentTags: Tag.Search[]): Gallery.Item[] {
@@ -79,12 +78,13 @@ export default class LdTagInput extends Vue {
 </script>
 
 <style lang="scss">
+@import "@/assets/scss/theme.scss";
+
 .proposition {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin: 10px;
-  color: lightcyan;
   cursor: pointer;
 }
 .proposition span {

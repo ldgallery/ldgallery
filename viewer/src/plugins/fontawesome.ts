@@ -28,6 +28,10 @@ import {
     faPlus,
     faMinus,
     faImage,
+    faHome,
+    faArrowLeft,
+    faFilter,
+    faAngleRight,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -37,6 +41,10 @@ library.add(
     faPlus,
     faMinus,
     faImage,
+    faHome,
+    faArrowLeft,
+    faFilter,
+    faAngleRight,
 );
 
 Vue.component("fa-icon", FontAwesomeIcon);
