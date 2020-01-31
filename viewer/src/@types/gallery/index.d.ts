@@ -18,6 +18,9 @@
 */
 
 declare namespace Gallery {
+    interface Other extends Item {
+        properties: OtherProperties,
+    }
     interface Picture extends Item {
         properties: PictureProperties,
     }
@@ -31,7 +34,10 @@ declare namespace Gallery {
         tags: RawTag[],
         path: string,
         thumbnail?: string,
-        properties: PictureProperties | DirectoryProperties,
+        properties: OtherProperties | PictureProperties | DirectoryProperties,
+    }
+    interface OtherProperties {
+        type: "other",
     }
     interface PictureProperties {
         type: "picture",
@@ -42,4 +48,5 @@ declare namespace Gallery {
         items: Item[]
     }
     type RawTag = string;
+    type ItemType = "other" | "picture" | "directory";
 }

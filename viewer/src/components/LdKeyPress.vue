@@ -1,4 +1,4 @@
-/* ldgallery - A static generator which turns a collection of tagged
+<!-- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
 -- Copyright (C) 2019-2020  Guillaume FOUET
@@ -15,33 +15,35 @@
 --
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+-->
 
-export default class Tools {
+<script lang="ts">
+import { Component, Vue, Prop, Emit } from "vue-property-decorator";
 
-  // Normalize a string to lowercase, no-accents
-  public static normalize(value: string) {
-    return value
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
+@Component
+export default class LdKeyPress extends Vue {
+  @Prop({ type: Number, required: true }) readonly keycode!: number;
+  @Prop({ type: String, default: "keyup" }) readonly event!: "keyup" | "keydown" | "keypress";
+
+  mounted() {
+    window.addEventListener(this.event, this.onEvent);
   }
 
-
-  public static checkType(item: Gallery.Item | null, type: Gallery.ItemType): boolean {
-    return item?.properties.type === type ?? false;
+  destroyed() {
+    window.removeEventListener(this.event, this.onEvent);
   }
 
-  public static directoriesFirst(items: Gallery.Item[]) {
-    return [
-      ...items
-        .filter(child => Tools.checkType(child, "directory"))
-        .sort((a, b) => a.title.localeCompare(b.title)),
-
-      ...items
-        .filter(child => !Tools.checkType(child, "directory")),
-    ];
+  render() {
+    return null;
   }
 
+  private onEvent(e: KeyboardEvent) {
+    if (e.keyCode === this.keycode) this.action(e);
+  }
 
+  @Emit()
+  private action(e: KeyboardEvent) {
+    return e;
+  }
 }
+</script>

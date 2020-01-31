@@ -24,8 +24,7 @@
 @import "buefy_variables";
 
 // 2. Setup your Custom Colors
-// $linkedin: #0077b5;
-// $linkedin-invert: findColorInvert($linkedin);
+@import "@/assets/scss/theme.scss";
 
 @import "~bulma/sass/utilities/derived-variables";
 

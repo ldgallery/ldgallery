@@ -19,10 +19,11 @@
 
 <template>
   <div :class="{fullscreen: $uiStore.fullscreen}">
-    <panel-top class="layout layout-top" />
-    <panel-left class="layout layout-left" />
-    <router-view class="layout layout-content scrollbar" />
+    <panel-top v-if="!isLoading" class="layout layout-top" />
+    <panel-left v-if="!isLoading" class="layout layout-left" />
+    <router-view v-if="!isLoading" class="layout layout-content scrollbar" />
     <b-loading :active="isLoading" is-full-page />
+    <ld-key-press :keycode="27" @action="$uiStore.fullscreen=false" />
   </div>
 </template>
 
@@ -35,7 +36,7 @@ import PanelTop from "./PanelTop.vue";
   components: { PanelLeft, PanelTop },
 })
 export default class MainLayout extends Vue {
-  isLoading: boolean = false;
+  isLoading: boolean = true;
 
   mounted() {
     this.fetchGalleryItems();
@@ -44,7 +45,7 @@ export default class MainLayout extends Vue {
   fetchGalleryItems() {
     this.isLoading = true;
     this.$galleryStore
-      .fetchGalleryItems(`${process.env.VUE_APP_DATA_URL}/index.json`)
+      .fetchGalleryItems(`${process.env.VUE_APP_DATA_URL}index.json`)
       .finally(() => (this.isLoading = false))
       .catch(this.displayError);
   }

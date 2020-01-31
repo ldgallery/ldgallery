@@ -24,7 +24,7 @@
     <h1>{{$t('panelLeft.filters')}}</h1>
     <ld-tag-input />
     <h1>{{$t('panelLeft.propositions')}}</h1>
-    <ld-proposition />
+    <ld-proposition class="scrollbar no-scroll-x" />
   </div>
 </template>
 
@@ -36,7 +36,4 @@ export default class PanelLeft extends Vue {}
 </script>
 
 <style lang="scss">
-.label {
-  color: white;
-}
 </style>

@@ -28,8 +28,8 @@
       @load="loading=false"
     />
     <div v-else class="flex-column flex-center">
-      <fa-icon icon="folder" class="fa-4x" />
-      {{item.path}}
+      <fa-icon icon="folder" size="4x" />
+      {{item.title}}
     </div>
   </div>
 </template>
@@ -57,16 +57,14 @@ export default class GalleryThumbnail extends Vue {
   max-height: 250px;
 }
 .preload {
-  background: linear-gradient(to right, rgba(0, 0, 0, 0) 8%, $loader-color 18%, rgba(0, 0, 0, 0) 33%);
-  background-size: 200% 50px;
-  animation: preloadAnimation 2s infinite linear;
+  animation: preloadAnimation 1s infinite ease-in-out alternate;
 }
 @keyframes preloadAnimation {
   from {
-    background-position: -200px 0;
+    background-color: $content-bgcolor;
   }
   to {
-    background-position: 200px 0;
+    background-color: $loader-color;
   }
 }
 // Temporary size until we get the true thumbnail size

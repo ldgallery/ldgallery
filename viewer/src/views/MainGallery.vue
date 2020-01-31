@@ -28,7 +28,8 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { Operation } from '@/@types/tag/Operation';
+import { Operation } from "@/@types/tag/Operation";
+import Tools from "@/tools";
 import GallerySearch from "./GallerySearch.vue";
 import GalleryDirectory from "./GalleryDirectory.vue";
 import GalleryPicture from "./GalleryPicture.vue";
@@ -40,7 +41,7 @@ export default class Gallery extends Vue {
   @Prop(String) readonly pathMatch!: string;
 
   mounted() {
-    this.pathChanged()
+    this.pathChanged();
   }
 
   @Watch("pathMatch")
@@ -59,14 +60,15 @@ export default class Gallery extends Vue {
 
   // ---
 
-  private checkType(type: string): boolean {
-    return this.$galleryStore.currentItem?.properties.type === type ?? false;
+  private checkType(type: Gallery.ItemType): boolean {
+    return Tools.checkType(this.$galleryStore.currentItem, type);
   }
 
   private extractTagsByOperation(currentTags: Tag.Search[]): Tag.SearchByOperation {
     let byOperation: Tag.SearchByOperation = {};
-    Object.values(Operation)
-      .forEach(operation => byOperation[operation] = currentTags.filter(tag => tag.operation === operation));
+    Object.values(Operation).forEach(
+      operation => (byOperation[operation] = currentTags.filter(tag => tag.operation === operation))
+    );
     return byOperation;
   }
 
@@ -75,8 +77,8 @@ export default class Gallery extends Vue {
     if (byOperation[Operation.INTERSECTION].length > 0) {
       byOperation[Operation.INTERSECTION]
         .map(tag => tag.items)
-        .reduce((a,b) => a.filter(c => b.includes(c)))
-        .flatMap(items=>items)
+        .reduce((a, b) => a.filter(c => b.includes(c)))
+        .flatMap(items => items)
         .forEach(item => intersection.add(item));
     }
     return intersection;
@@ -85,14 +87,16 @@ export default class Gallery extends Vue {
   private extractSubstraction(byOperation: Tag.SearchByOperation): Set<Gallery.Item> {
     let substraction = new Set<Gallery.Item>();
     if (byOperation[Operation.SUBSTRACTION].length > 0) {
-      byOperation[Operation.SUBSTRACTION]
-        .flatMap(tag => tag.items)
-        .forEach(item => substraction.add(item));
+      byOperation[Operation.SUBSTRACTION].flatMap(tag => tag.items).forEach(item => substraction.add(item));
     }
     return substraction;
   }
 
-  private aggregateAll(byOperation: Tag.SearchByOperation, intersection: Set<Gallery.Item>, substraction: Set<Gallery.Item>): Gallery.Item[] {
+  private aggregateAll(
+    byOperation: Tag.SearchByOperation,
+    intersection: Set<Gallery.Item>,
+    substraction: Set<Gallery.Item>
+  ): Gallery.Item[] {
     byOperation[Operation.ADDITION].flatMap(tag => tag.items).forEach(item => intersection.add(item));
     substraction.forEach(item => intersection.delete(item));
     return [...intersection];

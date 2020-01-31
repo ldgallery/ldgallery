@@ -18,23 +18,25 @@
 -->
 
 <template>
-  <div v-if="isReady">
-    <b-steps
-      v-model="activeStep"
-      class="pathBreadcrumb"
-      type="is-info"
-      :has-navigation="false"
-      :animated="false"
-      @input="onStepClick"
-    >
-      <b-step-item
-        v-for="item in $galleryStore.currentItemPath"
-        :key="item.path"
-        :label="item.title"
-        :icon="getIcon(item)"
-        :to="item.path"
-      />
-    </b-steps>
+  <div class="flex">
+    <div class="command-btns">
+      <fa-icon icon="tags" size="lg" class="disabled" />
+      <router-link to="/" :class="{disabled: $galleryStore.currentItemPath.length <= 1}">
+        <fa-icon icon="home" size="lg" />
+      </router-link>
+      <div class="link" @click="$router.go(-1)">
+        <fa-icon icon="arrow-left" size="lg" />
+      </div>
+    </div>
+    <ul class="pathBreadcrumb">
+      <li v-for="(item,idx) in $galleryStore.currentItemPath" :key="item.path">
+        <router-link :to="item.path">
+          <fa-icon :icon="getIcon(item)" size="lg" />
+          {{item.title}}
+        </router-link>
+        <fa-icon v-if="(idx+1) < $galleryStore.currentItemPath.length" icon="angle-right" />
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -44,23 +46,8 @@ import Gallery from "./Gallery.vue";
 
 @Component
 export default class PanelTop extends Vue {
-  activeStep: number = -1;
-
-  mounted() {
-    this.currentItemPathChanged();
-  }
-
-  get isReady() {
-    return this.activeStep >= 0;
-  }
-
-  @Watch("$galleryStore.currentItemPath")
-  currentItemPathChanged() {
-    this.activeStep = -1;
-    this.$nextTick(() => (this.activeStep = this.$galleryStore.currentItemPath.length - 1));
-  }
-
   getIcon(item: Gallery.Item) {
+    if (item.path.length <= 1) return "home";
     switch (item.properties.type) {
       case "picture":
         return "image";
@@ -68,19 +55,28 @@ export default class PanelTop extends Vue {
         return "folder";
     }
   }
-
-  onStepClick(index: number) {
-    const item = this.$galleryStore.currentItemPath[index];
-    if (item) this.$router.push(item.path);
-  }
 }
 </script>
 
 <style lang="scss">
+@import "@/assets/scss/theme.scss";
+
 .pathBreadcrumb {
-  margin: 3px;
+  display: flex;
+  list-style: none;
+  margin: 5px;
+  a {
+    margin-right: 5px;
+  }
+  li:not(:first-child) {
+    margin-left: 10px;
+  }
 }
-.step-title {
-  color: white;
+.command-btns {
+  display: flex;
+  justify-content: space-around;
+  vertical-align: middle;
+  align-items: center;
+  width: $layout-left;
 }
 </style>

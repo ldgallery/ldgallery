@@ -18,6 +18,7 @@
 
 module Compiler
   ( compileGallery
+  , writeJSON
   ) where
 
 

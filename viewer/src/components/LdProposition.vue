@@ -20,11 +20,17 @@
 <template>
   <div>
     <div v-for="proposed in proposedTags" :key="proposed.rawTag" class="proposition">
-      <fa-icon icon="minus" @click="add(Operation.SUBSTRACTION, proposed.rawTag)" />
-      <span
+      <div class="operation-btns link" @click="add(Operation.SUBSTRACTION, proposed.rawTag)">
+        <fa-icon icon="minus" />
+      </div>
+      <div class="operation-btns link" @click="add(Operation.ADDITION, proposed.rawTag)">
+        <fa-icon icon="plus" />
+      </div>
+      <div
+        class="operation-tag link"
         @click="add(Operation.INTERSECTION, proposed.rawTag)"
-      >{{proposed.rawTag}}&nbsp;x{{proposed.count}}</span>
-      <fa-icon icon="plus" @click="add(Operation.ADDITION, proposed.rawTag)" />
+      >{{proposed.rawTag}}</div>
+      <div class="disabled">x{{proposed.count}}</div>
     </div>
   </div>
 </template>
@@ -51,13 +57,12 @@ export default class LdTagInput extends Vue {
         .forEach(rawTag => (propositions[rawTag] = (propositions[rawTag] ?? 0) + 1));
     } else {
       // Tags count from the whole gallery
-      Object.entries(this.$galleryStore.tags)
-        .forEach(entry => (propositions[entry[0]] = entry[1].items.length));
+      Object.entries(this.$galleryStore.tags).forEach(entry => (propositions[entry[0]] = entry[1].items.length));
     }
-    
+
     return Object.entries(propositions)
-      .sort((a,b) => b[1] - a[1])
-      .map(entry => ({rawTag: entry[0], count: entry[1]}));
+      .sort((a, b) => b[1] - a[1])
+      .map(entry => ({ rawTag: entry[0], count: entry[1] }));
   }
 
   extractDistinctItems(currentTags: Tag.Search[]): Gallery.Item[] {
@@ -73,21 +78,28 @@ export default class LdTagInput extends Vue {
     const node = this.$galleryStore.tags[rawTag];
     const search: Tag.Search = { ...node, operation, display: `${operation}${node.tag}` };
     this.$uiStore.currentTags.push(search);
-    this.$uiStore.mode = "search";
+    setTimeout(() => this.$uiStore.setModeSearch()); // Give time for the UI to display the Tag change
   }
 }
 </script>
 
 <style lang="scss">
+@import "@/assets/scss/theme.scss";
+
 .proposition {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin: 10px;
-  color: lightcyan;
-  cursor: pointer;
-}
-.proposition span {
-  padding: 0 10px;
+  padding-right: 7px;
+  .operation-tag {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    flex-grow: 1;
+    cursor: pointer;
+  }
+  .operation-btns {
+    padding: 2px 7px;
+    cursor: pointer;
+  }
 }
 </style>

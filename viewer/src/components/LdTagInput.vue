@@ -27,7 +27,6 @@
     :data="filteredTags"
     field="display"
     type="is-black"
-    icon="tag"
     size="is-medium"
     class="panelTagInput"
     @typing="searchTags"
