@@ -24,27 +24,29 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import {
     faFolder,
     faSearch,
-    faTag,
     faPlus,
     faMinus,
     faImage,
     faHome,
     faArrowLeft,
+    faLevelUpAlt,
     faTags,
     faAngleRight,
+    faWindowClose,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
     faFolder,
     faSearch,
-    faTag,
     faPlus,
     faMinus,
     faImage,
     faHome,
     faArrowLeft,
+    faLevelUpAlt,
     faTags,
     faAngleRight,
+    faWindowClose,
 );
 
 Vue.component("fa-icon", FontAwesomeIcon);

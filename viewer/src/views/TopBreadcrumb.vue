@@ -18,25 +18,46 @@
 -->
 
 <template>
-  <div class="flex">
-    <top-command />
-    <top-breadcrumb />
-  </div>
+  <ul class="pathBreadcrumb">
+    <li v-for="(item,idx) in $galleryStore.currentItemPath" :key="item.path">
+      <router-link :to="item.path">
+        <fa-icon :icon="getIcon(item)" size="lg" />
+        {{item.title}}
+      </router-link>
+      <fa-icon v-if="(idx+1) < $galleryStore.currentItemPath.length" icon="angle-right" />
+    </li>
+  </ul>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import TopBreadcrumb from "./TopBreadcrumb.vue";
-import TopCommand from "./TopCommand.vue";
 
-@Component({
-  components: {
-    TopCommand,
-    TopBreadcrumb,
-  },
-})
-export default class PanelTop extends Vue {}
+@Component
+export default class TopBreadcrumb extends Vue {
+  getIcon(item: Gallery.Item) {
+    if (item.path.length <= 1) return "home";
+    switch (item.properties.type) {
+      case "picture":
+        return "image";
+      case "directory":
+        return "folder";
+    }
+  }
+}
 </script>
 
 <style lang="scss">
+.pathBreadcrumb {
+  border-left: 2px solid rgba(white, 0.1);
+  padding-left: 15px;
+  display: flex;
+  list-style: none;
+  margin: 5px;
+  a {
+    margin-right: 5px;
+  }
+  li:not(:first-child) {
+    margin-left: 10px;
+  }
+}
 </style>

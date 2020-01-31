@@ -27,6 +27,7 @@ const VuexModule = createModule({
 export default class UIStore extends VuexModule {
 
     fullscreen: boolean = false;
+    fullWidth: boolean = true;
     mode: "navigation" | "search" = "navigation";
     currentTags: Tag.Search[] = [];
 
@@ -44,6 +45,10 @@ export default class UIStore extends VuexModule {
 
     @mutation toggleFullscreen() {
         this.fullscreen = !this.fullscreen;
+    }
+
+    @mutation toggleFullWidth() {
+        this.fullWidth = !this.fullWidth;
     }
 
     @mutation setModeNavigation() {
