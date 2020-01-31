@@ -18,7 +18,7 @@
 -->
 
 <template>
-  <div :class="{fullscreen: $uiStore.fullscreen, fullWidth: $uiStore.fullWidth}">
+  <div :class="{'fullscreen': $uiStore.fullscreen, 'fullwidth': $uiStore.fullWidth}">
     <panel-top v-if="!isLoading" class="layout layout-top" />
     <panel-left v-if="!isLoading" class="layout layout-left" />
     <router-view v-if="!isLoading" class="layout layout-content scrollbar" />
@@ -99,9 +99,9 @@ html {
 }
 .fullscreen {
   --layout-top: 0px;
-  @extend .fullWidth;
+  @extend .fullwidth;
 }
-.fullWidth {
+.fullwidth {
   --layout-left: 0px;
   .layout {
     &.layout-left {

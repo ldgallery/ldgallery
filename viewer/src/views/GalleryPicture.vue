@@ -21,7 +21,7 @@
   <div
     v-dragscroll
     class="scrollbar"
-    :class="{fitToScreen: !$uiStore.fullscreen, originalSize: $uiStore.fullscreen}"
+    :class="{'fit-to-screen': !$uiStore.fullscreen, 'original-size': $uiStore.fullscreen}"
     @click="onClick"
     @dragscrollstart="dragging=true"
   >
@@ -50,7 +50,7 @@ export default class GalleryPicture extends Vue {
 </script>
 
 <style lang="scss">
-.fitToScreen {
+.fit-to-screen {
   display: flex;
   justify-content: space-around;
   height: 100%;
@@ -59,7 +59,7 @@ export default class GalleryPicture extends Vue {
     cursor: zoom-in;
   }
 }
-.originalSize {
+.original-size {
   display: block;
   text-align: center;
   cursor: grab;

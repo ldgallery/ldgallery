@@ -18,7 +18,7 @@
 -->
 
 <template>
-  <ul class="pathBreadcrumb">
+  <ul class="ld-breadcrumb">
     <li v-for="(item,idx) in $galleryStore.currentItemPath" :key="item.path">
       <router-link :to="item.path">
         <fa-icon :icon="getIcon(item)" size="lg" />
@@ -47,7 +47,7 @@ export default class TopBreadcrumb extends Vue {
 </script>
 
 <style lang="scss">
-.pathBreadcrumb {
+.ld-breadcrumb {
   border-left: 2px solid rgba(white, 0.1);
   padding-left: 15px;
   display: flex;

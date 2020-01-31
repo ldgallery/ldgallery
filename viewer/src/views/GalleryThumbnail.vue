@@ -18,7 +18,7 @@
 -->
 
 <template>
-  <div class="forcedsize" :class="{preload: loading}">
+  <div class="forcedsize" :class="{'preload': loading}">
     <v-lazy-image
       v-if="item.thumbnail"
       class="thumbnail"

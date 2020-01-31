@@ -22,13 +22,13 @@
     <div class="link" title="$t('title.tags')" @click="$uiStore.toggleFullWidth()">
       <fa-icon :icon="commandTagsIcon()" size="lg" />
     </div>
-    <router-link to="/" :class="{disabled: isRoot()}" title="$t('title.home')">
+    <router-link to="/" :class="{'disabled': isRoot()}" title="$t('title.home')">
       <fa-icon icon="home" size="lg" />
     </router-link>
     <div class="link" title="$t('title.back')" @click="$router.go(-1)">
       <fa-icon icon="arrow-left" size="lg" />
     </div>
-    <router-link :class="{disabled: isRoot()}" title="$t('title.parent')" :to="parent()">
+    <router-link :class="{'disabled': isRoot()}" title="$t('title.parent')" :to="parent()">
       <fa-icon icon="folder" size="xs" />
       <fa-icon icon="level-up-alt" size="lg" />
     </router-link>

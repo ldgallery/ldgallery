@@ -28,7 +28,7 @@
     field="display"
     type="is-black"
     size="is-medium"
-    class="panelTagInput"
+    class="paneltag-input"
     @typing="searchTags"
     @add="onAdd"
     @remove="onRemove"
@@ -119,7 +119,7 @@ export default class LdTagInput extends Vue {
 </script>
 
 <style lang="scss">
-.panelTagInput .autocomplete .dropdown-content {
+.paneltag-input .autocomplete .dropdown-content {
   max-height: 300px;
 }
 </style>
