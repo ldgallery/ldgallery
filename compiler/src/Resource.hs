@@ -18,7 +18,7 @@
 
 module Resource
   ( ItemProcessor, ThumbnailProcessor
-  , GalleryItem(..), GalleryItemProps(..), Resolution(..), Resource(..)
+  , GalleryItem(..), GalleryItemProps(..), Resolution(..), Resource(..), Thumbnail(..)
   , buildGalleryTree, galleryCleanupResourceDir
   ) where
 
@@ -90,13 +90,23 @@ instance ToJSON GalleryItemProps where
   toEncoding = genericToEncoding encodingOptions
 
 
+data Thumbnail = Thumbnail
+  { resource :: Resource
+  , resolution :: Resolution
+  } deriving (Generic, Show)
+
+instance ToJSON Thumbnail where
+  toJSON = genericToJSON encodingOptions
+  toEncoding = genericToEncoding encodingOptions
+
+
 data GalleryItem = GalleryItem
   { title :: String
   , datetime :: ZonedTime
   , description :: String
   , tags :: [Tag]
   , path :: Path
-  , thumbnail :: Maybe Resource
+  , thumbnail :: Maybe Thumbnail
   , properties :: GalleryItemProps
   } deriving (Generic, Show)
 
@@ -106,7 +116,7 @@ instance ToJSON GalleryItem where
 
 
 type ItemProcessor = Path -> IO GalleryItemProps
-type ThumbnailProcessor = Path -> IO (Maybe Resource)
+type ThumbnailProcessor = Path -> IO (Maybe Thumbnail)
 
 
 buildGalleryTree ::
@@ -150,7 +160,7 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName in
         subItemsParents :: [String]
         subItemsParents = (maybeToList $ fileName path) ++ parentTitles
 
-    maybeThumbnail :: Maybe Path -> IO (Maybe Resource)
+    maybeThumbnail :: Maybe Path -> IO (Maybe Thumbnail)
     maybeThumbnail Nothing = return Nothing
     maybeThumbnail (Just thumbnailPath) = processThumbnail thumbnailPath
 
@@ -197,10 +207,16 @@ galleryOutputDiff resources ref =
 
     resPath :: GalleryItemProps -> Maybe Path
     resPath Directory{} = Nothing
-    resPath resourceProps = Just (resourcePath $ resource resourceProps)
+    resPath resourceProps =
+        Just
+      $ resourcePath
+      $ (resource :: (GalleryItemProps -> Resource)) resourceProps
 
     thumbnailPaths :: [GalleryItem] -> [Path]
-    thumbnailPaths = (map resourcePath) . (mapMaybe thumbnail)
+    thumbnailPaths =
+        map resourcePath
+      . map (resource :: (Thumbnail -> Resource))
+      . mapMaybe thumbnail
 
 
 galleryCleanupResourceDir :: GalleryItem -> FileName -> IO ()
