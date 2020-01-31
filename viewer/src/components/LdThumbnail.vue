@@ -39,7 +39,7 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import Tools from "@/tools";
 
 @Component
-export default class GalleryThumbnail extends Vue {
+export default class LdThumbnail extends Vue {
   @Prop({ required: true }) readonly item!: Gallery.Item;
 
   loading: boolean = false;

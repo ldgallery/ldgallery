@@ -34,7 +34,7 @@ import { Component, Vue } from "vue-property-decorator";
 import Tools from "@/tools";
 
 @Component
-export default class TopBreadcrumb extends Vue {
+export default class LdBreadcrumb extends Vue {
   getIcon(item: Gallery.Item) {
     return Tools.getIcon(item);
   }

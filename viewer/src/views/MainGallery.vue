@@ -21,21 +21,23 @@
   <div>
     <gallery-search v-if="$uiStore.isModeSearch" :items="currentSearch" />
     <gallery-directory v-else-if="checkType('directory')" :directory="$galleryStore.currentItem" />
-    <gallery-picture v-else-if="checkType('picture')" :picture="$galleryStore.currentItem" />
+    <ld-picture v-else-if="checkType('picture')" :picture="$galleryStore.currentItem" />
     <div v-else>{{$t("gallery.unknowntype")}}</div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { Operation } from "@/@types/tag/Operation";
+import { Operation } from "@/@types/Operation";
 import Tools from "@/tools";
 import GallerySearch from "./GallerySearch.vue";
 import GalleryDirectory from "./GalleryDirectory.vue";
-import GalleryPicture from "./GalleryPicture.vue";
 
 @Component({
-  components: { GallerySearch, GalleryDirectory, GalleryPicture },
+  components: {
+    GallerySearch,
+    GalleryDirectory,
+  },
 })
 export default class Gallery extends Vue {
   @Prop(String) readonly pathMatch!: string;

@@ -21,7 +21,7 @@
   <div class="thumbnail-tiles">
     <div v-for="(item) in items" :key="item.path">
       <router-link :to="item.path" @click.native="$uiStore.setModeNavigation()">
-        <gallery-thumbnail :item="item" />
+        <ld-thumbnail :item="item" />
       </router-link>
     </div>
     <div v-if="items.length===0">{{$t('search.no-results')}}</div>
@@ -33,11 +33,8 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import GalleryThumbnail from "./GalleryThumbnail.vue";
 
-@Component({
-  components: { GalleryThumbnail },
-})
+@Component
 export default class GalleryPicture extends Vue {
   @Prop({ required: true }) readonly items!: Gallery.Item[];
 }

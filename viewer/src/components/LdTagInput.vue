@@ -40,7 +40,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { Operation } from "@/@types/tag/Operation";
+import { Operation } from "@/@types/Operation";
 import Tools from "@/tools";
 
 @Component

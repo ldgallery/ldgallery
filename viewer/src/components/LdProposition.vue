@@ -37,10 +37,10 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { Operation } from "@/@types/tag/Operation";
+import { Operation } from "@/@types/Operation";
 
 @Component
-export default class LdTagInput extends Vue {
+export default class LdProposition extends Vue {
   get Operation() {
     return Operation;
   }

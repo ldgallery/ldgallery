@@ -19,22 +19,15 @@
 
 <template>
   <div class="flex">
-    <top-command />
-    <top-breadcrumb />
+    <ld-command />
+    <ld-breadcrumb />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import TopBreadcrumb from "./TopBreadcrumb.vue";
-import TopCommand from "./TopCommand.vue";
 
-@Component({
-  components: {
-    TopCommand,
-    TopBreadcrumb,
-  },
-})
+@Component
 export default class PanelTop extends Vue {}
 </script>
 

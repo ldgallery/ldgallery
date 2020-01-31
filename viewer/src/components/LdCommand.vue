@@ -40,7 +40,7 @@ import { Component, Vue } from "vue-property-decorator";
 import { RawLocation } from "vue-router";
 
 @Component
-export default class TopCommand extends Vue {
+export default class LdCommand extends Vue {
   commandTagsIcon(): string {
     return this.$uiStore.fullWidth ? "tags" : "window-close";
   }

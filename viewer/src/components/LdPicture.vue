@@ -33,7 +33,7 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 
 @Component
-export default class GalleryPicture extends Vue {
+export default class LdPicture extends Vue {
   @Prop({ required: true }) readonly picture!: Gallery.Picture;
 
   dragging: boolean = false;
