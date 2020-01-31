@@ -29,8 +29,11 @@ $panel-left-txtcolor: $panel-top-txtcolor;
 $content-bgcolor: #1e1e1e;
 $toolbar-color: #d62929;
 $loader-color: #272727;
+
+// Overrides - Buefy
 $link: $panel-top-txtcolor;
 $link-hover: lightblue;
 $disabled-color: rgba($link, 0.3);
 $control-radius: 0;
 $input-radius: 0;
+$loading-background: $panel-top-bgcolor;
