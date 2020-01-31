@@ -96,10 +96,12 @@ img {
 
 // === Effect to apply on lazy-image loading
 
-.v-lazy-image {
-  opacity: 0;
-  transition: opacity 0.4s;
-}
-.v-lazy-image-loaded {
-  opacity: 1;
+img {
+  &.v-lazy-image {
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  &.v-lazy-image-loaded {
+    opacity: 1;
+  }
 }
