@@ -64,5 +64,11 @@ export default class LdCommand extends Vue {
   vertical-align: middle;
   align-items: center;
   width: $layout-left;
+  > * {
+    // Unify the minor size differences between icons
+    width: 26px;
+    height: 26px;
+    margin-top: 2px;
+  }
 }
 </style>
