@@ -19,10 +19,24 @@
 
 import Vue from "vue";
 
-import Buefy from "buefy";
+// @ts-ignore
+import Taginput from 'buefy/src/components/taginput';
+// @ts-ignore
+import Loading from 'buefy/src/components/loading';
+// @ts-ignore
+import Radio from 'buefy/src/components/radio';
+// @ts-ignore
+import SnackBar from 'buefy/src/components/snackbar';
+
 import "@/assets/scss/buefy.scss";
 
-Vue.use(Buefy, {
-    defaultIconComponent: 'fa-icon',
-    defaultIconPack: 'fas',
-});
+Vue.use(Taginput);
+Vue.use(Loading);
+Vue.use(Radio);
+Vue.use(SnackBar);
+
+declare module 'vue/types/vue' {
+    interface Vue {
+        $buefy: any;
+    }
+}

@@ -18,17 +18,17 @@
 -->
 
 <template>
-  <div class="forcedsize" :class="{preload: loading}">
+  <div class="forcedsize" :class="{'preload': loading}">
     <v-lazy-image
       v-if="item.thumbnail"
       class="thumbnail"
-      :src="pictureSrc"
+      :src="pictureSrc()"
       :title="item.path"
       @intersect="loading=true"
       @load="loading=false"
     />
     <div v-else class="flex-column flex-center">
-      <fa-icon icon="folder" size="4x" />
+      <fa-icon :icon="getIcon()" size="4x" />
       {{item.title}}
     </div>
   </div>
@@ -36,15 +36,20 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
+import Tools from "@/tools";
 
 @Component
-export default class GalleryThumbnail extends Vue {
+export default class LdThumbnail extends Vue {
   @Prop({ required: true }) readonly item!: Gallery.Item;
 
   loading: boolean = false;
 
-  get pictureSrc() {
+  pictureSrc() {
     return `${process.env.VUE_APP_DATA_URL}${this.item.thumbnail}`;
+  }
+
+  getIcon() {
+    return Tools.getIcon(this.item);
   }
 }
 </script>

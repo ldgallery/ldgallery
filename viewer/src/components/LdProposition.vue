@@ -37,10 +37,10 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { Operation } from "@/@types/tag/Operation";
+import { Operation } from "@/@types/Operation";
 
 @Component
-export default class LdTagInput extends Vue {
+export default class LdProposition extends Vue {
   get Operation() {
     return Operation;
   }
@@ -56,8 +56,10 @@ export default class LdTagInput extends Vue {
         .filter(rawTag => !currentTags.find(currentTag => currentTag.tag === rawTag))
         .forEach(rawTag => (propositions[rawTag] = (propositions[rawTag] ?? 0) + 1));
     } else {
-      // Tags count from the whole gallery
-      Object.entries(this.$galleryStore.tags).forEach(entry => (propositions[entry[0]] = entry[1].items.length));
+      // Tags count from the current directory
+      this.$galleryStore.currentItem?.tags
+        .map(tag => this.$galleryStore.tags[tag]) // FIXME: Folders with the same name are merged in the index
+        .forEach(tagindex => (propositions[tagindex.tag] = tagindex.items.length));
     }
 
     return Object.entries(propositions)

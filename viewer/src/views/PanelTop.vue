@@ -19,64 +19,17 @@
 
 <template>
   <div class="flex">
-    <div class="command-btns">
-      <fa-icon icon="tags" size="lg" class="disabled" />
-      <router-link to="/" :class="{disabled: $galleryStore.currentItemPath.length <= 1}">
-        <fa-icon icon="home" size="lg" />
-      </router-link>
-      <div class="link" @click="$router.go(-1)">
-        <fa-icon icon="arrow-left" size="lg" />
-      </div>
-    </div>
-    <ul class="pathBreadcrumb">
-      <li v-for="(item,idx) in $galleryStore.currentItemPath" :key="item.path">
-        <router-link :to="item.path">
-          <fa-icon :icon="getIcon(item)" size="lg" />
-          {{item.title}}
-        </router-link>
-        <fa-icon v-if="(idx+1) < $galleryStore.currentItemPath.length" icon="angle-right" />
-      </li>
-    </ul>
+    <ld-command />
+    <ld-breadcrumb />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import Gallery from "./Gallery.vue";
+import { Component, Vue } from "vue-property-decorator";
 
 @Component
-export default class PanelTop extends Vue {
-  getIcon(item: Gallery.Item) {
-    if (item.path.length <= 1) return "home";
-    switch (item.properties.type) {
-      case "picture":
-        return "image";
-      case "directory":
-        return "folder";
-    }
-  }
-}
+export default class PanelTop extends Vue {}
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/theme.scss";
-
-.pathBreadcrumb {
-  display: flex;
-  list-style: none;
-  margin: 5px;
-  a {
-    margin-right: 5px;
-  }
-  li:not(:first-child) {
-    margin-left: 10px;
-  }
-}
-.command-btns {
-  display: flex;
-  justify-content: space-around;
-  vertical-align: middle;
-  align-items: center;
-  width: $layout-left;
-}
 </style>

@@ -21,7 +21,7 @@
   <div class="thumbnail-tiles">
     <div v-for="(item) in orderedItems" :key="item.path">
       <router-link :to="item.path">
-        <gallery-thumbnail :item="item" />
+        <ld-thumbnail :item="item" />
       </router-link>
     </div>
     <div>
@@ -33,12 +33,8 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import Tools from "@/tools";
-import GalleryThumbnail from "./GalleryThumbnail.vue";
-import Gallery from "./Gallery.vue";
 
-@Component({
-  components: { GalleryThumbnail },
-})
+@Component
 export default class GalleryDirectory extends Vue {
   @Prop({ required: true }) readonly directory!: Gallery.Directory;
 

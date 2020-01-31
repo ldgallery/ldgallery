@@ -46,15 +46,15 @@ export default class GalleryStore extends VuexModule {
     }
 
     get currentItemPath(): Gallery.Item[] {
-        const galleryItemsRoot = this.galleryItemsRoot;
-        if (galleryItemsRoot)
-            return GalleryStore.searchCurrentItemPath(galleryItemsRoot, this.currentPath);
+        const root = this.galleryItemsRoot;
+        if (root)
+            return GalleryStore.searchCurrentItemPath(root, this.currentPath);
         return [];
     }
 
     get currentItem(): Gallery.Item | null {
-        const currentItemPath = this.currentItemPath;
-        return currentItemPath.length > 0 ? currentItemPath[currentItemPath.length - 1] : null;
+        const path = this.currentItemPath;
+        return path.length > 0 ? path[path.length - 1] : null;
     }
 
     // ---
@@ -69,9 +69,9 @@ export default class GalleryStore extends VuexModule {
 
     // Indexes the gallery
     @action async indexTags() {
+        const root = this.galleryItemsRoot;
         let index = {};
-        if (this.galleryItemsRoot)
-            GalleryStore.pushTagsForItem(index, this.galleryItemsRoot);
+        if (root) GalleryStore.pushTagsForItem(index, root);
         console.log("Index: ", index);
         this.setTags(index);
     }

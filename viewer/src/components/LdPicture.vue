@@ -21,11 +21,17 @@
   <div
     v-dragscroll
     class="scrollbar"
-    :class="{fitToScreen: !$uiStore.fullscreen, originalSize: $uiStore.fullscreen}"
+    :class="{'fit-to-screen': !$uiStore.fullscreen, 'original-size': $uiStore.fullscreen}"
     @click="onClick"
     @dragscrollstart="dragging=true"
   >
-    <v-lazy-image :src="pictureSrc" />
+    <v-lazy-image
+      :src="pictureSrc()"
+      :class="{'slow-loading': Boolean(slowLoadingStyle)}"
+      :style="slowLoadingStyle"
+      @load="clearTimer"
+    />
+    <b-loading :active="Boolean(slowLoadingStyle)" :is-full-page="false" class="ld-picture-loader" />
   </div>
 </template>
 
@@ -33,13 +39,36 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 
 @Component
-export default class GalleryPicture extends Vue {
+export default class LdPicture extends Vue {
   @Prop({ required: true }) readonly picture!: Gallery.Picture;
 
-  dragging: boolean = false;
+  readonly SLOW_LOADING_TIMEOUT_MS: number = 1500;
 
-  get pictureSrc() {
+  dragging: boolean = false;
+  slowLoadingStyle: string | null = null;
+  timer: NodeJS.Timeout | null = null;
+
+  mounted() {
+    if (this.picture.thumbnail) this.timer = setTimeout(this.generateSlowLoadingStyle, this.SLOW_LOADING_TIMEOUT_MS);
+  }
+
+  destroyed() {
+    this.clearTimer();
+  }
+
+  clearTimer() {
+    if (this.timer) clearTimeout(this.timer);
+    this.timer = null;
+    this.slowLoadingStyle = null;
+  }
+
+  pictureSrc() {
     return `${process.env.VUE_APP_DATA_URL}${this.picture.properties.resource}`;
+  }
+
+  generateSlowLoadingStyle() {
+    this.clearTimer();
+    this.slowLoadingStyle = `background-image: url('${process.env.VUE_APP_DATA_URL}${this.picture.thumbnail}');`;
   }
 
   onClick() {
@@ -50,7 +79,23 @@ export default class GalleryPicture extends Vue {
 </script>
 
 <style lang="scss">
-.fitToScreen {
+@import "@/assets/scss/theme.scss";
+
+.ld-picture-loader {
+  position: relative;
+  & .loading-background {
+    background: none !important;
+  }
+}
+img.slow-loading {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-color: $content-bgcolor;
+  background-blend-mode: soft-light;
+  opacity: 1 !important;
+}
+.fit-to-screen {
   display: flex;
   justify-content: space-around;
   height: 100%;
@@ -59,7 +104,7 @@ export default class GalleryPicture extends Vue {
     cursor: zoom-in;
   }
 }
-.originalSize {
+.original-size {
   display: block;
   text-align: center;
   cursor: grab;

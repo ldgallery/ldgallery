@@ -19,32 +19,39 @@
 
 import Vue from "vue";
 
-import { library } from "@fortawesome/fontawesome-svg-core";
+import { library, config } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import {
     faFolder,
     faSearch,
-    faTag,
     faPlus,
     faMinus,
     faImage,
     faHome,
     faArrowLeft,
+    faLevelUpAlt,
     faTags,
     faAngleRight,
+    faWindowClose,
+    faQuestionCircle,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
     faFolder,
     faSearch,
-    faTag,
     faPlus,
     faMinus,
     faImage,
     faHome,
     faArrowLeft,
+    faLevelUpAlt,
     faTags,
     faAngleRight,
+    faWindowClose,
+    faQuestionCircle,
 );
+
+config.autoAddCss = false;
+import "@fortawesome/fontawesome-svg-core/styles.css";
 
 Vue.component("fa-icon", FontAwesomeIcon);

@@ -18,27 +18,41 @@
 -->
 
 <template>
-  <div class="thumbnail-tiles">
-    <div v-for="(item) in items" :key="item.path">
-      <router-link :to="item.path" @click.native="$uiStore.setModeNavigation()">
-        <ld-thumbnail :item="item" />
+  <ul class="ld-breadcrumb">
+    <li v-for="(item,idx) in $galleryStore.currentItemPath" :key="item.path">
+      <router-link :to="item.path">
+        <fa-icon :icon="getIcon(item)" size="lg" />
+        {{item.title}}
       </router-link>
-    </div>
-    <div v-if="items.length===0">{{$t('search.no-results')}}</div>
-    <div>
-      <!-- Empty item for better flex layout -->
-    </div>
-  </div>
+      <fa-icon v-if="(idx+1) < $galleryStore.currentItemPath.length" icon="angle-right" />
+    </li>
+  </ul>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Vue } from "vue-property-decorator";
+import Tools from "@/tools";
 
 @Component
-export default class GalleryPicture extends Vue {
-  @Prop({ required: true }) readonly items!: Gallery.Item[];
+export default class LdBreadcrumb extends Vue {
+  getIcon(item: Gallery.Item) {
+    return Tools.getIcon(item);
+  }
 }
 </script>
 
 <style lang="scss">
+.ld-breadcrumb {
+  border-left: 2px solid rgba(white, 0.1);
+  padding-left: 15px;
+  display: flex;
+  list-style: none;
+  margin: 5px;
+  a {
+    margin-right: 5px;
+  }
+  li:not(:first-child) {
+    margin-left: 10px;
+  }
+}
 </style>
