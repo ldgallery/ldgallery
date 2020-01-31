@@ -17,7 +17,7 @@ Build
 The man page can be generated using [Pandoc]:
 
 ```
-pandoc --standalone --to man ldgallery.1.md --output=ldgallery.1
+pandoc --standalone --to man ldgallery.1.md --output ldgallery.1
 ```
 
 [Pandoc]: https://pandoc.org/

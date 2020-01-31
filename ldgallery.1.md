@@ -20,14 +20,14 @@ The ldgallery compiler program processes pictures and aggregates metadata from p
 
 # COMMAND
 
-ldgallery [\--input-dir=_./_] [\--output-dir=_./out_] [\--with-viewer]
+ldgallery [\--input-dir _./_] [\--output-dir _./out_] [\--with-viewer]
 
 Available options are:
 
--i, \--input-dir=_DIR_
+-i, \--input-dir _DIR_
 : Gallery source directory.  Defaults to the current directory.
 
--o, \--output-dir=_DIR_
+-o, \--output-dir _DIR_
 : Generated gallery output path.  Defaults to ./out.
 
 -r, \--rebuild-all
