@@ -31,17 +31,12 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import Tools from "@/tools";
 
 @Component
 export default class TopBreadcrumb extends Vue {
   getIcon(item: Gallery.Item) {
-    if (item.path.length <= 1) return "home";
-    switch (item.properties.type) {
-      case "picture":
-        return "image";
-      case "directory":
-        return "folder";
-    }
+    return Tools.getIcon(item);
   }
 }
 </script>

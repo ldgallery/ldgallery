@@ -33,6 +33,7 @@ import {
     faTags,
     faAngleRight,
     faWindowClose,
+    faQuestionCircle,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -47,6 +48,7 @@ library.add(
     faTags,
     faAngleRight,
     faWindowClose,
+    faQuestionCircle,
 );
 
 Vue.component("fa-icon", FontAwesomeIcon);

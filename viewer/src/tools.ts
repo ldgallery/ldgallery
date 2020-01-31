@@ -43,5 +43,17 @@ export default class Tools {
     ];
   }
 
+  public static getIcon(item: Gallery.Item): string {
+    if (item.path.length <= 1) return "home";
+    switch (item.properties.type) {
+      case "picture":
+        return "image";
+      case "directory":
+        return "folder";
+      case "other":
+      default:
+        return "question-circle";
+    }
+  }
 
 }
