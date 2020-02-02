@@ -58,6 +58,7 @@ export default class LdProposition extends Vue {
     } else {
       // Tags count from the current directory
       this.$galleryStore.currentItem?.tags
+        .flatMap(tag => tag.split("."))
         .map(tag => this.$galleryStore.tags[tag]) // FIXME: Folders with the same name are merged in the index
         .forEach(tagindex => (propositions[tagindex.tag] = tagindex.items.length));
     }
