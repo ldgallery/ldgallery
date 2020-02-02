@@ -51,7 +51,7 @@ instance FromJSON CompilerConfig where
     <*> v .:? "includedFiles" .!= ["*"]
     <*> v .:? "excludedFiles" .!= []
     <*> v .:? "tagsFromDirectories" .!= 0
-    <*> v .:? "thumbnailMaxResolution" .!= (Resolution 400 400)
+    <*> v .:? "thumbnailMaxResolution" .!= (Resolution 400 300)
     <*> v .:? "pictureMaxResolution"
 
 

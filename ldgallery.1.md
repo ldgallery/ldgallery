@@ -115,7 +115,7 @@ compiler.thumbnailMaxResolution.width
 : Maximum width in pixels of the item thumbnails, 400 by default.
 
 compiler.thumbnailMaxResolution.height
-: Maximum height in pixels of the item thumbnails, 400 by default.
+: Maximum height in pixels of the item thumbnails, 300 by default.
 
 compiler.pictureMaxResolution.width
 : Maximum width in pixels of the picture items, unlimited by default.
