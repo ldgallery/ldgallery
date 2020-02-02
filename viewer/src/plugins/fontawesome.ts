@@ -33,7 +33,7 @@ import {
     faTags,
     faAngleRight,
     faWindowClose,
-    faQuestionCircle,
+    faFile,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -48,7 +48,7 @@ library.add(
     faTags,
     faAngleRight,
     faWindowClose,
-    faQuestionCircle,
+    faFile,
 );
 
 config.autoAddCss = false;
