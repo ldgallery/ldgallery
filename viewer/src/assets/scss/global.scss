@@ -97,6 +97,7 @@ img {
 // === Effect to apply on lazy-image loading
 
 img {
+  display: block;
   &.v-lazy-image {
     opacity: 0;
     transition: opacity 0.4s;
