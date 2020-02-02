@@ -26,6 +26,7 @@ import Control.Monad (liftM2)
 import Data.List (any)
 import System.FilePath ((</>))
 import qualified System.FilePath.Glob as Glob
+import System.Directory (canonicalizePath)
 
 import Data.Aeson (ToJSON)
 import qualified Data.Aeson as JSON
@@ -52,9 +53,6 @@ galleryConf = "gallery.yaml"
 indexFile :: String
 indexFile = "index.json"
 
-viewerMainFile :: String
-viewerMainFile = "index.html"
-
 viewerConfFile :: String
 viewerConfFile = "viewer.json"
 
@@ -72,11 +70,11 @@ writeJSON outputPath object =
     ensureParentDir JSON.encodeFile outputPath object
 
 
-galleryDirFilter :: CompilerConfig -> FSNode -> Bool
-galleryDirFilter config =
+galleryDirFilter :: CompilerConfig -> FilePath -> FSNode -> Bool
+galleryDirFilter config outputDir =
       (not . isHidden)
+  &&& (not . isOutputGallery)
   &&& (not . matchesFile (== galleryConf))
-  &&& (not . containsOutputGallery)
   &&& ((matchesDir $ anyPattern $ includedDirectories config) |||
        (matchesFile $ anyPattern $ includedFiles config))
   &&& (not . ((matchesDir $ anyPattern $ excludedDirectories config) |||
@@ -97,10 +95,9 @@ galleryDirFilter config =
     anyPattern :: [String] -> FileName -> Bool
     anyPattern patterns filename = any (flip Glob.match filename) (map Glob.compile patterns)
 
-    containsOutputGallery :: FSNode -> Bool
-    containsOutputGallery File{} = False
-    containsOutputGallery Dir{items} =
-      any (matchesFile (== indexFile) ||| matchesFile (== viewerMainFile)) items
+    isOutputGallery :: FSNode -> Bool
+    isOutputGallery Dir{canonicalPath} = canonicalPath == outputDir
+    isOutputGallery File{} = False
 
 
 compileGallery :: FilePath -> FilePath -> Bool -> Bool -> IO ()
@@ -110,7 +107,8 @@ compileGallery inputDirPath outputDirPath rebuildAll cleanOutput =
     let config = compiler fullConfig
 
     inputDir <- readDirectory inputDirPath
-    let sourceFilter = galleryDirFilter config
+    canonicalOutPath <- canonicalizePath outputDirPath
+    let sourceFilter = galleryDirFilter config canonicalOutPath
     let sourceTree = filterDir sourceFilter inputDir
     inputTree <- readInputTree sourceTree
 
