@@ -33,7 +33,7 @@ declare namespace Gallery {
         description: string,
         tags: RawTag[],
         path: string,
-        thumbnail?: string,
+        thumbnail?: Thumbnail
         properties: OtherProperties | PictureProperties | DirectoryProperties,
     }
     interface OtherProperties {
@@ -46,6 +46,13 @@ declare namespace Gallery {
     interface DirectoryProperties {
         type: "directory",
         items: Item[]
+    }
+    interface Thumbnail {
+        resource: string,
+        resolution: {
+            width: number,
+            height: number,
+        }
     }
     type RawTag = string;
     type ItemType = "other" | "picture" | "directory";

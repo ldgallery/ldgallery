@@ -45,7 +45,7 @@ export default class LdThumbnail extends Vue {
   loading: boolean = false;
 
   pictureSrc() {
-    return `${process.env.VUE_APP_DATA_URL}${this.item.thumbnail}`;
+    if (this.item.thumbnail) return `${process.env.VUE_APP_DATA_URL}${this.item.thumbnail.resource}`;
   }
 
   getIcon() {
