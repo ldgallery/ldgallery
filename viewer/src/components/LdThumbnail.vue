@@ -18,12 +18,12 @@
 -->
 
 <template>
-  <div class="forcedsize" :class="{'preload': loading}">
+  <div :class="{'preload': loading}">
     <v-lazy-image
       v-if="item.thumbnail"
-      class="thumbnail"
       :src="pictureSrc()"
-      :title="item.path"
+      :style="pictureStyle()"
+      :title="item.title"
       @intersect="loading=true"
       @load="loading=false"
     />
@@ -45,7 +45,13 @@ export default class LdThumbnail extends Vue {
   loading: boolean = false;
 
   pictureSrc() {
-    return `${process.env.VUE_APP_DATA_URL}${this.item.thumbnail}`;
+    const resource = this.item.thumbnail!.resource;
+    return `${process.env.VUE_APP_DATA_URL}${resource}`;
+  }
+
+  pictureStyle() {
+    const resolution = this.item.thumbnail!.resolution;
+    return { width: `${resolution.width}px`, height: `${resolution.height}px` };
   }
 
   getIcon() {
@@ -57,10 +63,6 @@ export default class LdThumbnail extends Vue {
 <style lang="scss">
 @import "@/assets/scss/theme.scss";
 
-.thumbnail {
-  max-width: 250px;
-  max-height: 250px;
-}
 .preload {
   animation: preloadAnimation 1s infinite ease-in-out alternate;
 }
@@ -71,11 +73,5 @@ export default class LdThumbnail extends Vue {
   to {
     background-color: $loader-color;
   }
-}
-// Temporary size until we get the true thumbnail size
-.forcedsize {
-  width: 250px;
-  height: 250px;
-  text-align: center;
 }
 </style>

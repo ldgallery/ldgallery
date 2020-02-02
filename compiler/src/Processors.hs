@@ -27,16 +27,17 @@ module Processors
 import Control.Exception (Exception)
 import Data.Function ((&))
 import Data.Char (toLower)
+import Data.List (break)
 
 import System.Directory hiding (copyFile)
 import qualified System.Directory
 import System.FilePath
 
-import System.Process (callProcess)
+import System.Process (callProcess, readProcess)
 
 import Resource
   ( ItemProcessor, ThumbnailProcessor
-  , GalleryItemProps(..), Resolution(..), Resource(..) )
+  , GalleryItemProps(..), Resolution(..), Resource(..), Thumbnail(..) )
 
 import Files
 
@@ -123,6 +124,12 @@ withCached processor inputPath outputPath =
 resourceAt :: FilePath -> Path -> IO Resource
 resourceAt fsPath resPath = getModificationTime fsPath >>= return . Resource resPath
 
+getImageResolution :: FilePath -> IO Resolution
+getImageResolution fsPath =
+  readProcess "identify" ["-format", "%w %h", fsPath] []
+  >>= return . break (== ' ')
+  >>= return . \(w, h) -> Resolution (read w) (read h)
+
 
 type ItemFileProcessor =
      FileName        -- ^ Input base path
@@ -162,12 +169,14 @@ thumbnailFileProcessor maxRes cached inputBase outputBase resClass inputRes =
     inPath = localPath $ inputBase /> inputRes
     outPath = localPath $ outputBase /> relOutPath
 
-    process :: Maybe FileProcessor -> IO (Maybe Resource)
+    process :: Maybe FileProcessor -> IO (Maybe Thumbnail)
     process Nothing = return Nothing
     process (Just proc) =
-      proc inPath outPath
-      >> resourceAt outPath relOutPath
-      >>= return . Just
+      do
+        proc inPath outPath
+        resource <- resourceAt outPath relOutPath
+        resolution <- getImageResolution outPath
+        return $ Just $ Thumbnail resource resolution
 
     processorFor :: Format -> Maybe FileProcessor
     processorFor PictureFormat = Just $ resizePictureUpTo maxRes

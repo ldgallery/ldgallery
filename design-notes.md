@@ -143,7 +143,14 @@ Serialised item structure:
   ],
 
   "path": "[resource path]",
-  "thumbnail": "[resource path | null]",
+
+  "thumbnail": null | {
+    "resource": "[resource path]",
+    "resolution": {
+      "width": 400,
+      "height": 200
+    }
+  },
 
 
   "_comment": "type-dependent",

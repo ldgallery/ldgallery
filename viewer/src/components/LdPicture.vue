@@ -29,9 +29,9 @@
       :src="pictureSrc()"
       :class="{'slow-loading': Boolean(slowLoadingStyle)}"
       :style="slowLoadingStyle"
-      @load="clearTimer"
+      @load="clearSlowLoading"
     />
-    <b-loading :active="Boolean(slowLoadingStyle)" :is-full-page="false" class="ld-picture-loader" />
+    <b-loading :active="loader" :is-full-page="false" class="ld-picture-loader" />
   </div>
 </template>
 
@@ -46,20 +46,22 @@ export default class LdPicture extends Vue {
 
   dragging: boolean = false;
   slowLoadingStyle: string | null = null;
+  loader: boolean = false;
   timer: NodeJS.Timeout | null = null;
 
   mounted() {
-    if (this.picture.thumbnail) this.timer = setTimeout(this.generateSlowLoadingStyle, this.SLOW_LOADING_TIMEOUT_MS);
+    this.timer = setTimeout(this.generateSlowLoadingStyle, this.SLOW_LOADING_TIMEOUT_MS);
   }
 
   destroyed() {
-    this.clearTimer();
+    this.clearSlowLoading();
   }
 
-  clearTimer() {
+  clearSlowLoading() {
     if (this.timer) clearTimeout(this.timer);
     this.timer = null;
     this.slowLoadingStyle = null;
+    this.loader = false;
   }
 
   pictureSrc() {
@@ -67,8 +69,10 @@ export default class LdPicture extends Vue {
   }
 
   generateSlowLoadingStyle() {
-    this.clearTimer();
-    this.slowLoadingStyle = `background-image: url('${process.env.VUE_APP_DATA_URL}${this.picture.thumbnail}');`;
+    this.clearSlowLoading();
+    this.loader = true;
+    if (this.picture.thumbnail)
+      this.slowLoadingStyle = `background-image: url('${process.env.VUE_APP_DATA_URL}${this.picture.thumbnail.resource}');`;
   }
 
   onClick() {
