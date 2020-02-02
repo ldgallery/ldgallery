@@ -52,7 +52,7 @@ export default class Tools {
         return "folder";
       case "other":
       default:
-        return "question-circle";
+        return "file";
     }
   }
 

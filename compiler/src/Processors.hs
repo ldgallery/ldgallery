@@ -87,7 +87,11 @@ resizePictureUpTo maxResolution inputPath outputPath =
     maxSize Resolution{width, height} = show width ++ "x" ++ show height ++ ">"
 
     resize :: FileName -> FileName -> IO ()
-    resize input output = callProcess "magick" [input, "-resize", maxSize maxResolution, output]
+    resize input output = callProcess "magick"
+      [ input
+      , "-auto-orient"
+      , "-resize", maxSize maxResolution
+      , output ]
 
 
 type Cache = FileProcessor -> FileProcessor
