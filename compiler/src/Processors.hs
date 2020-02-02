@@ -126,9 +126,11 @@ resourceAt fsPath resPath = getModificationTime fsPath >>= return . Resource res
 
 getImageResolution :: FilePath -> IO Resolution
 getImageResolution fsPath =
-  readProcess "identify" ["-format", "%w %h", fsPath] []
+  readProcess "identify" ["-format", "%w %h", firstFrame] []
   >>= return . break (== ' ')
   >>= return . \(w, h) -> Resolution (read w) (read h)
+  where
+    firstFrame = fsPath ++ "[0]"
 
 
 type ItemFileProcessor =
