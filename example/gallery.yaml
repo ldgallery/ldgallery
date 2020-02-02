@@ -14,7 +14,7 @@ compiler:
 
   thumbnailMaxResolution:
     width: 400  # default
-    height: 400 # default
+    height: 300 # default
 
   pictureMaxResolution:
     width: 1024
