@@ -24,8 +24,8 @@ module Resource
 
 
 import Control.Concurrent.ParallelIO.Global (parallel)
-import Data.List ((\\), sortBy)
-import Data.Ord (comparing)
+import Data.List (sortOn)
+import Data.List.Ordered (minusBy)
 import Data.Char (toLower)
 import Data.Maybe (mapMaybe, fromMaybe, maybeToList)
 import Data.Function ((&))
@@ -202,11 +202,26 @@ galleryOutputDiff resources ref =
     thumbnailPaths :: [GalleryItem] -> [Path]
     thumbnailPaths = (map resourcePath) . (mapMaybe thumbnail)
 
+    (\\) :: [Path] -> [Path] -> [Path]
+    a \\ b = minusOn orderedForm (sortOn orderedForm a) (sortOn orderedForm b)
+      where
+        orderedForm :: Path -> WebPath
+        orderedForm = webPath
+
+        minusOn :: Ord b => (a -> b) -> [a] -> [a] -> [a]
+        minusOn f l r = map snd $ minusBy comparingFst (packRef f l) (packRef f r)
+
+        packRef :: (a -> b) -> [a] -> [(b, a)]
+        packRef f = map (\x -> let y = f x in y `seq` (y, x))
+
+        comparingFst :: Ord b => (b, a) -> (b, a) -> Ordering
+        comparingFst (l, _) (r, _) = compare l r
+
 
 galleryCleanupResourceDir :: GalleryItem -> FileName -> IO ()
 galleryCleanupResourceDir resourceTree outputDir =
   readDirectory outputDir
   >>= return . galleryOutputDiff resourceTree . root
-  >>= return . sortBy (flip $ comparing pathLength) -- nested files before dirs
+  >>= return . sortOn ((0 -) . pathLength) -- nested files before their parent dirs
   >>= return . map (localPath . (/>) outputDir)
   >>= mapM_ remove
