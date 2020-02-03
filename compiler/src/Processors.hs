@@ -24,10 +24,11 @@ module Processors
   ) where
 
 
-import Control.Exception (Exception)
+import Control.Exception (Exception, throwIO)
 import Data.Function ((&))
 import Data.Char (toLower)
 import Data.List (break)
+import Text.Read (readMaybe)
 
 import System.Directory hiding (copyFile)
 import qualified System.Directory
@@ -126,11 +127,17 @@ resourceAt fsPath resPath = getModificationTime fsPath >>= return . Resource res
 
 getImageResolution :: FilePath -> IO Resolution
 getImageResolution fsPath =
-  readProcess "identify" ["-format", "%w %h", firstFrame] []
-  >>= return . break (== ' ')
-  >>= return . \(w, h) -> Resolution (read w) (read h)
+  readProcess "magick" ["identify", "-format", "%w %h", firstFrame] []
+  >>= parseResolution . break (== ' ')
   where
+    firstFrame :: FilePath
     firstFrame = fsPath ++ "[0]"
+
+    parseResolution :: (String, String) -> IO Resolution
+    parseResolution (widthString, heightString) =
+      case (readMaybe widthString, readMaybe heightString) of
+        (Just w, Just h) -> return $ Resolution w h
+        _ -> throwIO $ ProcessingException fsPath "Unable to read image resolution."
 
 
 type ItemFileProcessor =
