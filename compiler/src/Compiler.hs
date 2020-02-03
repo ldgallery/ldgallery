@@ -70,10 +70,10 @@ writeJSON outputPath object =
     ensureParentDir JSON.encodeFile outputPath object
 
 
-galleryDirFilter :: CompilerConfig -> FilePath -> FSNode -> Bool
-galleryDirFilter config outputDir =
+galleryDirFilter :: CompilerConfig -> [FilePath] -> FSNode -> Bool
+galleryDirFilter config excludedCanonicalDirs =
       (not . isHidden)
-  &&& (not . isOutputGallery)
+  &&& (not . isExcludedDir)
   &&& (not . matchesFile (== galleryConf))
   &&& ((matchesDir $ anyPattern $ includedDirectories config) |||
        (matchesFile $ anyPattern $ includedFiles config))
@@ -95,20 +95,20 @@ galleryDirFilter config outputDir =
     anyPattern :: [String] -> FileName -> Bool
     anyPattern patterns filename = any (flip Glob.match filename) (map Glob.compile patterns)
 
-    isOutputGallery :: FSNode -> Bool
-    isOutputGallery Dir{canonicalPath} = canonicalPath == outputDir
-    isOutputGallery File{} = False
+    isExcludedDir :: FSNode -> Bool
+    isExcludedDir Dir{canonicalPath} = any (canonicalPath ==) excludedCanonicalDirs
+    isExcludedDir File{} = False
 
 
-compileGallery :: FilePath -> FilePath -> Bool -> Bool -> IO ()
-compileGallery inputDirPath outputDirPath rebuildAll cleanOutput =
+compileGallery :: FilePath -> FilePath -> [FilePath] -> Bool -> Bool -> IO ()
+compileGallery inputDirPath outputDirPath excludedDirs rebuildAll cleanOutput =
   do
     fullConfig <- readConfig inputGalleryConf
     let config = compiler fullConfig
 
     inputDir <- readDirectory inputDirPath
-    canonicalOutPath <- canonicalizePath outputDirPath
-    let sourceFilter = galleryDirFilter config canonicalOutPath
+    excludedCanonicalDirs <- mapM canonicalizePath excludedDirs
+    let sourceFilter = galleryDirFilter config excludedCanonicalDirs
     let sourceTree = filterDir sourceFilter inputDir
     inputTree <- readInputTree sourceTree
 
