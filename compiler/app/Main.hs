@@ -103,6 +103,7 @@ main =
       compileGallery
         (inputDir opts)
         (galleryOutputDir opts)
+        [outputDir opts]
         (rebuilAll opts)
         (cleanOutput opts)
 
