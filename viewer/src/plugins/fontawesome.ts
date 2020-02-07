@@ -30,9 +30,8 @@ import {
     faHome,
     faArrowLeft,
     faLevelUpAlt,
-    faTags,
     faAngleRight,
-    faWindowClose,
+    faAngleDoubleLeft,
     faFile,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -45,9 +44,8 @@ library.add(
     faHome,
     faArrowLeft,
     faLevelUpAlt,
-    faTags,
     faAngleRight,
-    faWindowClose,
+    faAngleDoubleLeft,
     faFile,
 );
 

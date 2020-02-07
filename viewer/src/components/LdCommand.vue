@@ -2,6 +2,7 @@
 --             pictures into a searchable web gallery.
 --
 -- Copyright (C) 2019-2020  Guillaume FOUET
+--               2020       Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -19,15 +20,15 @@
 
 <template>
   <div class="flex command-btns">
-    <div class="link" :title="$t('title.tags')" @click="$uiStore.toggleFullWidth()">
-      <fa-icon :icon="commandTagsIcon()" size="lg" />
-    </div>
-    <router-link to="/" :class="{'disabled': isRoot()}" :title="$t('title.home')">
+    <a class="link" :title="$t('title.search')" @click="$uiStore.toggleFullWidth()">
+      <fa-icon :icon="commandToggleSearchPanelIcon()" size="lg" />
+    </a>
+    <router-link to="/" :class="{'disabled': isRoot()}" :title="$t('title.home')" class="command-secondary">
       <fa-icon icon="home" size="lg" />
     </router-link>
-    <div class="link" :title="$t('title.back')" @click="$router.go(-1)">
+    <a class="link command-secondary" :title="$t('title.back')" @click="$router.go(-1)">
       <fa-icon icon="arrow-left" size="lg" />
-    </div>
+    </a>
     <router-link :class="{'disabled': isRoot()}" :title="$t('title.parent')" :to="parent()">
       <fa-icon icon="folder" size="xs" />
       <fa-icon icon="level-up-alt" size="lg" />
@@ -41,8 +42,8 @@ import { RawLocation } from "vue-router";
 
 @Component
 export default class LdCommand extends Vue {
-  commandTagsIcon(): string {
-    return this.$uiStore.fullWidth ? "tags" : "window-close";
+  commandToggleSearchPanelIcon(): string {
+    return this.$uiStore.fullWidth ? "search" : "angle-double-left";
   }
 
   isRoot(): boolean {
@@ -58,17 +59,32 @@ export default class LdCommand extends Vue {
 
 <style lang="scss">
 @import "@/assets/scss/theme.scss";
+@import "@/assets/scss/_buefy_variables.scss";
 
 .command-btns {
   justify-content: space-around;
   vertical-align: middle;
   align-items: center;
-  width: $layout-left;
+  flex: 0 0 $layout-left;
+
+  .disabled {
+    cursor: initial;
+  }
+
   > * {
-    // Unify the minor size differences between icons
-    width: 26px;
-    height: 26px;
-    margin-top: 2px;
+    // normalise icon active boxes
+    width: $layout-top;
+    line-height: $layout-top;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  @media only screen and (max-width: $tablet) {
+    flex: 0 1;
+
+    > .command-secondary {
+      display: none;
+    }
   }
 }
 </style>

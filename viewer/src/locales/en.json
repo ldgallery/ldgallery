@@ -1,15 +1,15 @@
 {
-  "tagInput.placeholder": "Tags",
-  "panelLeft.filters": "Filters",
+  "tagInput.placeholder": "Filters",
   "tagInput.nomatch": "No match",
-  "panelLeft.mode": "Mode",
-  "mode.navigation": "Navigation",
-  "mode.search": "Search",
+  "tags.action.exclude": "Exclude from results",
+  "tags.action.include": "Include in results",
+  "tags.action.add-filter": "Add tag to filters",
+  "tags.item-count": "Item count",
+  "tags.groups.uncategorised": "Uncategorised tags",
   "search.no-results": "No results",
-  "panelLeft.propositions": "Proposed tags",
   "gallery.unknowntype": "Unknown item type",
-  "title.tags": "Tags",
-  "title.home": "Home",
-  "title.back": "Back",
-  "title.parent": "Parent"
+  "title.search": "Open search panel",
+  "title.home": "Go to home",
+  "title.back": "Go back",
+  "title.parent": "Go to parent directory"
 }

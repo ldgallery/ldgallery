@@ -2,6 +2,7 @@
 --             pictures into a searchable web gallery.
 --
 -- Copyright (C) 2019-2020  Guillaume FOUET
+--               2020       Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -19,18 +20,40 @@
 
 <template>
   <div>
-    <div v-for="proposed in proposedTags" :key="proposed.rawTag" class="proposition">
-      <div class="operation-btns link" @click="add(Operation.SUBSTRACTION, proposed.rawTag)">
-        <fa-icon icon="minus" />
+    <div class="proposition-group">
+      <div class="proposition-group-header">{{ $t('tags.groups.uncategorised') }}</div>
+
+      <div v-for="proposed in proposedTags" :key="proposed.rawTag" class="proposition">
+        <a
+          class="operation-btns link"
+          :alt="$t('tags.action.exclude')"
+          :title="$t('tags.action.exclude')"
+          @click="add(Operation.SUBSTRACTION, proposed.rawTag)"
+        ><fa-icon icon="minus" /></a>
+
+        <!--
+          TODO: Remove this "addition" button, as it it completely useless.
+          The suggestions are restricted on the tags present in elements in the current directory or query.
+          Performing an union on an element of this restriction is a no-op.
+          (The addition operator stays useful when elements outside of the restricted suggestions are manually entered in the input field.)
+        -->
+        <a
+          class="operation-btns link"
+          :alt="$t('tags.action.include')"
+          :title="$t('tags.action.include')"
+          @click="add(Operation.ADDITION, proposed.rawTag)"
+        ><fa-icon icon="plus" /></a>
+
+        <a
+          class="operation-tag link"
+          :title="$t('tags.action.add-filter')"
+          @click="add(Operation.INTERSECTION, proposed.rawTag)"
+        >{{proposed.rawTag}}</a>
+
+        <div class="disabled proposition-count" :title="$t('tags.item-count')">
+          {{proposed.count}}
+        </div>
       </div>
-      <div class="operation-btns link" @click="add(Operation.ADDITION, proposed.rawTag)">
-        <fa-icon icon="plus" />
-      </div>
-      <div
-        class="operation-tag link"
-        @click="add(Operation.INTERSECTION, proposed.rawTag)"
-      >{{proposed.rawTag}}</div>
-      <div class="disabled">x{{proposed.count}}</div>
     </div>
   </div>
 </template>
@@ -89,20 +112,31 @@ export default class LdProposition extends Vue {
 <style lang="scss">
 @import "@/assets/scss/theme.scss";
 
-.proposition {
-  display: flex;
-  align-items: center;
-  padding-right: 7px;
-  .operation-tag {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    flex-grow: 1;
-    cursor: pointer;
+.proposition-group {
+  margin: 0.75em;
+
+  .proposition-group-header {
+    font-weight: bold;
   }
-  .operation-btns {
-    padding: 2px 7px;
-    cursor: pointer;
+
+  .proposition {
+    display: flex;
+    align-items: center;
+    .operation-tag {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      flex-grow: 1;
+      cursor: pointer;
+      padding-left: 0.2em;
+    }
+    .operation-btns {
+      padding: 2px 7px;
+      cursor: pointer;
+    }
+    .proposition-count {
+      margin: 0 0.5em;
+    }
   }
 }
 </style>

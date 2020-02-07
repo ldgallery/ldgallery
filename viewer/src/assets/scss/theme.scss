@@ -2,6 +2,7 @@
 --             pictures into a searchable web gallery.
 --
 -- Copyright (C) 2019-2020  Guillaume FOUET
+--               2020       Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -17,23 +18,74 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-// === Theme
+// Material Design Gray colour palette
+/*
+$palette-000: #FFFFFF;
+$palette-050: #FAFAFA;
+$palette-100: #F5F5F5;
+$palette-200: #EEEEEE;
+$palette-300: #E0E0E0;
+$palette-400: #BDBDBD;
+$palette-500: #9E9E9E;
+$palette-600: #757575;
+$palette-700: #616161;
+$palette-800: #424242;
+$palette-900: #212121;
+*/
 
-$layout-top: 35px;
+// Material Design Blue Gray colour palette
+$palette-000: #FFFFFF;
+$palette-050: #ECEFF1;
+$palette-100: #CFD8DC;
+$palette-200: #B0BEC5;
+$palette-300: #90A4AE;
+$palette-400: #78909C;
+$palette-500: #607D8B;
+$palette-600: #546E7A;
+$palette-700: #455A64;
+$palette-800: #37474F;
+$palette-900: #263238;
+
+// Material Design Brown colour palette
+/*
+$palette-000: #FFFFFF;
+$palette-050: #EFEBE9;
+$palette-100: #D7CCC8;
+$palette-200: #BCAAA4;
+$palette-300: #A1887F;
+$palette-400: #8D6E63;
+$palette-500: #795548;
+$palette-600: #6D4C41;
+$palette-700: #5D4037;
+$palette-800: #4E342E;
+$palette-900: #3E2723;
+*/
+
+// Buefy components
+$primary: $palette-000;
+$text: $primary;
+$text-light: $palette-100;
+$text-strong: $primary;
+$link: $primary;
+$link-visited: $link;
+$link-hover: $palette-100;
+$disabled-color: $palette-400;
+$radius: 0;
+$loading-background: $palette-800;
+
+// Custom components
+$panel-top-bgcolor: $palette-800;
+$panel-top-txtcolor: $primary;
+$panel-left-bgcolor: $palette-700;
+$panel-left-txtcolor: $primary;
+$content-bgcolor: $palette-900;
+$scrollbar-color: $palette-050;
+$loader-color: $palette-050;
+$input-background-color: $palette-500;
+$input-active-outline-color: $palette-200;
+$input-tag-background-color: $palette-800;
+$input-tag-delete-background-color: $palette-700;
+
+// Layout
+$layout-top: 45px;
 $layout-left: 250px;
-
-$panel-top-bgcolor: #225;
-$panel-top-txtcolor: white;
-$panel-left-bgcolor: $panel-top-bgcolor;
-$panel-left-txtcolor: $panel-top-txtcolor;
-$content-bgcolor: #1e1e1e;
-$toolbar-color: #d62929;
-$loader-color: #272727;
-
-// Overrides - Buefy
-$link: $panel-top-txtcolor;
-$link-hover: lightblue;
-$disabled-color: #656589;
-$control-radius: 0;
-$input-radius: 0;
-$loading-background: $panel-top-bgcolor;

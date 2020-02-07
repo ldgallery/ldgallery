@@ -2,6 +2,7 @@
 --             pictures into a searchable web gallery.
 --
 -- Copyright (C) 2019-2020  Guillaume FOUET
+--               2020       Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -19,12 +20,12 @@
 
 <template>
   <ul class="ld-breadcrumb">
-    <li v-for="(item,idx) in $galleryStore.currentItemPath" :key="item.path">
-      <router-link :to="item.path">
-        <fa-icon :icon="getIcon(item)" size="lg" />
+    <li v-for="item in $galleryStore.currentItemPath" :key="item.path">
+      <router-link :to="item.path" class="ld-breadcrumb-link">
+        <fa-icon class="ld-breadcrumb-element-icon" :icon="getIcon(item)" size="lg" />
         {{item.title}}
       </router-link>
-      <fa-icon v-if="(idx+1) < $galleryStore.currentItemPath.length" icon="angle-right" />
+      <span class="ld-breadcrumb-path-separator"><fa-icon icon="angle-right" /></span>
     </li>
   </ul>
 </template>
@@ -43,18 +44,50 @@ export default class LdBreadcrumb extends Vue {
 
 <style lang="scss">
 @import "@/assets/scss/theme.scss";
+@import "@/assets/scss/_buefy_variables.scss";
 
 .ld-breadcrumb {
-  border-left: 1px solid $disabled-color;
-  padding-left: 15px;
-  display: flex;
   list-style: none;
-  margin: 5px;
-  a {
-    margin-right: 5px;
-  }
-  li:not(:first-child) {
+  vertical-align: middle;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  padding: 0 7px;
+
+  > li {
+    line-height: $layout-top;
+    overflow: hidden;
+    display: flex;
+
+    .ld-breadcrumb-link {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+
+      .ld-breadcrumb-element-icon {
+        margin-right: 5px;
+      }
+    }
+
     margin-left: 10px;
+    .ld-breadcrumb-path-separator {
+      margin-left: 10px;
+    }
+
+    flex: 0 100 auto;
+    &:last-child {
+      flex: 0 1 auto;
+
+      .ld-breadcrumb-path-separator {
+        display: none;
+      }
+    }
+  }
+
+  @media only screen and (max-width: $tablet) {
+    > li:not(:last-child) {
+      display: none;
+    }
   }
 }
 </style>

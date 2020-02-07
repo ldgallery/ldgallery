@@ -2,6 +2,7 @@
 --             pictures into a searchable web gallery.
 --
 -- Copyright (C) 2019-2020  Guillaume FOUET
+--               2020       Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -26,7 +27,6 @@
     attached
     :data="filteredTags"
     field="display"
-    type="is-black"
     size="is-medium"
     class="paneltag-input"
     @typing="searchTags"
@@ -119,7 +119,32 @@ export default class LdTagInput extends Vue {
 </script>
 
 <style lang="scss">
-.paneltag-input .autocomplete .dropdown-content {
-  max-height: 300px;
+@import "@/assets/scss/theme.scss";
+
+.paneltag-input {
+  .taginput-container.is-focusable {
+    box-shadow: none !important;
+    border-color: transparent !important;
+
+    &.is-focused {
+      border-color: $input-active-outline-color !important;
+    }
+  }
+
+  .tag {
+    background-color: $input-tag-background-color;
+
+    &.is-delete {
+      background-color: $input-tag-delete-background-color !important;
+
+      &:hover {
+        color: $link-hover;
+      }
+    }
+  }
+
+  .paneltag-input .autocomplete .dropdown-content {
+    max-height: 300px;
+  }
 }
 </style>

@@ -2,6 +2,7 @@
 --             pictures into a searchable web gallery.
 --
 -- Copyright (C) 2019-2020  Guillaume FOUET
+--               2020       Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -115,7 +116,7 @@ html {
     background-color: $panel-top-bgcolor;
     color: $panel-top-txtcolor;
   }
-  &.layout-left {
+  &.layout-left, &.layout-top > *:first-child {
     background-color: $panel-left-bgcolor;
     color: $panel-left-txtcolor;
   }
