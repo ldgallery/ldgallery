@@ -25,9 +25,6 @@
       </router-link>
     </div>
     <div v-if="items.length===0">{{$t('search.no-results')}}</div>
-    <div>
-      <!-- Empty item for better flex layout -->
-    </div>
   </div>
 </template>
 
