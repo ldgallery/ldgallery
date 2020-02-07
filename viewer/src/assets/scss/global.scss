@@ -67,6 +67,17 @@
   color: $disabled-color !important;
 }
 
+// touch devices fixes
+@media (hover:none), (hover:on-demand) {
+  .link:hover {
+    color: $text !important;
+  }
+
+  .disabled:hover {
+    color: $disabled-color !important;
+  }
+}
+
 // === Scrollbar styling
 
 .scrollbar {

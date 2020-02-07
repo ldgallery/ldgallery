@@ -21,7 +21,7 @@
 <template>
   <ul class="ld-breadcrumb">
     <li v-for="item in $galleryStore.currentItemPath" :key="item.path">
-      <router-link :to="item.path" class="ld-breadcrumb-link">
+      <router-link :to="item.path" class="ld-breadcrumb-link link">
         <fa-icon class="ld-breadcrumb-element-icon" :icon="getIcon(item)" size="lg" />
         {{item.title}}
       </router-link>
