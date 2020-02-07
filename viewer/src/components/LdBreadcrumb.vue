@@ -25,7 +25,7 @@
         <fa-icon class="ld-breadcrumb-element-icon" :icon="getIcon(item)" size="lg" />
         {{item.title}}
       </router-link>
-      <span class="ld-breadcrumb-path-separator"><fa-icon icon="angle-right" /></span>
+      <span class="ld-breadcrumb-path-separator disabled"><fa-icon icon="angle-right" /></span>
     </li>
   </ul>
 </template>
@@ -65,7 +65,7 @@ export default class LdBreadcrumb extends Vue {
       text-overflow: ellipsis;
 
       .ld-breadcrumb-element-icon {
-        margin-right: 5px;
+        margin-right: 2px;
       }
     }
 
