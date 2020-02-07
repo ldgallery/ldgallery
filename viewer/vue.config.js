@@ -27,9 +27,12 @@ module.exports = {
       enableInSFC: false,
     },
   },
+  configureWebpack: {
+    devtool: 'source-map'
+  },
   productionSourceMap: false,
   devServer: {
-    port: 8085,
+    port: process.env.VUE_APP_DEVSERVER_PORT,
     serveIndex: true,
     before: (app, server, compiler) => {
       app.get(`/${process.env.VUE_APP_DATA_URL}*`, (req, res) => {

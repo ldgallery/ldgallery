@@ -6,9 +6,16 @@
 	],
 	"settings": {
 		"editor.formatOnSave": true,
+		"editor.wordBasedSuggestions": false,
 		"javascript.format.semicolons": "insert",
 		"typescript.disableAutomaticTypeAcquisition": true,
-		"vue-i18n-ally.localesPaths": "src/locales",
 		"vue-i18n-ally.keystyle": "flat",
+		"i18n-ally.localesPaths": "src/locales",
 	}
 }
+// Recommended Visual Studio Code extensions:
+// - Vetur
+// - i18n Ally
+// - SCSS Everywhere
+// - Debugger for Chrome
+// - vscode-icons
