@@ -31,12 +31,6 @@
           @click="add(Operation.SUBSTRACTION, proposed.rawTag)"
         ><fa-icon icon="minus" /></a>
 
-        <!--
-          TODO: Remove this "addition" button, as it it completely useless.
-          The suggestions are restricted on the tags present in elements in the current directory or query.
-          Performing an union on an element of this restriction is a no-op.
-          (The addition operator stays useful when elements outside of the restricted suggestions are manually entered in the input field.)
-        -->
         <a
           class="operation-btns link"
           :alt="$t('tags.action.include')"
