@@ -22,7 +22,7 @@ module Compiler
   ) where
 
 
-import Control.Monad (liftM2)
+import Control.Monad (liftM2, when)
 import Data.List (any)
 import System.FilePath ((</>))
 import qualified System.FilePath.Glob as Glob
@@ -118,11 +118,7 @@ compileGallery inputDirPath outputDirPath excludedDirs rebuildAll cleanOutput =
     let galleryBuilder = buildGalleryTree itemProc thumbnailProc (tagsFromDirectories config)
     resources <- galleryBuilder (galleryName config) inputTree
 
-    if cleanOutput then
-      galleryCleanupResourceDir resources outputDirPath
-    else
-      return ()
-
+    when cleanOutput $ galleryCleanupResourceDir resources outputDirPath
     writeJSON outputIndex resources
     writeJSON outputViewerConf $ viewer fullConfig
 

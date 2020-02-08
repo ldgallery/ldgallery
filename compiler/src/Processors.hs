@@ -25,6 +25,7 @@ module Processors
 
 
 import Control.Exception (Exception, throwIO)
+import Control.Monad (when)
 import Data.Function ((&))
 import Data.Char (toLower)
 import Data.List (break)
@@ -106,7 +107,7 @@ withCached :: Cache
 withCached processor inputPath outputPath =
   do
     isDir <- doesDirectoryExist outputPath
-    if isDir then removePathForcibly outputPath else noop
+    when isDir $ removePathForcibly outputPath
 
     fileExists <- doesFileExist outputPath
     if fileExists then
@@ -117,7 +118,6 @@ withCached processor inputPath outputPath =
       update
 
   where
-    noop = return ()
     update = processor inputPath outputPath
     skip = putStrLn $ "Skipping:\t" ++ outputPath
 

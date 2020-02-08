@@ -25,10 +25,13 @@ ldgallery [\--input-dir _./_] [\--output-dir _./out_] [\--with-viewer]
 Available options are:
 
 -i, \--input-dir _DIR_
-: Gallery source directory.  Defaults to the current directory.
+: Gallery source directory.
+  Defaults to the current directory.
 
 -o, \--output-dir _DIR_
-: Generated gallery output path.  Defaults to ./out.
+: Generated gallery output path.
+  Must be distinct from the source directory.
+  Defaults to ./out.
 
 -r, \--rebuild-all
 : Invalidate cache and recompile everything.

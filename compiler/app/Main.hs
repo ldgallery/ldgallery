@@ -20,11 +20,13 @@ module Main where
 
 import GHC.Generics (Generic)
 import Paths_ldgallery_compiler (version, getDataFileName)
+import Control.Monad (when)
 import Data.Version (showVersion)
 import Data.Int (Int64)
 import Data.Aeson (ToJSON)
 import Data.Time.Clock.System (getSystemTime, systemSeconds)
 import System.FilePath ((</>))
+import System.Directory (canonicalizePath)
 import System.Console.CmdArgs
 
 import Compiler
@@ -88,11 +90,9 @@ main =
   do
     opts <- cmdArgs options
     buildGallery opts
-    if (withViewer opts) then do
+    when (withViewer opts) $ do
       copyViewer (outputDir opts)
       writeViewerConfig (outputDir opts </> "config.json")
-    else
-      return ()
 
   where
     gallerySubdir :: String
@@ -100,12 +100,18 @@ main =
 
     buildGallery :: Options -> IO ()
     buildGallery opts =
-      compileGallery
-        (inputDir opts)
-        (galleryOutputDir opts)
-        [outputDir opts]
-        (rebuilAll opts)
-        (cleanOutput opts)
+      checkDistinctPaths (inputDir opts) (outputDir opts)
+      >>  compileGallery
+            (inputDir opts)
+            (galleryOutputDir opts)
+            [outputDir opts]
+            (rebuilAll opts)
+            (cleanOutput opts)
+      where
+        checkDistinctPaths a b = do
+          canonicalA <- canonicalizePath a
+          canonicalB <- canonicalizePath b
+          when (canonicalA == canonicalB) $ error "Input and output paths refer to the same location."
 
     galleryOutputDir :: Options -> FilePath
     galleryOutputDir opts =
