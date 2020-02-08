@@ -23,10 +23,10 @@
     <a class="link" :title="$t('title.tags')" @click="$uiStore.toggleFullWidth()">
       <fa-icon :icon="commandTagsIcon()" size="lg" />
     </a>
-    <router-link to="/" :class="{'disabled': isRoot()}" :title="$t('title.home')">
+    <router-link to="/" class="command-secondary" :class="{'disabled': isRoot()}" :title="$t('title.home')">
       <fa-icon icon="home" size="lg" />
     </router-link>
-    <a class="link" :title="$t('title.back')" @click="$router.go(-1)">
+    <a class="link command-secondary" :title="$t('title.back')" @click="$router.go(-1)">
       <fa-icon icon="arrow-left" size="lg" />
     </a>
     <router-link :class="{'disabled': isRoot()}" :title="$t('title.parent')" :to="parent()">
@@ -58,6 +58,7 @@ export default class LdCommand extends Vue {
 </script>
 
 <style lang="scss">
+@import "@/assets/scss/_buefy_variables.scss";
 @import "@/assets/scss/theme.scss";
 
 .command-btns {
@@ -72,6 +73,14 @@ export default class LdCommand extends Vue {
     line-height: $layout-top;
     text-align: center;
     vertical-align: middle;
+  }
+
+  @media only screen and (max-width: $tablet) {
+    flex: 0 1;
+
+    > .command-secondary {
+      display: none;
+    }
   }
 }
 </style>
