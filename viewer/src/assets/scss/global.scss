@@ -23,12 +23,16 @@
 
 // === Forms
 
-.input {
-  background-color: $input-background-color;
-  color: $text !important;
+.taginput {
+    .is-delete {
+      background-color: $input-tag-delete-background-color !important;
 
-  &::placeholder {
-    color: $text-light !important;
+      &:hover {
+        color: $link-hover;
+      }
+  }
+  .autocomplete .dropdown-content {
+    max-height: 300px;
   }
 }
 
@@ -67,6 +71,10 @@
   color: $disabled-color !important;
 }
 
+.title {
+  margin: 0.2em 0.5em !important;
+}
+
 // touch devices fixes
 @media (hover:none), (hover:on-demand) {
   .link:hover {
@@ -84,8 +92,8 @@
   overflow: auto;
 }
 .scrollbar::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 .scrollbar::-webkit-scrollbar-corner {
   background-color: transparent;

@@ -19,75 +19,55 @@
 -->
 
 <template>
-  <ul class="ld-breadcrumb">
-    <li v-for="item in $galleryStore.currentItemPath" :key="item.path">
-      <router-link :to="item.path" class="ld-breadcrumb-link link">
-        <fa-icon class="ld-breadcrumb-element-icon" :icon="getIcon(item)" size="lg" />
+  <ul ref="breadcrumb" class="ld-breadcrumb scrollbar" v-dragscroll>
+    <li v-for="(item,idx) in $galleryStore.currentItemPath" :key="item.path">
+      <router-link :to="item.path" class="link">
+        <fa-icon :icon="getIcon(item)" size="lg" />
         {{item.title}}
       </router-link>
-      <span class="ld-breadcrumb-path-separator disabled"><fa-icon icon="angle-right" /></span>
+      <fa-icon
+        v-if="(idx+1) < $galleryStore.currentItemPath.length"
+        icon="angle-right"
+        class="disabled"
+      />
     </li>
   </ul>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Ref } from "vue-property-decorator";
 import Tools from "@/tools";
 
 @Component
 export default class LdBreadcrumb extends Vue {
+  @Ref() readonly breadcrumb!: HTMLUListElement;
+
   getIcon(item: Gallery.Item) {
     return Tools.getIcon(item);
+  }
+
+  updated() {
+    this.breadcrumb.scrollLeft = this.breadcrumb.scrollWidth;
   }
 }
 </script>
 
 <style lang="scss">
 @import "@/assets/scss/theme.scss";
-@import "@/assets/scss/_buefy_variables.scss";
 
 .ld-breadcrumb {
-  list-style: none;
-  vertical-align: middle;
+  border-left: 1px solid $disabled-color;
+  padding-left: 15px;
+  margin: 5px;
   display: flex;
-  flex-wrap: nowrap;
-  overflow: hidden;
-  padding: 0 7px;
+  align-items: center;
+  white-space: nowrap;
 
-  > li {
-    line-height: $layout-top;
-    overflow: hidden;
-    display: flex;
-
-    .ld-breadcrumb-link {
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-
-      .ld-breadcrumb-element-icon {
-        margin-right: 2px;
-      }
-    }
-
-    margin-left: 10px;
-    .ld-breadcrumb-path-separator {
-      margin-left: 10px;
-    }
-
-    flex: 0 100 auto;
-    &:last-child {
-      flex: 0 1 auto;
-
-      .ld-breadcrumb-path-separator {
-        display: none;
-      }
-    }
+  a {
+    margin-right: 5px;
   }
-
-  @media only screen and (max-width: $tablet) {
-    > li:not(:last-child) {
-      display: none;
-    }
+  li:not(:first-child) {
+    margin-left: 10px;
   }
 }
 </style>

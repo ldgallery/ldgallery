@@ -11,5 +11,6 @@
   "title.search": "Open search panel",
   "title.home": "Go to home",
   "title.back": "Go back",
-  "title.parent": "Go to parent directory"
+  "title.parent": "Go to parent directory",
+  "panelLeft.propositions": "Proposed tags"
 }

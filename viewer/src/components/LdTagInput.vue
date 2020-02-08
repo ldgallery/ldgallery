@@ -28,7 +28,6 @@
     :data="filteredTags"
     field="display"
     size="is-medium"
-    class="paneltag-input"
     @typing="searchTags"
     @add="onAdd"
     @remove="onRemove"
@@ -119,32 +118,4 @@ export default class LdTagInput extends Vue {
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/theme.scss";
-
-.paneltag-input {
-  .taginput-container.is-focusable {
-    box-shadow: none !important;
-    border-color: transparent !important;
-
-    &.is-focused {
-      border-color: $input-active-outline-color !important;
-    }
-  }
-
-  .tag {
-    background-color: $input-tag-background-color;
-
-    &.is-delete {
-      background-color: $input-tag-delete-background-color !important;
-
-      &:hover {
-        color: $link-hover;
-      }
-    }
-  }
-
-  .paneltag-input .autocomplete .dropdown-content {
-    max-height: 300px;
-  }
-}
 </style>

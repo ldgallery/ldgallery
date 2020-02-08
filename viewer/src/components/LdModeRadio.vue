@@ -21,11 +21,11 @@
   <div class="flex">
     <b-radio-button v-model="$uiStore.mode" native-value="navigation" type="is-green">
       <fa-icon icon="folder" />
-      <span>{{$t('mode.navigation')}}</span>
+      <span>Navigation</span>
     </b-radio-button>
     <b-radio-button v-model="$uiStore.mode" native-value="search" type="is-purple">
       <fa-icon icon="search" />
-      <span>{{$t('mode.search')}}</span>
+      <span>Search</span>
     </b-radio-button>
   </div>
 </template>

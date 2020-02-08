@@ -116,7 +116,7 @@ html {
     background-color: $panel-top-bgcolor;
     color: $panel-top-txtcolor;
   }
-  &.layout-left, &.layout-top > *:first-child {
+  &.layout-left {
     background-color: $panel-left-bgcolor;
     color: $panel-left-txtcolor;
   }

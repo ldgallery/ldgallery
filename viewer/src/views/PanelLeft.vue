@@ -20,18 +20,10 @@
 
 <template>
   <div class="flex-column">
-    <ld-tag-input />
-    <ld-proposition class="scrollbar no-scroll-x" />
-
-    <!--
-    --  TODO: just remove the following "mode" switch: manually toggling it leads to inconsistent views.
-    --  The two modes should instead be made clear by the use of the breadcrumbs: the path would not appear anymore during searches.
-    --  Entering any query already switches automatically into search mode.
-    --  It is already possible to exit the search mode by clearing the filters, either by using the home, back and up navigation buttons, or manually by removing the tags in the input fieds.
-
     <ld-mode-radio />
-    -->
-
+    <ld-tag-input />
+    <h1 class="title">{{$t('panelLeft.propositions')}}</h1>
+    <ld-proposition class="scrollbar no-scroll-x" />
   </div>
 </template>
 

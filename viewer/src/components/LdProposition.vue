@@ -19,35 +19,29 @@
 -->
 
 <template>
-  <div>
-    <div class="proposition-group">
-      <div class="proposition-group-header">{{ $t('tags.groups.uncategorised') }}</div>
+  <div class="proposition-group">
+    <div v-for="proposed in proposedTags" :key="proposed.rawTag" class="proposition">
+      <a
+        class="operation-btns link"
+        :title="$t('tags.action.exclude')"
+        @click="add(Operation.SUBSTRACTION, proposed.rawTag)"
+      >
+        <fa-icon icon="minus" />
+      </a>
+      <a
+        class="operation-btns link"
+        :title="$t('tags.action.include')"
+        @click="add(Operation.ADDITION, proposed.rawTag)"
+      >
+        <fa-icon icon="plus" />
+      </a>
+      <a
+        class="operation-tag link"
+        :title="$t('tags.action.add-filter')"
+        @click="add(Operation.INTERSECTION, proposed.rawTag)"
+      >{{proposed.rawTag}}</a>
 
-      <div v-for="proposed in proposedTags" :key="proposed.rawTag" class="proposition">
-        <a
-          class="operation-btns link"
-          :alt="$t('tags.action.exclude')"
-          :title="$t('tags.action.exclude')"
-          @click="add(Operation.SUBSTRACTION, proposed.rawTag)"
-        ><fa-icon icon="minus" /></a>
-
-        <a
-          class="operation-btns link"
-          :alt="$t('tags.action.include')"
-          :title="$t('tags.action.include')"
-          @click="add(Operation.ADDITION, proposed.rawTag)"
-        ><fa-icon icon="plus" /></a>
-
-        <a
-          class="operation-tag link"
-          :title="$t('tags.action.add-filter')"
-          @click="add(Operation.INTERSECTION, proposed.rawTag)"
-        >{{proposed.rawTag}}</a>
-
-        <div class="disabled proposition-count" :title="$t('tags.item-count')">
-          {{proposed.count}}
-        </div>
-      </div>
+      <div class="disabled" :title="$t('tags.item-count')">{{proposed.count}}</div>
     </div>
   </div>
 </template>
@@ -107,30 +101,23 @@ export default class LdProposition extends Vue {
 @import "@/assets/scss/theme.scss";
 
 .proposition-group {
-  margin: 0.75em;
-
-  .proposition-group-header {
-    font-weight: bold;
-  }
+  margin: 0.25em;
 
   .proposition {
     display: flex;
     align-items: center;
-    .operation-tag {
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      overflow: hidden;
-      flex-grow: 1;
-      cursor: pointer;
-      padding-left: 0.2em;
-    }
-    .operation-btns {
-      padding: 2px 7px;
-      cursor: pointer;
-    }
-    .proposition-count {
-      margin: 0 0.5em;
-    }
+  }
+  .operation-tag {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    flex-grow: 1;
+    cursor: pointer;
+    padding-left: 0.2em;
+  }
+  .operation-btns {
+    padding: 2px 7px;
+    cursor: pointer;
   }
 }
 </style>

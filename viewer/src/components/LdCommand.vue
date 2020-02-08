@@ -23,7 +23,12 @@
     <a class="link" :title="$t('title.search')" @click="$uiStore.toggleFullWidth()">
       <fa-icon :icon="commandToggleSearchPanelIcon()" size="lg" />
     </a>
-    <router-link to="/" :class="{'disabled': isRoot()}" :title="$t('title.home')" class="command-secondary">
+    <router-link
+      to="/"
+      class="command-secondary"
+      :class="{'disabled': isRoot()}"
+      :title="$t('title.home')"
+    >
       <fa-icon icon="home" size="lg" />
     </router-link>
     <a class="link command-secondary" :title="$t('title.back')" @click="$router.go(-1)">
@@ -58,8 +63,8 @@ export default class LdCommand extends Vue {
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/theme.scss";
 @import "@/assets/scss/_buefy_variables.scss";
+@import "@/assets/scss/theme.scss";
 
 .command-btns {
   justify-content: space-around;
