@@ -27,6 +27,9 @@ module.exports = {
       enableInSFC: false,
     },
   },
+  chainWebpack: (config) => {
+    config.plugins.delete('prefetch');
+  },
   configureWebpack: {
     devtool: 'source-map'
   },
