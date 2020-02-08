@@ -20,16 +20,16 @@
 
 <template>
   <div class="flex command-btns">
-    <a class="link" :title="$t('title.tags')" @click="$uiStore.toggleFullWidth()">
-      <fa-icon :icon="commandTagsIcon()" size="lg" />
+    <a class="link" :title="$t('command.search')" @click="$uiStore.toggleFullWidth()">
+      <fa-icon :icon="commandToggleSearchPanelIcon()" size="lg" />
     </a>
-    <router-link to="/" class="command-secondary" :class="{'disabled': isRoot()}" :title="$t('title.home')">
+    <router-link to="/" class="command-secondary" :class="{'disabled': isRoot()}" :title="$t('command.home')">
       <fa-icon icon="home" size="lg" />
     </router-link>
-    <a class="link command-secondary" :title="$t('title.back')" @click="$router.go(-1)">
+    <a class="link command-secondary" :title="$t('command.back')" @click="$router.go(-1)">
       <fa-icon icon="arrow-left" size="lg" />
     </a>
-    <router-link :class="{'disabled': isRoot()}" :title="$t('title.parent')" :to="parent()">
+    <router-link :class="{'disabled': isRoot()}" :title="$t('command.parent')" :to="parent()">
       <fa-icon icon="folder" size="xs" />
       <fa-icon icon="level-up-alt" size="lg" />
     </router-link>
@@ -42,8 +42,8 @@ import { RawLocation } from "vue-router";
 
 @Component
 export default class LdCommand extends Vue {
-  commandTagsIcon(): string {
-    return this.$uiStore.fullWidth ? "tags" : "window-close";
+  commandToggleSearchPanelIcon(): string {
+    return this.$uiStore.fullWidth ? "search" : "angle-double-left";
   }
 
   isRoot(): boolean {

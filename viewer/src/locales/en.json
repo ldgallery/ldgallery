@@ -8,8 +8,8 @@
   "search.no-results": "No results",
   "panelLeft.propositions": "Proposed tags",
   "gallery.unknowntype": "Unknown item type",
-  "title.tags": "Tags",
-  "title.home": "Home",
-  "title.back": "Back",
-  "title.parent": "Parent"
+  "command.search": "Open search panel",
+  "command.home": "Go to gallery home",
+  "command.back": "Go back",
+  "command.parent": "Go to parent directory"
 }
