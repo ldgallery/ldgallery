@@ -2,6 +2,7 @@
 --             pictures into a searchable web gallery.
 --
 -- Copyright (C) 2019-2020  Guillaume FOUET
+--               2020       Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -63,12 +64,14 @@ export default class LdCommand extends Vue {
   justify-content: space-around;
   vertical-align: middle;
   align-items: center;
-  width: $layout-left;
+  flex: 0 0 $layout-left;
+
   > * {
-    // Unify the minor size differences between icons
-    width: 26px;
-    height: 26px;
-    margin-top: 2px;
+    // normalise icon active boxes
+    width: $layout-top;
+    line-height: $layout-top;
+    text-align: center;
+    vertical-align: middle;
   }
 }
 </style>
