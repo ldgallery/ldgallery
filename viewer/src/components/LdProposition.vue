@@ -21,17 +21,28 @@
 <template>
   <div>
     <div v-for="proposed in proposedTags" :key="proposed.rawTag" class="proposition">
-      <a class="operation-btns link" @click="add(Operation.SUBSTRACTION, proposed.rawTag)">
-        <fa-icon icon="minus" />
-      </a>
-      <a class="operation-btns link" @click="add(Operation.ADDITION, proposed.rawTag)">
-        <fa-icon icon="plus" />
-      </a>
+      <a
+        class="operation-btns link"
+        :title="$t('tag-propositions.substraction')"
+        @click="add(Operation.SUBSTRACTION, proposed.rawTag)"
+      ><fa-icon icon="minus" alt="[-]" /></a>
+
+      <a
+        class="operation-btns link"
+        :title="$t('tag-propositions.addition')"
+        @click="add(Operation.ADDITION, proposed.rawTag)"
+      ><fa-icon icon="plus" alt="[+]" /></a>
+
       <a
         class="operation-tag link"
+        :title="$t('tag-propositions.intersection')"
         @click="add(Operation.INTERSECTION, proposed.rawTag)"
       >{{proposed.rawTag}}</a>
-      <div class="disabled">x{{proposed.count}}</div>
+
+      <div
+        class="disabled"
+        :title="$t('tag-propositions.item-count')"
+      >{{proposed.count}}</div>
     </div>
   </div>
 </template>
