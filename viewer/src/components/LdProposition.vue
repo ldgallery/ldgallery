@@ -2,6 +2,7 @@
 --             pictures into a searchable web gallery.
 --
 -- Copyright (C) 2019-2020  Guillaume FOUET
+--               2020       Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -20,16 +21,16 @@
 <template>
   <div>
     <div v-for="proposed in proposedTags" :key="proposed.rawTag" class="proposition">
-      <div class="operation-btns link" @click="add(Operation.SUBSTRACTION, proposed.rawTag)">
+      <a class="operation-btns link" @click="add(Operation.SUBSTRACTION, proposed.rawTag)">
         <fa-icon icon="minus" />
-      </div>
-      <div class="operation-btns link" @click="add(Operation.ADDITION, proposed.rawTag)">
+      </a>
+      <a class="operation-btns link" @click="add(Operation.ADDITION, proposed.rawTag)">
         <fa-icon icon="plus" />
-      </div>
-      <div
+      </a>
+      <a
         class="operation-tag link"
         @click="add(Operation.INTERSECTION, proposed.rawTag)"
-      >{{proposed.rawTag}}</div>
+      >{{proposed.rawTag}}</a>
       <div class="disabled">x{{proposed.count}}</div>
     </div>
   </div>
