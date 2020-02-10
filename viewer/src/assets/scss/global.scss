@@ -63,6 +63,19 @@
   cursor: initial;
 }
 
+// Disable sticky hover styling on touch devices,
+// on which the virtual cursor doesn't leave the element after being tapped.
+// The fix can be applied to `a` elements by using the .link class.
+@media (hover:none), (hover:on-demand) {
+  .link:hover {
+    color: $link !important;
+  }
+￼
+  .disabled:hover {
+    color: $disabled-color !important;
+  }
+}
+
 // === Scrollbar styling
 
 .scrollbar {
