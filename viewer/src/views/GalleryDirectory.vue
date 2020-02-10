@@ -24,9 +24,6 @@
         <ld-thumbnail :item="item" />
       </router-link>
     </div>
-    <div>
-      <!-- Empty item for better flex layout -->
-    </div>
   </div>
 </template>
 
