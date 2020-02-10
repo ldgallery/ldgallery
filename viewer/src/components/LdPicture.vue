@@ -22,8 +22,10 @@
     v-dragscroll
     class="scrollbar"
     :class="{'fit-to-screen': !$uiStore.fullscreen, 'original-size': $uiStore.fullscreen}"
-    @click="onClick"
-    @dragscrollstart="dragging=true"
+    @click.capture="e => dragScrollClickFix.onClickCapture(e)"
+    @click="$uiStore.toggleFullscreen()"
+    @dragscrollstart="dragScrollClickFix.onDragScrollStart()"
+    @dragscrollend="dragScrollClickFix.onDragScrollEnd()"
   >
     <v-lazy-image
       :src="pictureSrc()"
@@ -37,14 +39,15 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
+import DragScrollClickFix from "@/dragscrollclickfix";
 
 @Component
 export default class LdPicture extends Vue {
   @Prop({ required: true }) readonly picture!: Gallery.Picture;
 
   readonly SLOW_LOADING_TIMEOUT_MS: number = 1500;
+  readonly dragScrollClickFix = new DragScrollClickFix();
 
-  dragging: boolean = false;
   slowLoadingStyle: string | null = null;
   loader: boolean = false;
   timer: NodeJS.Timeout | null = null;
@@ -73,11 +76,6 @@ export default class LdPicture extends Vue {
     this.loader = true;
     if (this.picture.thumbnail)
       this.slowLoadingStyle = `background-image: url('${process.env.VUE_APP_DATA_URL}${this.picture.thumbnail.resource}');`;
-  }
-
-  onClick() {
-    if (!this.dragging) this.$uiStore.toggleFullscreen();
-    this.dragging = false;
   }
 }
 </script>

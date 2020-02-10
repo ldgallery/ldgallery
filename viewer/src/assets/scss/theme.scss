@@ -57,6 +57,8 @@ $content-bgcolor: $palette-900;
 $toolbar-color: $palette-300;  // FIXME: should be named "scrollbar"
 $loader-color: $palette-800;
 $input-tag-delete-background-color: $palette-700;
+$breadcrumb-margins: 13px;
+$breadcrumb-overflow-mask-size: $breadcrumb-margins + 60px;
 
 
 // Layout

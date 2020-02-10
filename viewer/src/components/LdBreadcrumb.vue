@@ -18,23 +18,62 @@
 -->
 
 <template>
-  <ul class="ld-breadcrumb">
-    <li v-for="(item,idx) in $galleryStore.currentItemPath" :key="item.path">
-      <router-link :to="item.path">
-        <fa-icon :icon="getIcon(item)" size="lg" />
-        {{item.title}}
-      </router-link>
-      <fa-icon v-if="(idx+1) < $galleryStore.currentItemPath.length" icon="angle-right" />
-    </li>
-  </ul>
+  <div
+    ref="breadcrumb"
+    v-dragscroll
+    class="ld-breadcrumb flex scrollbar"
+    @click.capture="e => dragScrollClickFix.onClickCapture(e)"
+    @dragscrollstart="dragScrollClickFix.onDragScrollStart()"
+    @dragscrollend="dragScrollClickFix.onDragScrollEnd()"
+    @dragscrollmove="checkForOverflowMask"
+  >
+    <div v-show="overflowMask" class="ld-breadcrumb-overflow-mask"></div>
+    <ul class="ld-breadcrumb">
+      <li v-for="(item,idx) in $galleryStore.currentItemPath" :key="item.path">
+        <fa-icon v-if="idx > 0" icon="angle-right" class="disabled" />
+        <router-link :to="item.path" class="link">
+          <fa-icon :icon="getIcon(item)" size="lg" />
+          {{item.title}}
+        </router-link>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Ref, Watch } from "vue-property-decorator";
+import DragScrollClickFix from "@/dragscrollclickfix";
 import Tools from "@/tools";
 
 @Component
 export default class LdBreadcrumb extends Vue {
+  @Ref() readonly breadcrumb!: HTMLUListElement;
+
+  readonly dragScrollClickFix = new DragScrollClickFix();
+
+  dragging: boolean = false;
+  overflowMask: boolean = false;
+
+  mounted() {
+    window.addEventListener("resize", this.checkForOverflowMask);
+  }
+
+  destroyed() {
+    window.removeEventListener("resize", this.checkForOverflowMask);
+  }
+
+  checkForOverflowMask() {
+    this.overflowMask = this.breadcrumb.scrollLeft > 1;
+  }
+
+  @Watch("$galleryStore.currentItemPath")
+  changedCurrentItemPath() {
+    this.$nextTick(() => {
+      this.breadcrumb.scrollLeft = this.breadcrumb.scrollWidth;
+      this.checkForOverflowMask();
+    });
+  }
+
   getIcon(item: Gallery.Item) {
     return Tools.getIcon(item);
   }
@@ -44,16 +83,36 @@ export default class LdBreadcrumb extends Vue {
 <style lang="scss">
 @import "@/assets/scss/theme.scss";
 
+.ld-breadcrumb-overflow-mask {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba($panel-top-bgcolor, 1) $breadcrumb-margins,
+    rgba($panel-top-bgcolor, 0) $breadcrumb-overflow-mask-size
+  );
+  pointer-events: none;
+}
+
 .ld-breadcrumb {
-  padding-left: 15px;
-  display: flex;
-  list-style: none;
-  margin: 5px;
-  a {
-    margin-right: 5px;
+  ul {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    white-space: nowrap;
   }
-  li:not(:first-child) {
-    margin-left: 10px;
+  a {
+    margin-left: $breadcrumb-margins;
+  }
+  li {
+    margin-right: $breadcrumb-margins;
+  }
+  &.scrollbar {
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      height: 0;
+    }
   }
 }
 </style>
