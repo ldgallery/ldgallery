@@ -24,6 +24,10 @@
     <router-view v-if="!isLoading" class="layout layout-content scrollbar" />
     <b-loading :active="isLoading" is-full-page />
     <ld-key-press :keycode="27" @action="$uiStore.fullscreen=false" />
+
+    <!-- TODO: Remove when #21 (remove explicit navigation/search modes) is resolved -->
+    <ld-mode-radio v-if="!isLoading" class="tmp-mode-selector" />
+    <!-- ===== -->
   </div>
 </template>
 
@@ -123,4 +127,15 @@ html {
     background-color: $content-bgcolor;
   }
 }
+
+// TODO: Remove when #21 (remove explicit navigation/search modes) is resolved
+// Forced at the bottom right corner so we can continue working on the sidebar without interference
+.tmp-mode-selector {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 100;
+  opacity: 0.75;
+}
+// =====
 </style>

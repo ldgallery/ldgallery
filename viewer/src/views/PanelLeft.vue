@@ -20,9 +20,6 @@
 <template>
   <div class="flex-column">
     <ld-tag-input />
-    <!-- TODO: Remove when #21 is resolved -->
-    <ld-mode-radio />
-    <!-- === -->
     <h1 class="title">{{$t('panelLeft.propositions')}}</h1>
     <ld-proposition class="scrollbar no-scroll-x" />
   </div>
