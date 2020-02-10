@@ -18,7 +18,7 @@
 -->
 
 <template>
-  <div class="flex-column">
+  <div class="flex-column sidebar">
     <ld-tag-input />
     <h1 class="title">{{$t('panelLeft.propositions')}}</h1>
     <ld-proposition class="scrollbar no-scroll-x" />
@@ -33,4 +33,9 @@ export default class PanelLeft extends Vue {}
 </script>
 
 <style lang="scss">
+.sidebar {
+  .title {
+    margin: 0.2em 0.5em !important;
+  }
+}
 </style>
