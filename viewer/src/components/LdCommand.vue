@@ -2,6 +2,7 @@
 --             pictures into a searchable web gallery.
 --
 -- Copyright (C) 2019-2020  Guillaume FOUET
+--               2020       Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -19,16 +20,21 @@
 
 <template>
   <div class="flex command-btns">
-    <div class="link" :title="$t('title.tags')" @click="$uiStore.toggleFullWidth()">
-      <fa-icon :icon="commandTagsIcon()" size="lg" />
-    </div>
-    <router-link to="/" :class="{'disabled': isRoot()}" :title="$t('title.home')">
+    <a class="link" :title="$t('command.search')" @click="$uiStore.toggleFullWidth()">
+      <fa-icon :icon="commandToggleSearchPanelIcon()" size="lg" />
+    </a>
+    <router-link
+      to="/"
+      class="command-secondary"
+      :class="{'disabled': isRoot()}"
+      :title="$t('command.home')"
+    >
       <fa-icon icon="home" size="lg" />
     </router-link>
-    <div class="link" :title="$t('title.back')" @click="$router.go(-1)">
+    <a class="link command-secondary" :title="$t('command.back')" @click="$router.go(-1)">
       <fa-icon icon="arrow-left" size="lg" />
-    </div>
-    <router-link :class="{'disabled': isRoot()}" :title="$t('title.parent')" :to="parent()">
+    </a>
+    <router-link :class="{'disabled': isRoot()}" :title="$t('command.parent')" :to="parent()">
       <fa-icon icon="folder" size="xs" />
       <fa-icon icon="level-up-alt" size="lg" />
     </router-link>
@@ -41,8 +47,8 @@ import { RawLocation } from "vue-router";
 
 @Component
 export default class LdCommand extends Vue {
-  commandTagsIcon(): string {
-    return this.$uiStore.fullWidth ? "tags" : "window-close";
+  commandToggleSearchPanelIcon(): string {
+    return this.$uiStore.fullWidth ? "search" : "angle-double-left";
   }
 
   isRoot(): boolean {
@@ -57,6 +63,7 @@ export default class LdCommand extends Vue {
 </script>
 
 <style lang="scss">
+@import "@/assets/scss/_buefy_variables.scss";
 @import "@/assets/scss/theme.scss";
 
 .command-btns {
@@ -64,12 +71,22 @@ export default class LdCommand extends Vue {
   justify-content: space-around;
   vertical-align: middle;
   align-items: center;
-  width: $layout-left;
-  > * {
-    // Unify the minor size differences between icons
-    width: 26px;
-    height: 26px;
-    margin-top: 2px;
+  flex: 0 0 $layout-left;
+
+  > a {
+    // normalise icon active boxes
+    width: $layout-top;
+    line-height: $layout-top;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  @media only screen and (max-width: $tablet) {
+    flex: 0 1;
+
+    > .command-secondary {
+      display: none;
+    }
   }
 }
 </style>
