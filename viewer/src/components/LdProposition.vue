@@ -2,6 +2,7 @@
 --             pictures into a searchable web gallery.
 --
 -- Copyright (C) 2019-2020  Guillaume FOUET
+--               2020       Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -20,17 +21,28 @@
 <template>
   <div>
     <div v-for="proposed in proposedTags" :key="proposed.rawTag" class="proposition">
-      <div class="operation-btns link" @click="add(Operation.SUBSTRACTION, proposed.rawTag)">
-        <fa-icon icon="minus" />
-      </div>
-      <div class="operation-btns link" @click="add(Operation.ADDITION, proposed.rawTag)">
-        <fa-icon icon="plus" />
-      </div>
-      <div
+      <a
+        class="operation-btns link"
+        :title="$t('tag-propositions.substraction')"
+        @click="add(Operation.SUBSTRACTION, proposed.rawTag)"
+      ><fa-icon icon="minus" alt="[-]" /></a>
+
+      <a
+        class="operation-btns link"
+        :title="$t('tag-propositions.addition')"
+        @click="add(Operation.ADDITION, proposed.rawTag)"
+      ><fa-icon icon="plus" alt="[+]" /></a>
+
+      <a
         class="operation-tag link"
+        :title="$t('tag-propositions.intersection')"
         @click="add(Operation.INTERSECTION, proposed.rawTag)"
-      >{{proposed.rawTag}}</div>
-      <div class="disabled">x{{proposed.count}}</div>
+      >{{proposed.rawTag}}</a>
+
+      <div
+        class="disabled"
+        :title="$t('tag-propositions.item-count')"
+      >{{proposed.count}}</div>
     </div>
   </div>
 </template>

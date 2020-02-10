@@ -45,7 +45,6 @@ export default class LdBreadcrumb extends Vue {
 @import "@/assets/scss/theme.scss";
 
 .ld-breadcrumb {
-  border-left: 1px solid $disabled-color;
   padding-left: 15px;
   display: flex;
   list-style: none;
