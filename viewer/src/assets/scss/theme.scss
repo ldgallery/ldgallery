@@ -2,6 +2,7 @@
 --             pictures into a searchable web gallery.
 --
 -- Copyright (C) 2019-2020  Guillaume FOUET
+--               2020       Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -17,23 +18,48 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-// === Theme
+@import '_buefy_variables.scss';
+@import 'palette.scss';
 
-$layout-top: 35px;
+
+// Buefy components
+
+$primary: $palette-000;
+$text: $primary;
+$text-light: $palette-100;
+$text-strong: $primary;
+$input-color: $text;
+$input-placeholder-color: $text-light;
+$input-shadow: none;
+$input-border-color: transparent;
+$input-background-color: $palette-500;
+$input-focus-box-border-color: $palette-200;
+$input-focus-box-shadow-color: transparent;
+$link: $primary;
+$link-visited: $link;
+$link-hover: $palette-100;
+$disabled-color: $palette-400;
+$radius: 0;
+$loading-background: $palette-800;
+$title-color: $palette-200;
+$title-size: $size-5;
+$tag-background-color: $palette-800;
+
+
+// Custom components
+
+$panel-top-bgcolor: $palette-800;
+$panel-top-txtcolor: $primary;
+$panel-left-bgcolor: $palette-800;
+$panel-left-txtcolor: $primary;
+$command-buttons-bgcolor: $palette-700;
+$content-bgcolor: $palette-900;
+$toolbar-color: $palette-300;  // FIXME: should be named "scrollbar"
+$loader-color: $palette-800;
+$input-tag-delete-background-color: $palette-700;
+
+
+// Layout
+
+$layout-top: 45px;
 $layout-left: 250px;
-
-$panel-top-bgcolor: #225;
-$panel-top-txtcolor: white;
-$panel-left-bgcolor: $panel-top-bgcolor;
-$panel-left-txtcolor: $panel-top-txtcolor;
-$content-bgcolor: #1e1e1e;
-$toolbar-color: #d62929;
-$loader-color: #272727;
-
-// Overrides - Buefy
-$link: $panel-top-txtcolor;
-$link-hover: lightblue;
-$disabled-color: #656589;
-$control-radius: 0;
-$input-radius: 0;
-$loading-background: $panel-top-bgcolor;
