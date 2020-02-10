@@ -19,11 +19,11 @@
 
 <template>
   <div class="flex-column">
-    <h1>{{$t('panelLeft.mode')}}</h1>
-    <ld-mode-radio />
-    <h1>{{$t('panelLeft.filters')}}</h1>
     <ld-tag-input />
-    <h1>{{$t('panelLeft.propositions')}}</h1>
+    <!-- TODO: Remove when #21 is resolved -->
+    <ld-mode-radio />
+    <!-- === -->
+    <h1 class="title">{{$t('panelLeft.propositions')}}</h1>
     <ld-proposition class="scrollbar no-scroll-x" />
   </div>
 </template>
