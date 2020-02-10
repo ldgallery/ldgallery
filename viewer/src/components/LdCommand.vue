@@ -60,6 +60,7 @@ export default class LdCommand extends Vue {
 @import "@/assets/scss/theme.scss";
 
 .command-btns {
+  background-color: $command-buttons-bgcolor;
   justify-content: space-around;
   vertical-align: middle;
   align-items: center;
