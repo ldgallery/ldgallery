@@ -23,7 +23,12 @@
     <a class="link" :title="$t('command.search')" @click="$uiStore.toggleFullWidth()">
       <fa-icon :icon="commandToggleSearchPanelIcon()" size="lg" />
     </a>
-    <router-link to="/" class="command-secondary" :class="{'disabled': isRoot()}" :title="$t('command.home')">
+    <router-link
+      to="/"
+      class="command-secondary"
+      :class="{'disabled': isRoot()}"
+      :title="$t('command.home')"
+    >
       <fa-icon icon="home" size="lg" />
     </router-link>
     <a class="link command-secondary" :title="$t('command.back')" @click="$router.go(-1)">
@@ -67,7 +72,7 @@ export default class LdCommand extends Vue {
   align-items: center;
   flex: 0 0 $layout-left;
 
-  > * {
+  > a {
     // normalise icon active boxes
     width: $layout-top;
     line-height: $layout-top;
