@@ -4,7 +4,7 @@
   "mode.navigation": "Navigation",
   "mode.search": "Search",
   "search.no-results": "No results",
-  "panelLeft.propositions": "Proposed tags",
+  "panelLeft.propositions": "Related filters",
   "tag-propositions.substraction": "Exclude items with this tag",
   "tag-propositions.addition": "Include all items with this tag",
   "tag-propositions.intersection": "Search for this tag",
