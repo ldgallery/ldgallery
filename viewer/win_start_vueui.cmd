@@ -1,6 +1,6 @@
 @echo off
 set NODE_VERSION=12.14.0
-set VUECLI_VERSION=4.1.1
+set VUECLI_VERSION=4.2.2
 
 chcp 65001
 echo.
@@ -16,6 +16,17 @@ if errorlevel 1 (
   echo === npm install @vue/cli@%VUECLI_VERSION% ===
   ping localhost -n 3 >NUL
   cmd /c npm install -g @vue/cli@%VUECLI_VERSION%
+)
+echo.
+npm view -g @vue/cli version | find /i "%VUECLI_VERSION%"
+if errorlevel 1 (
+  echo ======================================================================
+  echo Warning: vue/cli doesn't match the requested version: %VUECLI_VERSION%
+  echo.
+  echo CTRL+C to quit and update, or press a key to ignore this warning...
+  echo ======================================================================
+  echo.
+  pause
 )
 echo.
 echo === npm install ===
