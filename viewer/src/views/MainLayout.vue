@@ -21,7 +21,7 @@
   <div :class="{'fullscreen': $uiStore.fullscreen, 'fullwidth': $uiStore.fullWidth}">
     <panel-top v-if="!isLoading" class="layout layout-top" />
     <panel-left v-if="!isLoading" class="layout layout-left" />
-    <router-view v-if="!isLoading" class="layout layout-content scrollbar" />
+    <router-view v-if="!isLoading" ref="content" class="layout layout-content scrollbar" />
     <b-loading :active="isLoading" is-full-page />
     <ld-key-press :keycode="27" @action="$uiStore.fullscreen=false" />
 
@@ -32,18 +32,29 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Ref, Watch } from "vue-property-decorator";
 import PanelLeft from "./PanelLeft.vue";
 import PanelTop from "./PanelTop.vue";
+import { Route } from "vue-router";
 
 @Component({
   components: { PanelLeft, PanelTop },
 })
 export default class MainLayout extends Vue {
+  @Ref() readonly content!: Vue;
+
   isLoading: boolean = true;
+  scrollPositions: ScrollPosition = {};
 
   mounted() {
     this.fetchGalleryItems();
+  }
+
+  @Watch("$route")
+  routeChanged(newRoute: Route, oldRoute: Route) {
+    const el = this.content.$el;
+    this.scrollPositions[oldRoute.path] = el.scrollTop;
+    this.$nextTick(() => (el.scrollTop = this.scrollPositions[newRoute.path]));
   }
 
   fetchGalleryItems() {
