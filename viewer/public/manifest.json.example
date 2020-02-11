@@ -1,0 +1,18 @@
+{
+    "short_name": "LdGallery",
+    "name": "LdGallery",
+    "icons": [
+        {
+            "src": "defaulticon.svg",
+            "type": "image/svg+xml",
+            "sizes": "192x192"
+        },
+        {
+            "src": "defaulticon.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        }
+    ],
+    "display": "standalone",
+    "_comment": "https://developer.mozilla.org/en-US/docs/Web/Manifest"
+}
