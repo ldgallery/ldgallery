@@ -98,17 +98,18 @@ export default class LdBreadcrumb extends Vue {
 .ld-breadcrumb {
   ul {
     display: flex;
-    height: 100%;
-    align-items: center;
     white-space: nowrap;
   }
   a {
+    padding: $breadcrumb-margins 0;
     margin-left: $breadcrumb-margins;
   }
   li {
+    align-self: center;
     margin-right: $breadcrumb-margins;
   }
   &.scrollbar {
+    overflow-y: hidden;
     scrollbar-width: none;
     &::-webkit-scrollbar {
       height: 0;
