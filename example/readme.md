@@ -8,7 +8,7 @@ Content
 -------
 
 ```
-./example
+./example/src
 ├── _DSC8808-1.jpg           -- a picture
 ├── _DSC8808-1.jpg.yaml      -- its associated sidecar metadata file
 ├── Glacier 3000             -- a directory grouping gallery items
@@ -18,5 +18,4 @@ Content
 │   ├── _DSC5542.jpg
 │   └── _DSC5542.jpg.yaml
 ├── gallery.yaml             -- gallery settings file
-└── readme.md                -- this README
 ```
