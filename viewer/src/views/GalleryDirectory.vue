@@ -35,6 +35,10 @@ import Tools from "@/tools";
 export default class GalleryDirectory extends Vue {
   @Prop({ required: true }) readonly directory!: Gallery.Directory;
 
+  mounted() {
+    this.$uiStore.fullscreen = false;
+  }
+
   get orderedItems() {
     return Tools.directoriesFirst(this.directory.properties.items);
   }

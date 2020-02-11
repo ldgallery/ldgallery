@@ -34,6 +34,10 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 @Component
 export default class GalleryPicture extends Vue {
   @Prop({ required: true }) readonly items!: Gallery.Item[];
+
+  mounted() {
+    this.$uiStore.fullscreen = false;
+  }
 }
 </script>
 
