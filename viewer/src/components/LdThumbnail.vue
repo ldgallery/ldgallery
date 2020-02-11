@@ -27,7 +27,7 @@
       @intersect="loading=true"
       @load="loading=false"
     />
-    <div v-else class="flex-column flex-center">
+    <div v-else class="thumbnail-other flex-column flex-center">
       <fa-icon :icon="getIcon()" size="4x" />
       {{item.title}}
     </div>
@@ -62,6 +62,12 @@ export default class LdThumbnail extends Vue {
 
 <style lang="scss">
 @import "@/assets/scss/theme.scss";
+
+.thumbnail-other {
+  width: $thumbnail-other-size;
+  height: $thumbnail-other-size;
+  text-align: center;
+}
 
 .preload {
   animation: preloadAnimation 1s infinite ease-in-out alternate;
