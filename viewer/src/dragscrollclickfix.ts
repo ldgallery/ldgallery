@@ -20,7 +20,7 @@
 // https://github.com/donmbelembe/vue-dragscroll/issues/61
 export default class DragScrollClickFix {
 
-  readonly DRAG_DELAY = 100; // This is the minimal delay to consider a click to be a drag, mostly usefull for touch devices
+  readonly DRAG_DELAY = 250; // This is the minimal delay to consider a click to be a drag, mostly usefull for touch devices
 
   timer: NodeJS.Timeout | null = null;
   dragging: boolean = false;
@@ -39,6 +39,7 @@ export default class DragScrollClickFix {
       clearTimeout(this.timer);
       this.timer = null;
     }
+    setTimeout(() => this.dragging = false);
   }
 
   onClickCapture(e: MouseEvent) {
