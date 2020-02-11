@@ -28,7 +28,7 @@
     @dragscrollend="dragScrollClickFix.onDragScrollEnd()"
   >
     <v-lazy-image
-      :src="pictureSrc()"
+      :src="pictureSrc(picture.properties.resource)"
       :class="{'slow-loading': Boolean(slowLoadingStyle)}"
       :style="slowLoadingStyle"
       @load="clearSlowLoading"
@@ -67,15 +67,17 @@ export default class LdPicture extends Vue {
     this.loader = false;
   }
 
-  pictureSrc() {
-    return `${process.env.VUE_APP_DATA_URL}${this.picture.properties.resource}`;
+  pictureSrc(resource: string) {
+    return `${process.env.VUE_APP_DATA_URL}${this.$galleryStore.config!.galleryRoot}${resource}`;
   }
 
   generateSlowLoadingStyle() {
     this.clearSlowLoading();
     this.loader = true;
-    if (this.picture.thumbnail)
-      this.slowLoadingStyle = `background-image: url('${process.env.VUE_APP_DATA_URL}${this.picture.thumbnail.resource}');`;
+    if (this.picture.thumbnail) {
+      const url = this.pictureSrc(this.picture.thumbnail.resource);
+      this.slowLoadingStyle = `background-image: url('${url}');`;
+    }
   }
 }
 </script>

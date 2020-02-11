@@ -18,6 +18,11 @@
 */
 
 declare namespace Gallery {
+    interface Config {
+        generationTimestamp: number,
+        galleryRoot: string,
+    }
+
     interface Other extends Item {
         properties: OtherProperties,
     }

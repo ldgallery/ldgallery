@@ -27,11 +27,16 @@ const VuexModule = createModule({
 
 export default class GalleryStore extends VuexModule {
 
+    config: Gallery.Config | null = null;
     galleryItemsRoot: Gallery.Item | null = null;
     tags: Tag.Index = {};
     currentPath: string = "/";
 
     // ---
+
+    @mutation setConfig(config: Gallery.Config) {
+        this.config = config;
+    }
 
     @mutation setGalleryItemsRoot(galleryItemsRoot: Gallery.Item) {
         this.galleryItemsRoot = galleryItemsRoot;
@@ -59,9 +64,18 @@ export default class GalleryStore extends VuexModule {
 
     // ---
 
+    // Fetches the gallery's JSON config
+    @action async fetchConfig() {
+        return fetch(`${process.env.VUE_APP_DATA_URL}config.json`)
+            .then(config => config.json())
+            .then(this.setConfig);
+    }
+
     // Fetches the gallery's JSON metadata
-    @action async fetchGalleryItems(url: string) {
-        return fetch(url)
+    @action async fetchGalleryItems() {
+        const root = this.config?.galleryRoot ?? '';
+        const timestamp = this.config?.generationTimestamp ?? 0;
+        return fetch(`${process.env.VUE_APP_DATA_URL}${root}index.json?${timestamp}`)
             .then(response => response.json())
             .then(this.setGalleryItemsRoot)
             .then(this.indexTags);
