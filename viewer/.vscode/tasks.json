@@ -9,11 +9,28 @@
             "group": {
                 "kind": "build",
                 "isDefault": true
-            }
+            },
+            "problemMatcher": [
+                "$tsc"
+            ]
         },
         {
             "type": "npm",
             "script": "serve",
+            "problemMatcher": [
+                "$tsc"
+            ]
+        },
+        {
+            "type": "npm",
+            "script": "lint-autoformat",
+            "problemMatcher": [
+                "$tsc"
+            ]
+        },
+        {
+            "type": "npm",
+            "script": "lint",
             "problemMatcher": [
                 "$tsc"
             ]
