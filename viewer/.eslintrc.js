@@ -13,6 +13,7 @@ module.exports = {
   rules: {
     "no-console": "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
+    'eol-last': ['warn', 'always'],
     'vue/attribute-hyphenation': 'warn',
     'vue/html-closing-bracket-spacing': 'warn',
     'vue/html-end-tags': 'error',
@@ -24,7 +25,7 @@ module.exports = {
     'vue/v-bind-style': 'warn',
     'vue/v-on-style': 'warn',
     'vue/attributes-order': 'warn',
-    'vue/this-in-template': 'warn'
+    'vue/this-in-template': 'warn',
   },
 
   parserOptions: {
