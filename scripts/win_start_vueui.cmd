@@ -1,6 +1,7 @@
 @echo off
 set NODE_VERSION=12.14.0
 set VUECLI_VERSION=4.2.2
+cd ..\viewer\
 
 chcp 65001
 echo.

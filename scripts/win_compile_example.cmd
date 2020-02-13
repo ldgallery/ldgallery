@@ -5,5 +5,6 @@ IF ERRORLEVEL 2 SET rebuild=
 echo.
 
 @echo on
+cd ..\compiler\
 stack exec ldgallery-compiler-exe -- %rebuild% --clean-output -i=../example/ -o=../example/out/
 @pause
