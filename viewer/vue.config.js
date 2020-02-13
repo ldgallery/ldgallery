@@ -43,7 +43,7 @@ module.exports = {
         const url = req.url.slice(process.env.VUE_APP_DATA_URL.length);
         const paramIdx = url.indexOf('?');
         const filepath = paramIdx < 0 ? url : url.substring(0, paramIdx);
-        const fullpath = `${process.env.VUE_APP_EXAMPLE_PROJECT}${decodeURIComponent(filepath)}`;
+        const fullpath = `${process.env.VUE_APP_DEVSERVER_CONFIG_PATH}${decodeURIComponent(filepath)}`;
         const file = fs.readFileSync(fullpath);
         res.end(file);
       });

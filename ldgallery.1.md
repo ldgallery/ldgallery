@@ -126,9 +126,6 @@ compiler.pictureMaxResolution.width
 compiler.pictureMaxResolution.height
 : Maximum height in pixels of the picture items, unlimited by default.
 
-viewer.defaultSearchMode [TODO]
-: Default search view mode ("highlight" or "filter").  Defaults to "filter".
-
 viewer.defaultSearchQuery [TODO]
 : Default search query string.
 
@@ -137,9 +134,6 @@ viewer.defaultSortOrder [TODO]
 
 viewer.tagGroups[].tag [TODO]
 : Tag prefix defining the tag group.
-
-viewer.tagGroups[].order [TODO]
-: Order in which to display tag groups.
 
 viewer.tagGroups[].colour [TODO]
 : Colour associated to the tag group.

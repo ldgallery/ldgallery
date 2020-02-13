@@ -8,6 +8,10 @@ npm install
 ```
 
 ### Compiles and hot-reloads for development
+
+The viewer DevServer will serve the compiled version of the example gallery by default.
+To override, create a file .env.development.local
+
 ```
 npm run serve
 ```

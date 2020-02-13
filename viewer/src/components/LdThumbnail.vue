@@ -21,7 +21,7 @@
   <div :class="{'preload': loading}">
     <v-lazy-image
       v-if="item.thumbnail"
-      :src="pictureSrc()"
+      :src="pictureSrc(item.thumbnail.resource)"
       :style="pictureStyle()"
       :title="item.title"
       @intersect="loading=true"
@@ -44,9 +44,8 @@ export default class LdThumbnail extends Vue {
 
   loading: boolean = false;
 
-  pictureSrc() {
-    const resource = this.item.thumbnail!.resource;
-    return `${process.env.VUE_APP_DATA_URL}${resource}`;
+  pictureSrc(resource: string) {
+    return `${process.env.VUE_APP_DATA_URL}${this.$galleryStore.config!.galleryRoot}${resource}`;
   }
 
   pictureStyle() {
