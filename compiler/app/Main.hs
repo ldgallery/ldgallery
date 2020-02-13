@@ -22,9 +22,7 @@ import GHC.Generics (Generic)
 import Paths_ldgallery_compiler (version, getDataFileName)
 import Control.Monad (when)
 import Data.Version (showVersion)
-import Data.Int (Int64)
 import Data.Aeson (ToJSON)
-import Data.Time.Clock.System (getSystemTime, systemSeconds)
 import System.FilePath ((</>))
 import System.Directory (canonicalizePath)
 import System.Console.CmdArgs
@@ -35,7 +33,6 @@ import Files (readDirectory, copyTo)
 
 data ViewerConfig = ViewerConfig
   { galleryRoot :: String
-  , generationTimestamp :: Int64
   } deriving (Generic, Show, ToJSON)
 
 
@@ -126,7 +123,4 @@ main =
       >>= copyTo target
 
     writeViewerConfig :: FilePath -> IO ()
-    writeViewerConfig fileName =
-      getSystemTime
-      >>= return . ViewerConfig gallerySubdir . systemSeconds
-      >>= writeJSON fileName
+    writeViewerConfig fileName = writeJSON fileName $ ViewerConfig gallerySubdir
