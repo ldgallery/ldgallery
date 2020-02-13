@@ -29,7 +29,7 @@ module Files
 
 
 import Control.Monad (mapM)
-import Data.List (isPrefixOf, length, subsequences)
+import Data.List (isPrefixOf, length, subsequences, sortOn)
 import Data.Function ((&))
 import Data.Text (pack)
 import Data.Aeson (ToJSON)
@@ -154,6 +154,7 @@ readDirectory root = mkNode (Path []) >>= return . AnchoredFSNode root
     mkDirNode path canonicalPath =
       (listDirectory $ localPath (root /> path))
       >>= mapM (mkNode . ((</) path))
+      >>= return . sortOn nodeName
       >>= return . Dir path canonicalPath
 
 copyTo :: FilePath -> AnchoredFSNode -> IO ()
