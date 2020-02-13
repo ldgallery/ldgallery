@@ -19,7 +19,6 @@
 
 declare namespace Gallery {
     interface Config {
-        generationTimestamp: number,
         galleryRoot: string,
     }
 
