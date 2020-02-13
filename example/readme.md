@@ -8,7 +8,8 @@ Content
 -------
 
 ```
-./example/src
+./example/out                -- the output directory for the compiled version of the gallery
+./example/src                -- source directory with pictures, configuration, tags and metadata
 ├── _DSC8808-1.jpg           -- a picture
 ├── _DSC8808-1.jpg.yaml      -- its associated sidecar metadata file
 ├── Glacier 3000             -- a directory grouping gallery items
@@ -17,5 +18,5 @@ Content
 │   ├── _DSC5475.jpg.yaml
 │   ├── _DSC5542.jpg
 │   └── _DSC5542.jpg.yaml
-├── gallery.yaml             -- gallery settings file
+└── gallery.yaml             -- gallery settings file
 ```
