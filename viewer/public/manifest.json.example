@@ -3,11 +3,6 @@
     "name": "LdGallery",
     "icons": [
         {
-            "src": "defaulticon.svg",
-            "type": "image/svg+xml",
-            "sizes": "192x192"
-        },
-        {
             "src": "defaulticon.png",
             "type": "image/png",
             "sizes": "192x192"
