@@ -19,19 +19,36 @@
 
 <template>
   <div class="flex">
-    <ld-command :current-item-path="$galleryStore.currentItemPath" />
-    <ld-breadcrumb
-      :current-item-path="$galleryStore.currentItemPath"
-      :search-mode="$uiStore.searchMode"
-    />
+    <b-button @click="clear">
+      <fa-icon icon="eraser" />
+      <span>{{$t('command.search.clear')}}</span>
+    </b-button>
+    <b-button expanded :loading="loading" @click="search">
+      <fa-icon icon="search" />
+      <span>{{$t('command.search.search')}}</span>
+    </b-button>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Emit } from "vue-property-decorator";
 
 @Component
-export default class PanelTop extends Vue {}
+export default class LdCommandSearch extends Vue {
+  loading: boolean = false;
+
+  @Emit()
+  clear(e: HTMLButtonElement) {
+    return e;
+  }
+
+  @Emit()
+  search(e: HTMLButtonElement) {
+    this.loading = true;
+    this.$nextTick(() => (this.loading = false));
+    return e;
+  }
+}
 </script>
 
 <style lang="scss">

@@ -17,7 +17,20 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-export default class Tools {
+export default class Navigation {
+
+  // Searches for an item by path from a root item (navigation)
+  public static searchCurrentItemPath(root: Gallery.Item, path: string): Gallery.Item[] {
+    if (path === root.path) return [root];
+    if (root.properties.type === "directory" && path.startsWith(root.path)) {
+      const itemChain = root.properties.items
+        .map(item => this.searchCurrentItemPath(item, path))
+        .find(itemChain => itemChain.length > 0);
+      if (itemChain) return [root, ...itemChain];
+    }
+    return [];
+  }
+
 
   // Normalize a string to lowercase, no-accents
   public static normalize(value: string) {
@@ -35,11 +48,11 @@ export default class Tools {
   public static directoriesFirst(items: Gallery.Item[]) {
     return [
       ...items
-        .filter(child => Tools.checkType(child, "directory"))
+        .filter(child => Navigation.checkType(child, "directory"))
         .sort((a, b) => a.title.localeCompare(b.title)),
 
       ...items
-        .filter(child => !Tools.checkType(child, "directory")),
+        .filter(child => !Navigation.checkType(child, "directory")),
     ];
   }
 
@@ -55,5 +68,4 @@ export default class Tools {
         return "file";
     }
   }
-
 }

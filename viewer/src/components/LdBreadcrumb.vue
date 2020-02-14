@@ -29,24 +29,29 @@
   >
     <div v-show="overflowMask" class="ld-breadcrumb-overflow-mask"></div>
     <ul class="ld-breadcrumb">
-      <li v-for="(item,idx) in $galleryStore.currentItemPath" :key="item.path">
+      <li v-for="(item,idx) in currentItemPath" :key="item.path">
         <fa-icon v-if="idx > 0" icon="angle-right" class="disabled" />
         <router-link :to="item.path" class="link">
           <fa-icon :icon="getIcon(item)" size="lg" />
           {{item.title}}
         </router-link>
       </li>
+      <li v-if="searchMode">
+        <fa-icon icon="search" size="lg" class="disabled" />
+      </li>
     </ul>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Ref, Watch } from "vue-property-decorator";
-import DragScrollClickFix from "@/dragscrollclickfix";
-import Tools from "@/tools";
+import { Component, Vue, Ref, Watch, Prop } from "vue-property-decorator";
+import DragScrollClickFix from "@/services/dragscrollclickfix";
+import Navigation from "@/services/navigation";
 
 @Component
 export default class LdBreadcrumb extends Vue {
+  @Prop({ required: true }) readonly currentItemPath!: Gallery.Item[];
+  @Prop(Boolean) readonly searchMode!: boolean;
   @Ref() readonly breadcrumb!: HTMLUListElement;
 
   readonly dragScrollClickFix = new DragScrollClickFix();
@@ -66,7 +71,7 @@ export default class LdBreadcrumb extends Vue {
     this.overflowMask = this.breadcrumb.scrollLeft > 1;
   }
 
-  @Watch("$galleryStore.currentItemPath")
+  @Watch("currentItemPath")
   changedCurrentItemPath() {
     this.$nextTick(() => {
       this.breadcrumb.scrollLeft = this.breadcrumb.scrollWidth;
@@ -75,7 +80,7 @@ export default class LdBreadcrumb extends Vue {
   }
 
   getIcon(item: Gallery.Item) {
-    return Tools.getIcon(item);
+    return Navigation.getIcon(item);
   }
 }
 </script>

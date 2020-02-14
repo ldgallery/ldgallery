@@ -18,19 +18,20 @@
 */
 
 import Vue from "vue";
-import VueRouter from "vue-router";
-import MainGallery from "@/views/MainGallery.vue";
+import VueRouter, { RouteConfig } from "vue-router";
+import GalleryNavigation from "@/views/GalleryNavigation.vue";
 
 Vue.use(VueRouter);
 
-// async way : component: () => import(/* webpackChunkName: "MainGallery" */ "@/views/MainGallery.vue"),
-
-const routes = [
+const routes: RouteConfig[] = [
   {
     path: "*",
-    name: "MainGallery",
-    component: MainGallery,
-    props: true
+    name: "GalleryNavigation",
+    component: GalleryNavigation,
+    props: (route) => ({
+      path: route.params.pathMatch,
+      query: Object.keys(route.query),
+    }),
   },
 ];
 

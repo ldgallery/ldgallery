@@ -1,4 +1,4 @@
-<!-- ldgallery - A static generator which turns a collection of tagged
+/* ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
 -- Copyright (C) 2019-2020  Guillaume FOUET
@@ -15,66 +15,30 @@
 --
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
--->
+*/
 
-<template>
-  <div>
-    <gallery-search v-if="$uiStore.isModeSearch" :items="currentSearch" />
-    <gallery-directory v-else-if="checkType('directory')" :directory="$galleryStore.currentItem" />
-    <ld-picture v-else-if="checkType('picture')" :picture="$galleryStore.currentItem" />
-    <div v-else>{{$t("gallery.unknowntype")}}</div>
-  </div>
-</template>
+import { Operation } from '@/@types/Operation';
 
-<script lang="ts">
-import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { Operation } from "@/@types/Operation";
-import Tools from "@/tools";
-import GallerySearch from "./GallerySearch.vue";
-import GalleryDirectory from "./GalleryDirectory.vue";
-
-@Component({
-  components: {
-    GallerySearch,
-    GalleryDirectory,
-  },
-})
-export default class Gallery extends Vue {
-  @Prop(String) readonly pathMatch!: string;
-
-  mounted() {
-    this.pathChanged();
-  }
-
-  @Watch("pathMatch")
-  pathChanged() {
-    console.log("Path: ", this.pathMatch);
-    this.$galleryStore.setCurrentPath(this.pathMatch);
-  }
+export default class IndexSearch {
 
   // Results of the search (by tags)
-  get currentSearch(): Gallery.Item[] {
-    const byOperation = this.extractTagsByOperation(this.$uiStore.currentTags);
+  public static search(searchTags: Tag.Search[], rootPath: string): Gallery.Item[] {
+    const byOperation = this.extractTagsByOperation(searchTags);
     const intersection = this.extractIntersection(byOperation);
     const substraction = this.extractSubstraction(byOperation);
-    return this.aggregateAll(byOperation, intersection, substraction);
+    return this.aggregateAll(byOperation, intersection, substraction)
+      .filter(item => item.path.startsWith(rootPath));
   }
 
-  // ---
-
-  private checkType(type: Gallery.ItemType): boolean {
-    return Tools.checkType(this.$galleryStore.currentItem, type);
-  }
-
-  private extractTagsByOperation(currentTags: Tag.Search[]): Tag.SearchByOperation {
+  private static extractTagsByOperation(searchTags: Tag.Search[]): Tag.SearchByOperation {
     let byOperation: Tag.SearchByOperation = {};
     Object.values(Operation).forEach(
-      operation => (byOperation[operation] = currentTags.filter(tag => tag.operation === operation))
+      operation => (byOperation[operation] = searchTags.filter(tag => tag.operation === operation))
     );
     return byOperation;
   }
 
-  private extractIntersection(byOperation: Tag.SearchByOperation): Set<Gallery.Item> {
+  private static extractIntersection(byOperation: Tag.SearchByOperation): Set<Gallery.Item> {
     let intersection = new Set<Gallery.Item>();
     if (byOperation[Operation.INTERSECTION].length > 0) {
       byOperation[Operation.INTERSECTION]
@@ -86,7 +50,7 @@ export default class Gallery extends Vue {
     return intersection;
   }
 
-  private extractSubstraction(byOperation: Tag.SearchByOperation): Set<Gallery.Item> {
+  private static extractSubstraction(byOperation: Tag.SearchByOperation): Set<Gallery.Item> {
     let substraction = new Set<Gallery.Item>();
     if (byOperation[Operation.SUBSTRACTION].length > 0) {
       byOperation[Operation.SUBSTRACTION].flatMap(tag => tag.items).forEach(item => substraction.add(item));
@@ -94,7 +58,7 @@ export default class Gallery extends Vue {
     return substraction;
   }
 
-  private aggregateAll(
+  private static aggregateAll(
     byOperation: Tag.SearchByOperation,
     intersection: Set<Gallery.Item>,
     substraction: Set<Gallery.Item>
@@ -104,7 +68,3 @@ export default class Gallery extends Vue {
     return [...intersection];
   }
 }
-</script>
-
-<style lang="scss">
-</style>

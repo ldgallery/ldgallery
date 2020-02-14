@@ -25,13 +25,17 @@
         class="operation-btns link"
         :title="$t('tag-propositions.substraction')"
         @click="add(Operation.SUBSTRACTION, proposed.rawTag)"
-      ><fa-icon icon="minus" alt="[-]" /></a>
+      >
+        <fa-icon icon="minus" alt="[-]" />
+      </a>
 
       <a
         class="operation-btns link"
         :title="$t('tag-propositions.addition')"
         @click="add(Operation.ADDITION, proposed.rawTag)"
-      ><fa-icon icon="plus" alt="[+]" /></a>
+      >
+        <fa-icon icon="plus" alt="[+]" />
+      </a>
 
       <a
         class="operation-tag link"
@@ -39,39 +43,39 @@
         @click="add(Operation.INTERSECTION, proposed.rawTag)"
       >{{proposed.rawTag}}</a>
 
-      <div
-        class="disabled"
-        :title="$t('tag-propositions.item-count')"
-      >{{proposed.count}}</div>
+      <div class="disabled" :title="$t('tag-propositions.item-count')">{{proposed.count}}</div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Model, Prop } from "vue-property-decorator";
 import { Operation } from "@/@types/Operation";
 
 @Component
 export default class LdProposition extends Vue {
+  @Prop({ type: Array, required: true }) readonly currentTags!: string[];
+  @Prop({ required: true }) readonly tagsIndex!: Tag.Index;
+  @Model() model!: Tag.Search[];
+
   get Operation() {
     return Operation;
   }
 
   get proposedTags() {
-    const currentTags = this.$uiStore.currentTags;
     let propositions: { [index: string]: number } = {};
-    if (currentTags.length > 0) {
+    if (this.model.length > 0) {
       // Tags count from current search
-      this.extractDistinctItems(currentTags)
+      this.extractDistinctItems(this.model)
         .flatMap(item => item.tags)
         .map(this.rightmost)
-        .filter(rawTag => !currentTags.find(currentTag => currentTag.tag === rawTag))
+        .filter(rawTag => !this.model.find(search => search.tag === rawTag))
         .forEach(rawTag => (propositions[rawTag] = (propositions[rawTag] ?? 0) + 1));
     } else {
       // Tags count from the current directory
-      this.$galleryStore.currentItem?.tags
+      this.currentTags
         .flatMap(tag => tag.split("."))
-        .map(tag => this.$galleryStore.tags[tag]) // FIXME: Folders with the same name are merged in the index
+        .map(tag => this.tagsIndex[tag])
         .forEach(tagindex => (propositions[tagindex.tag] = tagindex.items.length));
     }
 
@@ -90,10 +94,9 @@ export default class LdProposition extends Vue {
   }
 
   add(operation: Operation, rawTag: Gallery.RawTag) {
-    const node = this.$galleryStore.tags[rawTag];
+    const node = this.tagsIndex[rawTag];
     const search: Tag.Search = { ...node, operation, display: `${operation}${node.tag}` };
-    this.$uiStore.currentTags.push(search);
-    setTimeout(() => this.$uiStore.setModeSearch()); // Give time for the UI to display the Tag change
+    this.model.push(search);
   }
 }
 </script>

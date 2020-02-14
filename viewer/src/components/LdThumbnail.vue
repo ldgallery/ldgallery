@@ -36,7 +36,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import Tools from "@/tools";
+import Navigation from "@/services/navigation";
 
 @Component
 export default class LdThumbnail extends Vue {
@@ -54,7 +54,7 @@ export default class LdThumbnail extends Vue {
   }
 
   getIcon() {
-    return Tools.getIcon(this.item);
+    return Navigation.getIcon(this.item);
   }
 }
 </script>

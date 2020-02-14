@@ -23,14 +23,6 @@
     <a class="link" :title="$t('command.search')" @click="$uiStore.toggleFullWidth()">
       <fa-icon :icon="commandToggleSearchPanelIcon()" size="lg" />
     </a>
-    <router-link
-      to="/"
-      class="command-secondary"
-      :class="{'disabled': isRoot()}"
-      :title="$t('command.home')"
-    >
-      <fa-icon icon="home" size="lg" />
-    </router-link>
     <a class="link command-secondary" :title="$t('command.back')" @click="$router.go(-1)">
       <fa-icon icon="arrow-left" size="lg" />
     </a>
@@ -42,21 +34,23 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Prop } from "vue-property-decorator";
 import { RawLocation } from "vue-router";
 
 @Component
 export default class LdCommand extends Vue {
+  @Prop({ required: true }) readonly currentItemPath!: Gallery.Item[];
+
   commandToggleSearchPanelIcon(): string {
     return this.$uiStore.fullWidth ? "search" : "angle-double-left";
   }
 
   isRoot(): boolean {
-    return this.$galleryStore.currentItemPath.length <= 1;
+    return this.currentItemPath.length <= 1;
   }
 
   parent(): RawLocation {
-    if (!this.isRoot()) return this.$galleryStore.currentItemPath[this.$galleryStore.currentItemPath.length - 2];
+    if (!this.isRoot()) return this.currentItemPath[this.currentItemPath.length - 2];
     return "";
   }
 }

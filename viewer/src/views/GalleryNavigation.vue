@@ -18,41 +18,43 @@
 -->
 
 <template>
-  <ld-gallery :items="items()" :noresult="$t('search.no-results')" />
+  <div>
+    <gallery-search v-if="query.length" :path="path" :query="query" />
+    <gallery-directory v-else-if="checkType('directory')" :directory="$galleryStore.currentItem" />
+    <ld-picture v-else-if="checkType('picture')" :picture="$galleryStore.currentItem" />
+    <div v-else>{{$t("gallery.unknowntype")}}</div>
+  </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import { Operation } from "@/@types/Operation";
-import IndexSearch from "@/services/indexsearch";
-import IndexFactory from "../services/indexfactory";
+import Navigation from "@/services/navigation";
+import GalleryDirectory from "./GalleryDirectory.vue";
+import GallerySearch from "@/views/GallerySearch.vue";
 
-@Component
-export default class GalleryPicture extends Vue {
+@Component({
+  components: {
+    GalleryDirectory,
+    GallerySearch,
+  },
+})
+export default class GalleryNavigation extends Vue {
   @Prop(String) readonly path!: string;
   @Prop(Array) readonly query!: string[];
 
-  currentSearch: Tag.Search[] = [];
-
   mounted() {
-    this.$uiStore.fullscreen = false;
-    this.$uiStore.searchMode = true;
-    this.restoreSearchFilters();
+    this.pathChanged();
   }
 
-  destroyed() {
-    this.$uiStore.searchMode = false;
+  @Watch("path")
+  pathChanged() {
+    console.log("Path: ", this.path);
+    this.$galleryStore.setCurrentPath(this.path);
   }
 
-  items() {
-    return IndexSearch.search(this.currentSearch, this.path);
-  }
-
-  @Watch("query")
-  restoreSearchFilters() {
-    const tagsIndex = this.$galleryStore.tagsIndex;
-    this.currentSearch = this.query.flatMap(filter => IndexFactory.searchTags(tagsIndex, filter));
-    this.$uiStore.searchFilters = [...this.currentSearch];
+  private checkType(type: Gallery.ItemType): boolean {
+    return Navigation.checkType(this.$galleryStore.currentItem, type);
   }
 }
 </script>
