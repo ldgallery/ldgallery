@@ -116,7 +116,7 @@ compileGallery inputDirPath outputDirPath excludedDirs rebuildAll cleanOutput =
     let itemProc = itemProcessor config cache
     let thumbnailProc = thumbnailProcessor config cache
     let galleryBuilder = buildGalleryTree itemProc thumbnailProc (tagsFromDirectories config)
-    resources <- galleryBuilder (galleryName config) inputTree
+    resources <- galleryBuilder inputTree
 
     when cleanOutput $ galleryCleanupResourceDir resources outputDirPath
     writeJSON outputIndex resources

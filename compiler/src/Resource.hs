@@ -121,44 +121,52 @@ type ThumbnailProcessor = Path -> IO (Maybe Thumbnail)
 
 buildGalleryTree ::
      ItemProcessor -> ThumbnailProcessor
-  -> Int -> String -> InputTree -> IO GalleryItem
-buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName inputTree =
-  mkGalleryItem [] inputTree
+  -> Int -> InputTree -> IO GalleryItem
+buildGalleryTree processItem processThumbnail tagsFromDirectories inputTree =
+  mkGalleryItem [] [] inputTree
   where
-    mkGalleryItem :: [String] -> InputTree -> IO GalleryItem
-    mkGalleryItem parentTitles InputFile{path, modTime, sidecar} =
+    mkGalleryItem :: [String] -> [Tag] -> InputTree -> IO GalleryItem
+    mkGalleryItem parentDirs inheritedTags InputFile{path, modTime, sidecar} =
       do
         properties <- processItem path
         processedThumbnail <- processThumbnail path
         return GalleryItem
-          { title = fromMeta title $ fromMaybe "" $ fileName path
-          , datetime = fromMaybe (toZonedTime modTime) (Input.datetime sidecar)
-          , description = fromMeta description ""
-          , tags = unique ((fromMeta tags []) ++ implicitParentTags parentTitles)
+          { title = Input.title sidecar ?? fileName path ?? ""
+          , datetime = Input.datetime sidecar ?? toZonedTime modTime
+          , description = Input.description sidecar ?? ""
+          , tags = unique ((Input.tags sidecar ?? []) ++ inheritedTags ++ parentDirTags parentDirs)
           , path = "/" /> path
           , thumbnail = processedThumbnail
           , properties = properties }
 
-      where
-        fromMeta :: (Sidecar -> Maybe a) -> a -> a
-        fromMeta get fallback = fromMaybe fallback $ get sidecar
-
-    mkGalleryItem parentTitles InputDir{path, modTime, dirThumbnailPath, items} =
+    mkGalleryItem parentDirs inheritedTags InputDir{path, modTime, sidecar, dirThumbnailPath, items} =
       do
+        let itemsParents = (maybeToList $ fileName path) ++ parentDirs
+        let dirTags = (Input.tags sidecar ?? []) ++ inheritedTags
+        processedItems <- parallel $ map (mkGalleryItem itemsParents dirTags) items
         processedThumbnail <- maybeThumbnail dirThumbnailPath
-        processedItems <- parallel $ map (mkGalleryItem subItemsParents) items
         return GalleryItem
-          { title = fromMaybe galleryName (fileName path)
-          , datetime = fromMaybe (toZonedTime modTime) (mostRecentModTime processedItems)
-          , description = ""
-          , tags = unique (aggregateTags processedItems ++ implicitParentTags parentTitles)
+          { title = Input.title sidecar ?? fileName path ?? ""
+          , datetime = Input.datetime sidecar ?? mostRecentModTime processedItems
+                                              ?? toZonedTime modTime
+          , description = Input.description sidecar ?? ""
+          , tags = unique (aggregateTags processedItems ++ parentDirTags parentDirs)
           , path = "/" /> path
           , thumbnail = processedThumbnail
           , properties = Directory processedItems }
 
-      where
-        subItemsParents :: [String]
-        subItemsParents = (maybeToList $ fileName path) ++ parentTitles
+    infixr ??
+    (??) :: Maybe a -> a -> a
+    (??) = flip fromMaybe
+
+    unique :: Ord a => [a] -> [a]
+    unique = Set.toList . Set.fromList
+
+    parentDirTags :: [String] -> [Tag]
+    parentDirTags = take tagsFromDirectories
+
+    aggregateTags :: [GalleryItem] -> [Tag]
+    aggregateTags = concatMap (\item -> tags (item::GalleryItem))
 
     maybeThumbnail :: Maybe Path -> IO (Maybe Thumbnail)
     maybeThumbnail Nothing = return Nothing
@@ -170,15 +178,6 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories galleryName in
 
     comparingTime :: ZonedTime -> ZonedTime -> Ordering
     comparingTime l r = compare (zonedTimeToUTC l) (zonedTimeToUTC r)
-
-    aggregateTags :: [GalleryItem] -> [Tag]
-    aggregateTags = concatMap (\item -> tags (item::GalleryItem))
-
-    unique :: Ord a => [a] -> [a]
-    unique = Set.toList . Set.fromList
-
-    implicitParentTags :: [String] -> [Tag]
-    implicitParentTags = take tagsFromDirectories
 
     toZonedTime :: UTCTime -> ZonedTime
     toZonedTime = utcToZonedTime utc
