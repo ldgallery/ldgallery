@@ -2,7 +2,7 @@
 pagetitle: User manual - ldgallery
 title: LDGALLERY(1) ldgallery user manual
 author: Pacien TRAN-GIRARD, Guillaume FOUET
-date: 2020-01-05 (v0.1.0.0-SNAPSHOT)
+date: 2020-02-15 (v0.1.0.0-SNAPSHOT)
 ---
 
 
@@ -55,7 +55,8 @@ Available options are:
 # INPUT GALLERY STRUCTURE
 
 A gallery source directory contains the gallery items and their sidecar metadata files, optionally grouped inside sub-directories.
-Directory thumbnails can be set by placing a picture file named "thumbnail", with any image file extension, inside of it.
+
+Directory thumbnails can be set by placing a picture file named "thumbnail", with any image file extension, inside of directories.
 
 An example input gallery directory structure could be as follows:
 
@@ -65,6 +66,7 @@ An example input gallery directory structure could be as follows:
 ├── DSC0001.jpg.yaml ---- its associated sidecar metadata file
 ├── Some directory ------ a directory grouping gallery items
 │   ├── thumbnail.jpg --- a thumbnail for its parent directory
+│   ├── directory.yaml -- directory sidecar metadata file
 │   ├── DSC0002.jpg
 │   ├── DSC0002.jpg.yaml
 │   ├── DSC0003.jpg
@@ -73,31 +75,36 @@ An example input gallery directory structure could be as follows:
 ```
 
 
-# ITEM METADATA SIDECAR
+# METADATA SIDECAR
 
-Item metadata are read from sidecar files of the same name, with the ".yaml" extension appended.
-When a sidecar file is absent or a particular key omitted, values are set as empty or to their fallback value specified below.
+File metadata are read from sidecar files of the same name, with the ".yaml" extension appended.
 Metadata contained within item files themselves (e.g. Exif fields for pictures) are ignored.
 
+Directory metadata are read from sidecar files named "directory.yaml" located within the directory.
+
+When a sidecar file is absent or a particular key omitted, values are set as empty or to their fallback value specified below.
+
 title
-: Title of the item.  Defaults to the name of the file.
+: Title of the item.
+  Defaults to the name of the file or directory.
 
 datetime
-: ISO 8601 zoned date and time.  Defaults to the last modification time of the file.
+: ISO 8601 zoned date and time.
+  Defaults to the last modification time of the file itself,
+  or the most recent modification date of a directory's items.
 
 description
 : Description for the item.
 
 tags
-: List of tags for the item.  Tag groups can be defined using prefixes separated by "." (dot).
+: List of tags for the item.
+  Tag groups can be defined using prefixes separated by "." (dot).
+  Tags specified in a directory metadata sidecar are applied to all items within that directory.
 
 
 # GALLERY CONFIGURATION
 
 The gallery settings reside in a file named "gallery.yaml" located at the root of the gallery's source directory.
-
-compiler.galleryName
-: Name of the gallery.  Defaults to "Gallery".
 
 compiler.includedDirectories[]
 : Glob patterns of directory names to include in the gallery.  Defaults to ["*"] (matches all directory names).

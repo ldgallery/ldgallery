@@ -33,8 +33,7 @@ import Resource (Resolution(..))
 
 
 data CompilerConfig = CompilerConfig
-  { galleryName :: String
-  , includedDirectories :: [String]
+  { includedDirectories :: [String]
   , excludedDirectories :: [String]
   , includedFiles :: [String]
   , excludedFiles :: [String]
@@ -45,8 +44,7 @@ data CompilerConfig = CompilerConfig
 
 instance FromJSON CompilerConfig where
   parseJSON = withObject "CompilerConfig" $ \v -> CompilerConfig
-    <$> v .:? "galleryName" .!= "Gallery"
-    <*> v .:? "includedDirectories" .!= ["*"]
+    <$> v .:? "includedDirectories" .!= ["*"]
     <*> v .:? "excludedDirectories" .!= []
     <*> v .:? "includedFiles" .!= ["*"]
     <*> v .:? "excludedFiles" .!= []

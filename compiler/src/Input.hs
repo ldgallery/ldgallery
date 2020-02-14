@@ -58,6 +58,7 @@ data InputTree =
     | InputDir
       { path :: Path
       , modTime :: UTCTime
+      , sidecar :: Sidecar
       , dirThumbnailPath :: Maybe Path
       , items :: [InputTree] }
   deriving Show
@@ -78,6 +79,9 @@ emptySidecar = Sidecar
 
 sidecarExt :: String
 sidecarExt = "yaml"
+
+dirSidecar :: String
+dirSidecar = "directory." ++ sidecarExt
 
 readSidecarFile :: FilePath -> IO Sidecar
 readSidecarFile filepath =
@@ -107,7 +111,8 @@ readInputTree (AnchoredFSNode anchor root@Dir{}) = mkDirNode root
       do
         dirItems <- mapM mkInputNode items
         modTime <- getModificationTime $ localPath (anchor /> path)
-        return $ InputDir path modTime (findThumbnail items) (catMaybes dirItems)
+        sidecar <- readSidecarFile $ localPath (anchor /> path </ dirSidecar)
+        return $ InputDir path modTime sidecar (findThumbnail items) (catMaybes dirItems)
 
     isSidecar :: FSNode -> Bool
     isSidecar Dir{} = False

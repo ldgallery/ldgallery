@@ -1,6 +1,4 @@
 compiler:
-  galleryName: Example gallery
-
   #includedDirectories: ["*"]
   #excludedDirectories: []
 
