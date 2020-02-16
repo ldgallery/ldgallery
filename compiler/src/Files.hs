@@ -53,7 +53,7 @@ type FileName = String
 type LocalPath = String
 type WebPath = String
 
- -- | Reversed path component list
+-- | Reversed path component list
 data Path = Path [FileName] deriving Show
 
 instance ToJSON Path where
