@@ -56,7 +56,7 @@ Available options are:
 
 A gallery source directory contains the gallery items and their sidecar metadata files, optionally grouped inside sub-directories.
 
-Directory thumbnails can be set by placing a picture file named "thumbnail", with any image file extension, inside of directories.
+Directory thumbnails can be set by placing a picture file named "_directory", with any image file extension, inside of directories.
 
 An example input gallery directory structure could be as follows:
 
@@ -65,8 +65,8 @@ An example input gallery directory structure could be as follows:
 ├── DSC0001.jpg --------- a picture
 ├── DSC0001.jpg.yaml ---- its associated sidecar metadata file
 ├── Some directory ------ a directory grouping gallery items
-│   ├── thumbnail.jpg --- a thumbnail for its parent directory
-│   ├── directory.yaml -- directory sidecar metadata file
+│   ├── _directory.jpg -- a thumbnail for its parent directory
+│   ├── _directory.yaml - directory sidecar metadata file
 │   ├── DSC0002.jpg
 │   ├── DSC0002.jpg.yaml
 │   ├── DSC0003.jpg
@@ -80,7 +80,7 @@ An example input gallery directory structure could be as follows:
 File metadata are read from sidecar files of the same name, with the ".yaml" extension appended.
 Metadata contained within item files themselves (e.g. Exif fields for pictures) are ignored.
 
-Directory metadata are read from sidecar files named "directory.yaml" located within the directory.
+Directory metadata are read from sidecar files named "_directory.yaml" located within the directory.
 
 When a sidecar file is absent or a particular key omitted, values are set as empty or to their fallback value specified below.
 

@@ -80,8 +80,11 @@ emptySidecar = Sidecar
 sidecarExt :: String
 sidecarExt = "yaml"
 
-dirSidecar :: String
-dirSidecar = "directory." ++ sidecarExt
+dirPropFile :: String
+dirPropFile = "_directory"
+
+dirSidecar :: Path
+dirSidecar = Path [dirPropFile] <.> sidecarExt
 
 readSidecarFile :: FilePath -> IO Sidecar
 readSidecarFile filepath =
@@ -111,7 +114,7 @@ readInputTree (AnchoredFSNode anchor root@Dir{}) = mkDirNode root
       do
         dirItems <- mapM mkInputNode items
         modTime <- getModificationTime $ localPath (anchor /> path)
-        sidecar <- readSidecarFile $ localPath (anchor /> path </ dirSidecar)
+        sidecar <- readSidecarFile $ localPath (anchor /> path </> dirSidecar)
         return $ InputDir path modTime sidecar (findThumbnail items) (catMaybes dirItems)
 
     isSidecar :: FSNode -> Bool
@@ -125,7 +128,7 @@ readInputTree (AnchoredFSNode anchor root@Dir{}) = mkDirNode root
     isThumbnail File{path} =
       fileName path
       & fmap dropExtension
-      & (maybe False ("thumbnail" ==))
+      & (maybe False (dirPropFile ==))
 
     findThumbnail :: [FSNode] -> Maybe Path
     findThumbnail = (fmap Files.path) . (find isThumbnail)
