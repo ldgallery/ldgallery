@@ -8,7 +8,9 @@ compiler:
   #excludedFiles:
   #- "*.md"
 
-  tagsFromDirectories: 0 # default
+  tagsFromDirectories:
+    fromParents: 0 # default
+    prefix: ""     # default
 
   thumbnailMaxResolution:
     width: 400  # default

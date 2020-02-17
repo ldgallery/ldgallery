@@ -27,7 +27,7 @@ import Control.Concurrent.ParallelIO.Global (parallel)
 import Data.List (sortOn)
 import Data.List.Ordered (minusBy)
 import Data.Char (toLower)
-import Data.Maybe (mapMaybe, fromMaybe, maybeToList)
+import Data.Maybe (mapMaybe, fromMaybe)
 import Data.Function ((&))
 import qualified Data.Set as Set
 import Data.Text (pack)
@@ -37,10 +37,11 @@ import Data.Time.Format (formatTime, defaultTimeLocale)
 import Safe.Foldable (maximumByMay)
 
 import GHC.Generics (Generic)
-import Data.Aeson (FromJSON, ToJSON, genericToJSON, genericToEncoding)
+import Data.Aeson (ToJSON, genericToJSON, genericToEncoding)
 import qualified Data.Aeson as JSON
 
 import Files
+import Config (Resolution(..), TagsFromDirectoriesConfig(..))
 import Input (InputTree(..), Sidecar(..))
 
 
@@ -56,16 +57,6 @@ encodingOptions = JSON.defaultOptions
 
 
 type Tag = String
-
-data Resolution = Resolution
-  { width :: Int
-  , height :: Int
-  } deriving (Generic, Show, FromJSON)
-
-instance ToJSON Resolution where
-  toJSON = genericToJSON encodingOptions
-  toEncoding = genericToEncoding encodingOptions
-
 
 data Resource = Resource
   { resourcePath :: Path
@@ -120,13 +111,13 @@ type ThumbnailProcessor = Path -> IO (Maybe Thumbnail)
 
 
 buildGalleryTree ::
-     ItemProcessor -> ThumbnailProcessor
-  -> Int -> InputTree -> IO GalleryItem
-buildGalleryTree processItem processThumbnail tagsFromDirectories inputTree =
-  mkGalleryItem [] [] inputTree
+     ItemProcessor -> ThumbnailProcessor -> TagsFromDirectoriesConfig
+  -> InputTree -> IO GalleryItem
+buildGalleryTree processItem processThumbnail tagsFromDirsConfig inputTree =
+  mkGalleryItem [] inputTree
   where
-    mkGalleryItem :: [String] -> [Tag] -> InputTree -> IO GalleryItem
-    mkGalleryItem parentDirs inheritedTags InputFile{path, modTime, sidecar} =
+    mkGalleryItem :: [Tag] -> InputTree -> IO GalleryItem
+    mkGalleryItem inheritedTags InputFile{path, modTime, sidecar} =
       do
         properties <- processItem path
         processedThumbnail <- processThumbnail path
@@ -134,23 +125,22 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories inputTree =
           { title = Input.title sidecar ?? fileName path ?? ""
           , datetime = Input.datetime sidecar ?? toZonedTime modTime
           , description = Input.description sidecar ?? ""
-          , tags = unique ((Input.tags sidecar ?? []) ++ inheritedTags ++ parentDirTags parentDirs)
+          , tags = unique ((Input.tags sidecar ?? []) ++ inheritedTags ++ parentDirTags path)
           , path = "/" /> path
           , thumbnail = processedThumbnail
           , properties = properties }
 
-    mkGalleryItem parentDirs inheritedTags InputDir{path, modTime, sidecar, dirThumbnailPath, items} =
+    mkGalleryItem inheritedTags InputDir{path, modTime, sidecar, dirThumbnailPath, items} =
       do
-        let itemsParents = (maybeToList $ fileName path) ++ parentDirs
         let dirTags = (Input.tags sidecar ?? []) ++ inheritedTags
-        processedItems <- parallel $ map (mkGalleryItem itemsParents dirTags) items
+        processedItems <- parallel $ map (mkGalleryItem dirTags) items
         processedThumbnail <- maybeThumbnail dirThumbnailPath
         return GalleryItem
           { title = Input.title sidecar ?? fileName path ?? ""
           , datetime = Input.datetime sidecar ?? mostRecentModTime processedItems
                                               ?? toZonedTime modTime
           , description = Input.description sidecar ?? ""
-          , tags = unique (aggregateTags processedItems ++ parentDirTags parentDirs)
+          , tags = unique (aggregateTags processedItems ++ parentDirTags path)
           , path = "/" /> path
           , thumbnail = processedThumbnail
           , properties = Directory processedItems }
@@ -162,8 +152,11 @@ buildGalleryTree processItem processThumbnail tagsFromDirectories inputTree =
     unique :: Ord a => [a] -> [a]
     unique = Set.toList . Set.fromList
 
-    parentDirTags :: [String] -> [Tag]
-    parentDirTags = take tagsFromDirectories
+    parentDirTags :: Path -> [Tag]
+    parentDirTags (Path elements) =
+        drop 1 elements
+      & take (fromParents tagsFromDirsConfig)
+      & map (prefix tagsFromDirsConfig ++)
 
     aggregateTags :: [GalleryItem] -> [Tag]
     aggregateTags = concatMap (\item -> tags (item::GalleryItem))
