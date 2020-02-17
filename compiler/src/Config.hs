@@ -19,17 +19,24 @@
 module Config
   ( GalleryConfig(..)
   , CompilerConfig(..)
+  , TagsFromDirectoriesConfig(..)
+  , Resolution(..)
   , readConfig
   ) where
 
 
 import GHC.Generics (Generic)
-import Data.Aeson (FromJSON, withObject, (.:?), (.!=))
+import Data.Aeson (ToJSON, FromJSON, withObject, (.:?), (.!=))
 import qualified Data.Aeson as JSON
 
 import Files (FileName)
 import Input (decodeYamlFile)
-import Resource (Resolution(..))
+
+
+data Resolution = Resolution
+  { width :: Int
+  , height :: Int
+  } deriving (Generic, Show, ToJSON, FromJSON)
 
 
 data CompilerConfig = CompilerConfig
@@ -37,7 +44,7 @@ data CompilerConfig = CompilerConfig
   , excludedDirectories :: [String]
   , includedFiles :: [String]
   , excludedFiles :: [String]
-  , tagsFromDirectories :: Int
+  , tagsFromDirectories :: TagsFromDirectoriesConfig
   , thumbnailMaxResolution :: Resolution
   , pictureMaxResolution :: Maybe Resolution
   } deriving (Generic, Show)
@@ -48,9 +55,20 @@ instance FromJSON CompilerConfig where
     <*> v .:? "excludedDirectories" .!= []
     <*> v .:? "includedFiles" .!= ["*"]
     <*> v .:? "excludedFiles" .!= []
-    <*> v .:? "tagsFromDirectories" .!= 0
+    <*> v .:? "tagsFromDirectories" .!= (TagsFromDirectoriesConfig 0 "")
     <*> v .:? "thumbnailMaxResolution" .!= (Resolution 400 300)
     <*> v .:? "pictureMaxResolution"
+
+
+data TagsFromDirectoriesConfig = TagsFromDirectoriesConfig
+  { fromParents :: Int
+  , prefix :: String
+  } deriving (Generic, Show)
+
+instance FromJSON TagsFromDirectoriesConfig where
+  parseJSON = withObject "TagsFromDirectoriesConfig" $ \v -> TagsFromDirectoriesConfig
+    <$> v .:? "fromParents" .!= 0
+    <*> v .:? "prefix" .!= ""
 
 
 data GalleryConfig = GalleryConfig

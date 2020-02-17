@@ -107,19 +107,28 @@ tags
 The gallery settings reside in a file named "gallery.yaml" located at the root of the gallery's source directory.
 
 compiler.includedDirectories[]
-: Glob patterns of directory names to include in the gallery.  Defaults to ["*"] (matches all directory names).
+: Glob patterns of directory names to include in the gallery.
+  Defaults to ["*"] (matches all directory names).
 
 compiler.excludedDirectories[]
-: Glob patterns of directory names to exclude from the gallery.  Defaults to [] (none).
+: Glob patterns of directory names to exclude from the gallery.
+  Defaults to [] (none).
 
 compiler.includedFiles[]
-: Glob patterns of file names to include in the gallery.  Defaults to ["*"] (matches all file names).
+: Glob patterns of file names to include in the gallery.
+  Defaults to ["*"] (matches all file names).
 
 compiler.excludedFiles[]
-: Glob patterns of file names to exclude from the gallery.  Defaults to [] (none).
+: Glob patterns of file names to exclude from the gallery.
+  Defaults to [] (none).
 
-compiler.tagsFromDirectories
-: How far to look at parent directories to add implicit tags.  Defaults to 0.
+compiler.tagsFromDirectories.fromParents
+: Automatically generate tags from the name of parent directories,
+  looking up in the hierarchy as far as indicated by this parameter.
+  Defaults to 0 (do not generate tags from parent directories).
+
+compiler.tagsFromDirectories.prefix
+: Prefix to use for tags automatically generated from the parent directories' names.
 
 compiler.thumbnailMaxResolution.width
 : Maximum width in pixels of the item thumbnails, 400 by default.
@@ -137,7 +146,8 @@ viewer.defaultSearchQuery [TODO]
 : Default search query string.
 
 viewer.defaultSortOrder [TODO]
-: Default sort order ("alphanumeric", "reverse-alphanumeric", "date", "reverse-date").  Defaults to "date".
+: Default sort order ("alphanumeric", "reverse-alphanumeric", "date", "reverse-date").
+  Defaults to "date".
 
 viewer.tagGroups[].tag [TODO]
 : Tag prefix defining the tag group.
@@ -146,7 +156,8 @@ viewer.tagGroups[].colour [TODO]
 : Colour associated to the tag group.
 
 viewer.hiddenTags [TODO]
-: List of tags to hide by default.  Items bearing one of those tags will not be displayed until they are being explicitly searched for.
+: List of tags to hide by default.
+  Items bearing one of those tags will not be displayed until they are being explicitly searched for.
 
 
 # SEE ALSO
