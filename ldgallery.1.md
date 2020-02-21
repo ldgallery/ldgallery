@@ -33,6 +33,10 @@ Available options are:
   Must be distinct from the source directory.
   Defaults to ./out.
 
+-g, \--gallery-config _FILE_
+: Gallery configuration file.
+  Defaults to $input-dir/gallery.yaml.
+
 -r, \--rebuild-all
 : Invalidate cache and recompile everything.
 
