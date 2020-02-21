@@ -47,8 +47,8 @@ import Processors
   , skipCached, withCached )
 
 
-galleryConf :: String
-galleryConf = "gallery.yaml"
+defaultGalleryConf :: String
+defaultGalleryConf = "gallery.yaml"
 
 indexFile :: String
 indexFile = "index.json"
@@ -74,7 +74,6 @@ galleryDirFilter :: CompilerConfig -> [FilePath] -> FSNode -> Bool
 galleryDirFilter config excludedCanonicalDirs =
       (not . isHidden)
   &&& (not . isExcludedDir)
-  &&& (not . matchesFile (== galleryConf))
   &&& ((matchesDir $ anyPattern $ includedDirectories config) |||
        (matchesFile $ anyPattern $ includedFiles config))
   &&& (not . ((matchesDir $ anyPattern $ excludedDirectories config) |||
@@ -100,10 +99,10 @@ galleryDirFilter config excludedCanonicalDirs =
     isExcludedDir File{} = False
 
 
-compileGallery :: FilePath -> FilePath -> [FilePath] -> Bool -> Bool -> IO ()
-compileGallery inputDirPath outputDirPath excludedDirs rebuildAll cleanOutput =
+compileGallery :: FilePath -> FilePath -> FilePath -> [FilePath] -> Bool -> Bool -> IO ()
+compileGallery configPath inputDirPath outputDirPath excludedDirs rebuildAll cleanOutput =
   do
-    fullConfig <- readConfig inputGalleryConf
+    fullConfig <- readConfig $ inputGalleryConf configPath
     let config = compiler fullConfig
 
     inputDir <- readDirectory inputDirPath
@@ -123,7 +122,10 @@ compileGallery inputDirPath outputDirPath excludedDirs rebuildAll cleanOutput =
     writeJSON outputViewerConf $ viewer fullConfig
 
   where
-    inputGalleryConf = inputDirPath </> galleryConf
+    inputGalleryConf :: FilePath -> FilePath
+    inputGalleryConf "" = inputDirPath </> defaultGalleryConf
+    inputGalleryConf file = file
+
     outputIndex = outputDirPath </> indexFile
     outputViewerConf = outputDirPath </> viewerConfFile
 

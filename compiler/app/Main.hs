@@ -37,8 +37,9 @@ data ViewerConfig = ViewerConfig
 
 
 data Options = Options
-  { inputDir :: String
-  , outputDir :: String
+  { inputDir :: FilePath
+  , outputDir :: FilePath
+  , galleryConfig :: FilePath
   , rebuilAll :: Bool
   , cleanOutput :: Bool
   , withViewer :: Bool
@@ -58,6 +59,12 @@ options = Options
       &= name "output-dir"
       &= explicit
       &= help "Generated gallery output path (default=./out)"
+  , galleryConfig = ""
+      &= typFile
+      &= name "g"
+      &= name "gallery-config"
+      &= explicit
+      &= help "Gallery configuration file (default=$input-dir/gallery.yaml)"
   , rebuilAll = False
       &= name "r"
       &= name "rebuild-all"
@@ -99,6 +106,7 @@ main =
     buildGallery opts =
       checkDistinctPaths (inputDir opts) (outputDir opts)
       >>  compileGallery
+            (galleryConfig opts)
             (inputDir opts)
             (galleryOutputDir opts)
             [outputDir opts]
