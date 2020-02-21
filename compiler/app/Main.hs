@@ -24,11 +24,11 @@ import Control.Monad (when)
 import Data.Version (showVersion)
 import Data.Aeson (ToJSON)
 import System.FilePath ((</>))
-import System.Directory (canonicalizePath)
+import System.Directory (canonicalizePath, listDirectory)
 import System.Console.CmdArgs
 
 import Compiler
-import Files (readDirectory, copyTo)
+import Files (readDirectory, copyTo, remove)
 
 
 data ViewerConfig = ViewerConfig
@@ -88,12 +88,13 @@ main =
     opts <- cmdArgs options
     buildGallery opts
     when (withViewer opts) $ do
+      when (cleanOutput opts) $ cleanViewerDir (outputDir opts)
       copyViewer (outputDir opts)
       writeViewerConfig (outputDir opts </> "config.json")
 
   where
     gallerySubdir :: String
-    gallerySubdir = "gallery/"
+    gallerySubdir = "gallery"
 
     buildGallery :: Options -> IO ()
     buildGallery opts =
@@ -115,6 +116,12 @@ main =
       if withViewer opts then outputBase </> gallerySubdir else outputBase
       where outputBase = outputDir opts
 
+    cleanViewerDir :: FilePath -> IO ()
+    cleanViewerDir target =
+      listDirectory target
+      >>= return . filter (/= gallerySubdir)
+      >>= mapM_ remove . map (target </>)
+
     copyViewer :: FilePath -> IO ()
     copyViewer target =
       putStrLn "Copying viewer webapp"
@@ -123,4 +130,4 @@ main =
       >>= copyTo target
 
     writeViewerConfig :: FilePath -> IO ()
-    writeViewerConfig fileName = writeJSON fileName $ ViewerConfig gallerySubdir
+    writeViewerConfig fileName = writeJSON fileName $ ViewerConfig (gallerySubdir ++ "/")
