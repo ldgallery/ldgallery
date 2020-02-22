@@ -17,14 +17,13 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 module Config
-  ( GalleryConfig(..)
-  , CompilerConfig(..)
-  , readConfig
+  ( GalleryConfig(..), readConfig
+  , ViewerConfig(..), viewerConfig
   ) where
 
 
 import GHC.Generics (Generic)
-import Data.Aeson (FromJSON, withObject, (.:?), (.!=))
+import Data.Aeson (FromJSON, ToJSON, withObject, (.:?), (.!=))
 import qualified Data.Aeson as JSON
 
 import Files (FileName)
@@ -32,7 +31,7 @@ import Input (decodeYamlFile)
 import Resource (Resolution(..))
 
 
-data CompilerConfig = CompilerConfig
+data GalleryConfig = GalleryConfig
   { includedDirectories :: [String]
   , excludedDirectories :: [String]
   , includedFiles :: [String]
@@ -42,8 +41,8 @@ data CompilerConfig = CompilerConfig
   , pictureMaxResolution :: Maybe Resolution
   } deriving (Generic, Show)
 
-instance FromJSON CompilerConfig where
-  parseJSON = withObject "CompilerConfig" $ \v -> CompilerConfig
+instance FromJSON GalleryConfig where
+  parseJSON = withObject "GalleryConfig" $ \v -> GalleryConfig
     <$> v .:? "includedDirectories" .!= ["*"]
     <*> v .:? "excludedDirectories" .!= []
     <*> v .:? "includedFiles" .!= ["*"]
@@ -53,10 +52,13 @@ instance FromJSON CompilerConfig where
     <*> v .:? "pictureMaxResolution"
 
 
-data GalleryConfig = GalleryConfig
-  { compiler :: CompilerConfig
-  , viewer :: JSON.Object
-  } deriving (Generic, FromJSON, Show)
-
 readConfig :: FileName -> IO GalleryConfig
 readConfig = decodeYamlFile
+
+
+data ViewerConfig = ViewerConfig
+  { -- TODO: add viewer config keys (tag groups...)
+  } deriving (Generic, ToJSON, Show)
+
+viewerConfig :: GalleryConfig -> ViewerConfig
+viewerConfig _ = ViewerConfig -- TODO

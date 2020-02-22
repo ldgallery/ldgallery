@@ -106,47 +106,32 @@ tags
 
 The gallery settings reside in a file named "gallery.yaml" located at the root of the gallery's source directory.
 
-compiler.includedDirectories[]
+includedDirectories[]
 : Glob patterns of directory names to include in the gallery.  Defaults to ["*"] (matches all directory names).
 
-compiler.excludedDirectories[]
+excludedDirectories[]
 : Glob patterns of directory names to exclude from the gallery.  Defaults to [] (none).
 
-compiler.includedFiles[]
+includedFiles[]
 : Glob patterns of file names to include in the gallery.  Defaults to ["*"] (matches all file names).
 
-compiler.excludedFiles[]
+excludedFiles[]
 : Glob patterns of file names to exclude from the gallery.  Defaults to [] (none).
 
-compiler.tagsFromDirectories
+tagsFromDirectories
 : How far to look at parent directories to add implicit tags.  Defaults to 0.
 
-compiler.thumbnailMaxResolution.width
+thumbnailMaxResolution.width
 : Maximum width in pixels of the item thumbnails, 400 by default.
 
-compiler.thumbnailMaxResolution.height
+thumbnailMaxResolution.height
 : Maximum height in pixels of the item thumbnails, 300 by default.
 
-compiler.pictureMaxResolution.width
+pictureMaxResolution.width
 : Maximum width in pixels of the picture items, unlimited by default.
 
-compiler.pictureMaxResolution.height
+pictureMaxResolution.height
 : Maximum height in pixels of the picture items, unlimited by default.
-
-viewer.defaultSearchQuery [TODO]
-: Default search query string.
-
-viewer.defaultSortOrder [TODO]
-: Default sort order ("alphanumeric", "reverse-alphanumeric", "date", "reverse-date").  Defaults to "date".
-
-viewer.tagGroups[].tag [TODO]
-: Tag prefix defining the tag group.
-
-viewer.tagGroups[].colour [TODO]
-: Colour associated to the tag group.
-
-viewer.hiddenTags [TODO]
-: List of tags to hide by default.  Items bearing one of those tags will not be displayed until they are being explicitly searched for.
 
 
 # SEE ALSO
