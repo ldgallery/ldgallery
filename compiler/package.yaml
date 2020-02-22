@@ -54,7 +54,7 @@ library:
   source-dirs: src
 
 executables:
-  ldgallery-compiler-exe:
+  ldgallery:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
