@@ -1,24 +1,22 @@
-compiler:
-  #includedDirectories: ["*"]
-  #excludedDirectories: []
+# ldgallery example gallery configuration file
 
-  includedFiles:
+#includedDirectories: ["*"]
+#excludedDirectories: []
+
+includedFiles:
   - "*.jpg"
 
-  #excludedFiles:
-  #- "*.md"
+#excludedFiles:
+#  - "*.md"
 
-  tagsFromDirectories:
-    fromParents: 0 # default
-    prefix: ""     # default
+tagsFromDirectories:
+  fromParents: 0 # default
+  prefix: ""     # default
 
-  thumbnailMaxResolution:
-    width: 400  # default
-    height: 300 # default
+thumbnailMaxResolution:
+  width: 400  # default
+  height: 300 # default
 
-  pictureMaxResolution:
-    width: 1024
-    height: 768
-
-
-viewer: {}
+pictureMaxResolution:
+  width: 1024
+  height: 768

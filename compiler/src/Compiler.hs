@@ -70,7 +70,7 @@ writeJSON outputPath object =
     ensureParentDir JSON.encodeFile outputPath object
 
 
-galleryDirFilter :: CompilerConfig -> [FilePath] -> FSNode -> Bool
+galleryDirFilter :: GalleryConfig -> [FilePath] -> FSNode -> Bool
 galleryDirFilter config excludedCanonicalDirs =
       (not . isHidden)
   &&& (not . isExcludedDir)
@@ -102,8 +102,7 @@ galleryDirFilter config excludedCanonicalDirs =
 compileGallery :: FilePath -> FilePath -> FilePath -> [FilePath] -> Bool -> Bool -> IO ()
 compileGallery configPath inputDirPath outputDirPath excludedDirs rebuildAll cleanOutput =
   do
-    fullConfig <- readConfig $ inputGalleryConf configPath
-    let config = compiler fullConfig
+    config <- readConfig $ inputGalleryConf configPath
 
     inputDir <- readDirectory inputDirPath
     excludedCanonicalDirs <- mapM canonicalizePath excludedDirs
@@ -119,7 +118,7 @@ compileGallery configPath inputDirPath outputDirPath excludedDirs rebuildAll cle
 
     when cleanOutput $ galleryCleanupResourceDir resources outputDirPath
     writeJSON outputIndex resources
-    writeJSON outputViewerConf $ viewer fullConfig
+    writeJSON outputViewerConf $ viewerConfig config
 
   where
     inputGalleryConf :: FilePath -> FilePath

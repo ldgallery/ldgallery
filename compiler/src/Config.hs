@@ -17,11 +17,10 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 module Config
-  ( GalleryConfig(..)
-  , CompilerConfig(..)
+  ( GalleryConfig(..), readConfig
+  , ViewerConfig(..), viewerConfig
   , TagsFromDirectoriesConfig(..)
   , Resolution(..)
-  , readConfig
   ) where
 
 
@@ -39,27 +38,6 @@ data Resolution = Resolution
   } deriving (Generic, Show, ToJSON, FromJSON)
 
 
-data CompilerConfig = CompilerConfig
-  { includedDirectories :: [String]
-  , excludedDirectories :: [String]
-  , includedFiles :: [String]
-  , excludedFiles :: [String]
-  , tagsFromDirectories :: TagsFromDirectoriesConfig
-  , thumbnailMaxResolution :: Resolution
-  , pictureMaxResolution :: Maybe Resolution
-  } deriving (Generic, Show)
-
-instance FromJSON CompilerConfig where
-  parseJSON = withObject "CompilerConfig" $ \v -> CompilerConfig
-    <$> v .:? "includedDirectories" .!= ["*"]
-    <*> v .:? "excludedDirectories" .!= []
-    <*> v .:? "includedFiles" .!= ["*"]
-    <*> v .:? "excludedFiles" .!= []
-    <*> v .:? "tagsFromDirectories" .!= (TagsFromDirectoriesConfig 0 "")
-    <*> v .:? "thumbnailMaxResolution" .!= (Resolution 400 300)
-    <*> v .:? "pictureMaxResolution"
-
-
 data TagsFromDirectoriesConfig = TagsFromDirectoriesConfig
   { fromParents :: Int
   , prefix :: String
@@ -72,9 +50,32 @@ instance FromJSON TagsFromDirectoriesConfig where
 
 
 data GalleryConfig = GalleryConfig
-  { compiler :: CompilerConfig
-  , viewer :: JSON.Object
-  } deriving (Generic, FromJSON, Show)
+  { includedDirectories :: [String]
+  , excludedDirectories :: [String]
+  , includedFiles :: [String]
+  , excludedFiles :: [String]
+  , tagsFromDirectories :: TagsFromDirectoriesConfig
+  , thumbnailMaxResolution :: Resolution
+  , pictureMaxResolution :: Maybe Resolution
+  } deriving (Generic, Show)
+
+instance FromJSON GalleryConfig where
+  parseJSON = withObject "GalleryConfig" $ \v -> GalleryConfig
+    <$> v .:? "includedDirectories" .!= ["*"]
+    <*> v .:? "excludedDirectories" .!= []
+    <*> v .:? "includedFiles" .!= ["*"]
+    <*> v .:? "excludedFiles" .!= []
+    <*> v .:? "tagsFromDirectories" .!= (TagsFromDirectoriesConfig 0 "")
+    <*> v .:? "thumbnailMaxResolution" .!= (Resolution 400 300)
+    <*> v .:? "pictureMaxResolution"
 
 readConfig :: FileName -> IO GalleryConfig
 readConfig = decodeYamlFile
+
+
+data ViewerConfig = ViewerConfig
+  { -- TODO: add viewer config keys (tag groups...)
+  } deriving (Generic, ToJSON, Show)
+
+viewerConfig :: GalleryConfig -> ViewerConfig
+viewerConfig _ = ViewerConfig -- TODO
