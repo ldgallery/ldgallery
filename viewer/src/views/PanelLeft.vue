@@ -34,7 +34,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { Dictionary } from "vue-router/types/router";
-import Navigation from "../services/navigation";
+import Navigation from "@/services/navigation";
 
 @Component
 export default class PanelLeft extends Vue {

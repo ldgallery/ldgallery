@@ -25,7 +25,7 @@
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import { Operation } from "@/@types/Operation";
 import IndexSearch from "@/services/indexsearch";
-import IndexFactory from "../services/indexfactory";
+import IndexFactory from "@/services/indexfactory";
 
 @Component
 export default class GalleryPicture extends Vue {

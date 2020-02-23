@@ -40,7 +40,7 @@
 import { Component, Vue, Model, Prop } from "vue-property-decorator";
 import { Operation } from "@/@types/Operation";
 import Navigation from "@/services/navigation";
-import IndexFactory from "../services/indexfactory";
+import IndexFactory from "@/services/indexfactory";
 
 @Component
 export default class LdTagInput extends Vue {
