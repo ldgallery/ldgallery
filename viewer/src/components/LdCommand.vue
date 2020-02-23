@@ -46,11 +46,12 @@ export default class LdCommand extends Vue {
   }
 
   isRoot(): boolean {
-    return this.currentItemPath.length <= 1;
+    return this.currentItemPath.length <= 1 && !this.$uiStore.searchMode;
   }
 
   parent(): RawLocation {
-    if (!this.isRoot()) return this.currentItemPath[this.currentItemPath.length - 2];
+    if (this.$uiStore.searchMode) return this.$route.path;
+    if (this.currentItemPath.length > 1) return this.currentItemPath[this.currentItemPath.length - 2];
     return "";
   }
 }
