@@ -1,5 +1,5 @@
 @echo off
 cd ..\compiler\
-stack exec ldgallery-compiler-exe -- --help
+stack exec ldgallery -- --help
 @echo.
 @pause
