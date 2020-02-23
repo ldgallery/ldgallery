@@ -37,7 +37,10 @@
         </router-link>
       </li>
       <li v-if="searchMode">
-        <fa-icon icon="search" size="lg" class="disabled" />
+        <fa-icon icon="angle-right" class="disabled" />
+        <router-link :to="$route" class="link">
+          <fa-icon icon="search" size="lg" class="disabled" />
+        </router-link>
       </li>
     </ul>
   </div>
