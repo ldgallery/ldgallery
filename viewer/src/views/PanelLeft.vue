@@ -34,6 +34,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { Dictionary } from "vue-router/types/router";
+import Navigation from "../services/navigation";
 
 @Component
 export default class PanelLeft extends Vue {
@@ -43,7 +44,8 @@ export default class PanelLeft extends Vue {
   }
 
   search() {
-    this.$router.push({ query: this.serializeSearch() }).catch(err => {
+    const lastDirectory = Navigation.getLastDirectory(this.$galleryStore.currentItemPath);
+    this.$router.push({ path: lastDirectory.path, query: this.serializeSearch() }).catch(err => {
       if (err.name !== "NavigationDuplicated") throw err;
     });
   }

@@ -31,7 +31,6 @@ export default class Navigation {
     return [];
   }
 
-
   // Normalize a string to lowercase, no-accents
   public static normalize(value: string) {
     return value
@@ -40,11 +39,20 @@ export default class Navigation {
       .toLowerCase();
   }
 
-
+  // Checks if the type of an item matches
   public static checkType(item: Gallery.Item | null, type: Gallery.ItemType): boolean {
     return item?.properties.type === type ?? false;
   }
 
+  public static getLastDirectory(itemPath: Gallery.Item[]): Gallery.Directory {
+    for (let idx = itemPath.length - 1; idx >= 0; idx--) {
+      const item = itemPath[idx];
+      if (Navigation.checkType(item, "directory")) return item as Gallery.Directory;
+    }
+    throw new Error("No directory found");
+  }
+
+  // Sort a list of items, moving the directories to the beginning of the list
   public static directoriesFirst(items: Gallery.Item[]) {
     return [
       ...items
@@ -56,6 +64,7 @@ export default class Navigation {
     ];
   }
 
+  // Get the icon for an item
   public static getIcon(item: Gallery.Item): string {
     if (item.path.length <= 1) return "home";
     switch (item.properties.type) {
