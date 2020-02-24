@@ -14,10 +14,11 @@ Build
 * Compile the _ldgallery compiler_ as detailed in `./compiler/readme.md`.
 
 
-The man page can be generated using [Pandoc]:
+The man pages can be generated using [Pandoc]:
 
 ```
-pandoc --standalone --to man ldgallery.1.md --output ldgallery.1
+pandoc --standalone --to man compiler/ldgallery.1.md --output ldgallery.1
+pandoc --standalone --to man viewer/ldgallery-viewer.7.md --output ldgallery-viewer.7
 ```
 
 [Pandoc]: https://pandoc.org/
