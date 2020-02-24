@@ -39,7 +39,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import DragScrollClickFix from "@/dragscrollclickfix";
+import DragScrollClickFix from "@/services/dragscrollclickfix";
 
 @Component
 export default class LdPicture extends Vue {

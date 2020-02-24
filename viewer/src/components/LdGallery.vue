@@ -18,23 +18,29 @@
 -->
 
 <template>
-  <div class="flex">
-    <b-radio-button v-model="$uiStore.mode" native-value="navigation" type="is-green">
-      <fa-icon icon="folder" />
-      <span>{{$t('mode.navigation')}}</span>
-    </b-radio-button>
-    <b-radio-button v-model="$uiStore.mode" native-value="search" type="is-purple">
-      <fa-icon icon="search" />
-      <span>{{$t('mode.search')}}</span>
-    </b-radio-button>
+  <div class="thumbnail-tiles">
+    <div v-for="item in items" :key="item.path">
+      <router-link :to="item.path">
+        <ld-thumbnail :item="item" />
+      </router-link>
+    </div>
+    <div v-if="hasNoResults()">{{noresult}}</div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Prop, Model } from "vue-property-decorator";
+import DragScrollClickFix from "@/services/dragscrollclickfix";
 
 @Component
-export default class LdModeRadio extends Vue {}
+export default class LdPicture extends Vue {
+  @Prop({ type: Array, required: true }) readonly items!: Gallery.Item[];
+  @Prop(String) readonly noresult?: string;
+
+  hasNoResults(): boolean {
+    return Boolean(this.noresult) && this.items.length === 0;
+  }
+}
 </script>
 
 <style lang="scss">

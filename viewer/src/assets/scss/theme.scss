@@ -18,9 +18,8 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-@import '_buefy_variables.scss';
-@import 'palette.scss';
-
+@import "_buefy_variables.scss";
+@import "palette.scss";
 
 // Buefy components
 
@@ -44,7 +43,14 @@ $loading-background: $palette-800;
 $title-color: $palette-200;
 $title-size: $size-5;
 $tag-background-color: $palette-800;
-
+$button-color: $palette-100;
+$button-active-color: $palette-100;
+$button-active-border-color: $palette-500;
+$button-background-color: $palette-700;
+$button-border-color: $palette-500;
+$button-focus-color: $button-color;
+$button-focus-border-color: $link;
+$button-focus-box-shadow-size: 0;
 
 // Custom components
 
@@ -54,13 +60,12 @@ $panel-left-bgcolor: $palette-800;
 $panel-left-txtcolor: $primary;
 $command-buttons-bgcolor: $palette-700;
 $content-bgcolor: $palette-900;
-$toolbar-color: $palette-300;  // FIXME: should be named "scrollbar"
+$scrollbar-color: $palette-300;
 $loader-color: $palette-800;
 $input-tag-delete-background-color: $palette-700;
 $breadcrumb-margins: 12px;
 $breadcrumb-overflow-mask-size: $breadcrumb-margins + 60px;
 $thumbnail-other-size: 120px;
-
 
 // Layout
 

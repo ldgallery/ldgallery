@@ -24,7 +24,7 @@ import Taginput from 'buefy/src/components/taginput';
 // @ts-ignore
 import Loading from 'buefy/src/components/loading';
 // @ts-ignore
-import Radio from 'buefy/src/components/radio';
+import Button from 'buefy/src/components/button';
 // @ts-ignore
 import SnackBar from 'buefy/src/components/snackbar';
 
@@ -32,7 +32,7 @@ import "@/assets/scss/buefy.scss";
 
 Vue.use(Taginput);
 Vue.use(Loading);
-Vue.use(Radio);
+Vue.use(Button);
 Vue.use(SnackBar);
 
 declare module 'vue/types/vue' {

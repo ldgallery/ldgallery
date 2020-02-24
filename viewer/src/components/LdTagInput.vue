@@ -19,7 +19,7 @@
 
 <template>
   <b-taginput
-    v-model="$uiStore.currentTags"
+    v-model="model"
     :placeholder="$t('tagInput.placeholder')"
     autocomplete
     ellipsis
@@ -30,8 +30,6 @@
     size="is-medium"
     class="paneltag-input"
     @typing="searchTags"
-    @add="onAdd"
-    @remove="onRemove"
   >
     <template slot-scope="props">{{displayOption(props.option)}}</template>
     <template slot="empty">{{$t('tagInput.nomatch')}}</template>
@@ -39,80 +37,25 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Model, Prop } from "vue-property-decorator";
 import { Operation } from "@/@types/Operation";
-import Tools from "@/tools";
+import Navigation from "@/services/navigation";
+import IndexFactory from "@/services/indexfactory";
 
 @Component
 export default class LdTagInput extends Vue {
+  @Prop({ required: true }) readonly tagsIndex!: Tag.Index;
+  @Model() model!: Tag.Search[];
+
   filteredTags: Tag.Search[] = [];
-
-  onAdd(e: any) {
-    this.$uiStore.mode = "search";
-  }
-
-  onRemove() {
-    if (this.$uiStore.currentTags.length === 0) this.$uiStore.mode = "navigation";
-  }
 
   displayOption(option: Tag.Search): string {
     return `${option.display} (${option.items.length})`;
   }
 
-  extractOperation(filter: string): Operation {
-    const first = filter.slice(0, 1);
-    switch (first) {
-      case Operation.ADDITION:
-      case Operation.SUBSTRACTION:
-        return first;
-      default:
-        return Operation.INTERSECTION;
-    }
-  }
-
   searchTags(filter: string) {
-    const tags = this.$galleryStore.tags;
-    let search: Tag.Search[] = [];
-    if (tags && filter) {
-      const operation = this.extractOperation(filter);
-      if (operation !== Operation.INTERSECTION) filter = filter.slice(1);
-      if (filter.includes(":")) {
-        const filterParts = filter.split(":");
-        search = this.searchTagsFromFilterWithCategory(tags, operation, filterParts[0], filterParts[1]);
-      } else {
-        search = this.searchTagsFromFilter(tags, operation, filter);
-      }
-    }
-    this.filteredTags = this.cleanupAndSort(search);
-  }
-
-  searchTagsFromFilterWithCategory(
-    tags: Tag.Index,
-    operation: Operation,
-    category: string,
-    disambiguation: string
-  ): Tag.Search[] {
-    disambiguation = Tools.normalize(disambiguation);
-    return Object.values(tags)
-      .filter(node => node.tag.includes(category))
-      .flatMap(node =>
-        Object.values(node.children)
-          .filter(child => child.tagfiltered.includes(disambiguation))
-          .map(child => ({ ...child, parent: node, operation, display: `${operation}${node.tag}:${child.tag}` }))
-      );
-  }
-
-  searchTagsFromFilter(tags: Tag.Index, operation: Operation, filter: string): Tag.Search[] {
-    filter = Tools.normalize(filter);
-    return Object.values(tags)
-      .filter(node => node.tagfiltered.includes(filter))
-      .map(node => ({ ...node, operation, display: `${operation}${node.tag}` }));
-  }
-
-  cleanupAndSort(search: Tag.Search[]): Tag.Search[] {
-    const currentTags = this.$uiStore.currentTags;
-    return search
-      .filter(node => !currentTags.find(currentTag => currentTag.tag === node.tag))
+    this.filteredTags = IndexFactory.searchTags(this.tagsIndex, filter)
+      .filter(newSearch => !this.model.find(currentSearch => currentSearch.tag === newSearch.tag))
       .sort((a, b) => b.items.length - a.items.length);
   }
 }

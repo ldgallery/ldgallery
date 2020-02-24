@@ -17,7 +17,19 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-export default class Tools {
+export default class Navigation {
+
+  // Searches for an item by path from a root item (navigation)
+  public static searchCurrentItemPath(root: Gallery.Item, path: string): Gallery.Item[] {
+    if (path === root.path) return [root];
+    if (root.properties.type === "directory" && path.startsWith(root.path)) {
+      const itemChain = root.properties.items
+        .map(item => this.searchCurrentItemPath(item, path))
+        .find(itemChain => itemChain.length > 0);
+      if (itemChain) return [root, ...itemChain];
+    }
+    return [];
+  }
 
   // Normalize a string to lowercase, no-accents
   public static normalize(value: string) {
@@ -27,22 +39,32 @@ export default class Tools {
       .toLowerCase();
   }
 
-
+  // Checks if the type of an item matches
   public static checkType(item: Gallery.Item | null, type: Gallery.ItemType): boolean {
     return item?.properties.type === type ?? false;
   }
 
+  public static getLastDirectory(itemPath: Gallery.Item[]): Gallery.Directory {
+    for (let idx = itemPath.length - 1; idx >= 0; idx--) {
+      const item = itemPath[idx];
+      if (Navigation.checkType(item, "directory")) return item as Gallery.Directory;
+    }
+    throw new Error("No directory found");
+  }
+
+  // Sort a list of items, moving the directories to the beginning of the list
   public static directoriesFirst(items: Gallery.Item[]) {
     return [
       ...items
-        .filter(child => Tools.checkType(child, "directory"))
+        .filter(child => Navigation.checkType(child, "directory"))
         .sort((a, b) => a.title.localeCompare(b.title)),
 
       ...items
-        .filter(child => !Tools.checkType(child, "directory")),
+        .filter(child => !Navigation.checkType(child, "directory")),
     ];
   }
 
+  // Get the icon for an item
   public static getIcon(item: Gallery.Item): string {
     if (item.path.length <= 1) return "home";
     switch (item.properties.type) {
@@ -55,5 +77,4 @@ export default class Tools {
         return "file";
     }
   }
-
 }

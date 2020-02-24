@@ -19,17 +19,47 @@
 
 <template>
   <div class="flex-column sidebar">
-    <ld-tag-input />
+    <ld-tag-input v-model="$uiStore.searchFilters" :tags-index="$galleryStore.tagsIndex" />
+    <ld-command-search @clear="clear" @search="search" />
     <h1 class="title">{{$t('panelLeft.propositions')}}</h1>
-    <ld-proposition class="scrollbar no-scroll-x" />
+    <ld-proposition
+      v-model="$uiStore.searchFilters"
+      :tags-index="$galleryStore.tagsIndex"
+      :current-tags="currentTags()"
+      class="scrollbar no-scroll-x"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
+import { Dictionary } from "vue-router/types/router";
+import Navigation from "@/services/navigation";
 
 @Component
-export default class PanelLeft extends Vue {}
+export default class PanelLeft extends Vue {
+  clear() {
+    this.$uiStore.searchFilters = [];
+    this.search();
+  }
+
+  search() {
+    const lastDirectory = Navigation.getLastDirectory(this.$galleryStore.currentItemPath);
+    this.$router.push({ path: lastDirectory.path, query: this.serializeSearch() }).catch(err => {
+      if (err.name !== "NavigationDuplicated") throw err;
+    });
+  }
+
+  serializeSearch() {
+    let query: Dictionary<null> = {};
+    this.$uiStore.searchFilters.forEach(filter => (query[filter.display] = null));
+    return query;
+  }
+
+  currentTags() {
+    return this.$galleryStore.currentItem?.tags ?? [];
+  }
+}
 </script>
 
 <style lang="scss">

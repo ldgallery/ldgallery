@@ -24,10 +24,6 @@
     <router-view v-if="!isLoading" ref="content" class="layout layout-content scrollbar" />
     <b-loading :active="isLoading" is-full-page />
     <ld-key-press :keycode="27" @action="$uiStore.fullscreen=false" />
-
-    <!-- TODO: Remove when #21 (remove explicit navigation/search modes) is resolved -->
-    <ld-mode-radio v-if="!isLoading" class="tmp-mode-selector" />
-    <!-- ===== -->
   </div>
 </template>
 

@@ -18,18 +18,12 @@
 -->
 
 <template>
-  <div class="thumbnail-tiles">
-    <div v-for="(item) in orderedItems" :key="item.path">
-      <router-link :to="item.path">
-        <ld-thumbnail :item="item" />
-      </router-link>
-    </div>
-  </div>
+  <ld-gallery :items="orderedItems()" :noresult="$t('directory.no-results')" />
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import Tools from "@/tools";
+import Navigation from "@/services/navigation";
 
 @Component
 export default class GalleryDirectory extends Vue {
@@ -39,8 +33,8 @@ export default class GalleryDirectory extends Vue {
     this.$uiStore.fullscreen = false;
   }
 
-  get orderedItems() {
-    return Tools.directoriesFirst(this.directory.properties.items);
+  orderedItems() {
+    return Navigation.directoriesFirst(this.directory.properties.items);
   }
 }
 </script>
