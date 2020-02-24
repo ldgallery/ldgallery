@@ -43,6 +43,7 @@ export default class MainLayout extends Vue {
   scrollPositions: ScrollPosition = {};
 
   mounted() {
+    history.replaceState({ ldgallery: "ENTRYPOINT" }, "");
     this.fetchGalleryItems();
   }
 
