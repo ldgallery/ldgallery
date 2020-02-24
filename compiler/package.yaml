@@ -1,5 +1,6 @@
 name:                ldgallery-compiler
 version:             0.1.0.0
+homepage:            https://ldgallery.pacien.org
 github:              "pacien/ldgallery"
 license:             AGPL-3
 author:              "Pacien TRAN-GIRARD, Guillaume FOUET"
@@ -12,7 +13,7 @@ extra-source-files:
 # Metadata used when publishing your package
 synopsis:            A static generator which turns a collection of tagged pictures into a searchable web gallery
 category:            Web
-description:         Please see the README on GitHub at <https://github.com/pacien/ldgallery>
+description:         Please see the project's website at <https://ldgallery.pacien.org>
 
 dependencies:
 - base >= 4.7 && < 5
