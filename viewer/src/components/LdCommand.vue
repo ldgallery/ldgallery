@@ -23,7 +23,12 @@
     <a class="link" :title="$t('command.search')" @click="$uiStore.toggleFullWidth()">
       <fa-icon :icon="commandToggleSearchPanelIcon()" size="lg" />
     </a>
-    <a class="link command-secondary" :title="$t('command.back')" @click="$router.go(-1)">
+    <a
+      :class="{'disabled': isEntryPoint()}"
+      class="link command-secondary"
+      :title="$t('command.back')"
+      @click="isEntryPoint() || $router.back()"
+    >
       <fa-icon icon="arrow-left" size="lg" />
     </a>
     <router-link :class="{'disabled': isRoot()}" :title="$t('command.parent')" :to="parent()">
@@ -47,6 +52,10 @@ export default class LdCommand extends Vue {
 
   isRoot(): boolean {
     return this.currentItemPath.length <= 1 && !this.$uiStore.searchMode;
+  }
+
+  isEntryPoint(): boolean {
+    return history.state.ldgallery === "ENTRYPOINT"; // Set by MainLayout.vue
   }
 
   parent(): RawLocation {
