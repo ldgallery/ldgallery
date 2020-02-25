@@ -33,6 +33,10 @@ Available options are:
   Must be distinct from the source directory.
   Defaults to ./out.
 
+-x, \--output-index _FILE_
+: Generated gallery index output path.
+  Defaults to $output-dir/index.json.
+
 -g, \--gallery-config _FILE_
 : Gallery configuration file.
   Defaults to $input-dir/gallery.yaml.
@@ -45,6 +49,7 @@ Available options are:
 
 -w, \--with-viewer
 : Include the static web viewer in the output.
+  The compiled gallery itself is then placed in $output-dir/gallery.
 
 -h, \--help
 : Display help message.

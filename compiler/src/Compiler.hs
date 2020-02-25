@@ -51,8 +51,8 @@ import Processors
 defaultGalleryConf :: String
 defaultGalleryConf = "gallery.yaml"
 
-indexFile :: String
-indexFile = "index.json"
+defaultIndexFile :: String
+defaultIndexFile = "index.json"
 
 itemsDir :: String
 itemsDir = "items"
@@ -103,8 +103,8 @@ galleryDirFilter config excludedCanonicalDirs =
     isExcludedDir File{} = False
 
 
-compileGallery :: FilePath -> FilePath -> FilePath -> [FilePath] -> Bool -> Bool -> IO ()
-compileGallery configPath inputDirPath outputDirPath excludedDirs rebuildAll cleanOutput =
+compileGallery :: FilePath -> FilePath -> FilePath -> FilePath -> [FilePath] -> Bool -> Bool -> IO ()
+compileGallery configPath inputDirPath outputDirPath outputIndexPath excludedDirs rebuildAll cleanOutput =
   do
     config <- readConfig $ inputGalleryConf configPath
 
@@ -121,12 +121,16 @@ compileGallery configPath inputDirPath outputDirPath excludedDirs rebuildAll cle
     resources <- galleryBuilder inputTree
 
     when cleanOutput $ galleryCleanupResourceDir resources outputDirPath
-    writeJSON (outputDirPath </> indexFile) $ GalleryIndex (viewerConfig config) resources
+    writeJSON (outputGalleryIndex outputIndexPath) $ GalleryIndex (viewerConfig config) resources
 
   where
     inputGalleryConf :: FilePath -> FilePath
     inputGalleryConf "" = inputDirPath </> defaultGalleryConf
     inputGalleryConf file = file
+
+    outputGalleryIndex :: FilePath -> FilePath
+    outputGalleryIndex "" = outputDirPath </> defaultIndexFile
+    outputGalleryIndex file = file
 
     itemProcessor config cache =
       itemFileProcessor

@@ -39,6 +39,7 @@ data ViewerConfig = ViewerConfig
 data Options = Options
   { inputDir :: FilePath
   , outputDir :: FilePath
+  , outputIndex :: FilePath
   , galleryConfig :: FilePath
   , rebuilAll :: Bool
   , cleanOutput :: Bool
@@ -59,6 +60,12 @@ options = Options
       &= name "output-dir"
       &= explicit
       &= help "Generated gallery output path (default=./out)"
+  , outputIndex = ""
+      &= typFile
+      &= name "x"
+      &= name "output-index"
+      &= explicit
+      &= help "Generated gallery index output path (default=$output-dir/index.json)"
   , galleryConfig = ""
       &= typFile
       &= name "g"
@@ -110,6 +117,7 @@ main =
             (galleryConfig opts)
             (inputDir opts)
             (galleryOutputDir opts)
+            (outputIndex opts)
             [outputDir opts]
             (rebuilAll opts)
             (cleanOutput opts)
