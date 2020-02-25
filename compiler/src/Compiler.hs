@@ -22,6 +22,7 @@ module Compiler
   ) where
 
 
+import GHC.Generics (Generic)
 import Control.Monad (liftM2, when)
 import Data.List (any)
 import System.FilePath ((</>))
@@ -33,7 +34,7 @@ import qualified Data.Aeson as JSON
 
 import Config
 import Input (readInputTree)
-import Resource (buildGalleryTree, galleryCleanupResourceDir)
+import Resource (GalleryItem, buildGalleryTree, galleryCleanupResourceDir)
 import Files
   ( FileName
   , FSNode(..)
@@ -53,14 +54,17 @@ defaultGalleryConf = "gallery.yaml"
 indexFile :: String
 indexFile = "index.json"
 
-viewerConfFile :: String
-viewerConfFile = "viewer.json"
-
 itemsDir :: String
 itemsDir = "items"
 
 thumbnailsDir :: String
 thumbnailsDir = "thumbnails"
+
+
+data GalleryIndex = GalleryIndex
+  { properties :: ViewerConfig
+  , tree :: GalleryItem
+  } deriving (Generic, Show, ToJSON)
 
 
 writeJSON :: ToJSON a => FileName -> a -> IO ()
@@ -117,16 +121,12 @@ compileGallery configPath inputDirPath outputDirPath excludedDirs rebuildAll cle
     resources <- galleryBuilder inputTree
 
     when cleanOutput $ galleryCleanupResourceDir resources outputDirPath
-    writeJSON outputIndex resources
-    writeJSON outputViewerConf $ viewerConfig config
+    writeJSON (outputDirPath </> indexFile) $ GalleryIndex (viewerConfig config) resources
 
   where
     inputGalleryConf :: FilePath -> FilePath
     inputGalleryConf "" = inputDirPath </> defaultGalleryConf
     inputGalleryConf file = file
-
-    outputIndex = outputDirPath </> indexFile
-    outputViewerConf = outputDirPath </> viewerConfFile
 
     itemProcessor config cache =
       itemFileProcessor

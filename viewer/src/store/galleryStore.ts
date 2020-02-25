@@ -77,6 +77,7 @@ export default class GalleryStore extends VuexModule {
         const root = this.config?.galleryRoot ?? '';
         return fetch(`${process.env.VUE_APP_DATA_URL}${root}index.json`, { cache: "no-cache" })
             .then(response => response.json())
+            .then(index => index.tree)
             .then(this.setGalleryItemsRoot)
             .then(this.indexTags);
     }
