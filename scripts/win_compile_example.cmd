@@ -6,5 +6,5 @@ echo.
 cd ..\compiler\
 
 @echo on
-stack exec ldgallery-compiler-exe -- %rebuild% --clean-output -i=../example/src/ -o=../example/out/
+stack exec ldgallery -- %rebuild% --clean-output -i=../example/src/ -o=../example/out/
 @pause
