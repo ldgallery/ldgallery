@@ -19,6 +19,7 @@
 
 <template>
   <div :class="{'fullscreen': $uiStore.fullscreen, 'fullwidth': $uiStore.fullWidth}">
+    <ld-title :current-item-path="$galleryStore.currentItemPath" />
     <panel-top v-if="!isLoading" class="layout layout-top" />
     <panel-left v-if="!isLoading" class="layout layout-left" />
     <router-view v-if="!isLoading" ref="content" class="layout layout-content scrollbar" />
