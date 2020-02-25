@@ -115,6 +115,9 @@ tags
 
 The gallery settings reside in a file named "gallery.yaml" located at the root of the gallery's source directory.
 
+galleryTitle
+: Title of the gallery.  Defaults to "ldgallery".
+
 includedDirectories[]
 : Glob patterns of directory names to include in the gallery.  Defaults to ["*"] (matches all directory names).
 

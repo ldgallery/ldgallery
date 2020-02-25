@@ -23,7 +23,7 @@ declare namespace Gallery {
     }
 
     interface GalleryProperties {
-        // empty for now
+        galleryTitle: string
     }
     interface Index {
         properties: GalleryProperties,
