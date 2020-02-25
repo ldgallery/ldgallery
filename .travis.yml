@@ -18,8 +18,7 @@ jobs:
         - staging
       overwrite: true
       skip_cleanup: true
-      file:
-      - viewer.tar.gz
+      file: ldgallery-linux-amd64.tar.gz
 
     cache:
       directories:
@@ -42,12 +41,13 @@ jobs:
     - cd ..
 
     script:
+    - mkdir dist
     - cd viewer
     - npm run lint
-    - npm run build
+    - npm run build -- --dest ../dist/viewer
     - cd ..
-    - tar -czvf viewer.tar.gz viewer/dist
-    - cp -r viewer/dist compiler/data/viewer
     - cd compiler
     - stack build --no-terminal
+    - stack install --local-bin-path ../dist/
     - cd ..
+    - tar -cvzf ldgallery-linux-amd64.tar.gz dist
