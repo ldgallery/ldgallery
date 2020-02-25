@@ -2,30 +2,52 @@ language: generic
 
 jobs:
   include:
-  - name: viewer
-    language: node_js
-    node_js: 12
+  - name: release-linux
+    language: generic
+
+    deploy:
+      provider: releases
+      edge: true
+      api_key:
+        secure: zRJV96jl3zchT88YAtT6irCXgm96qVcIokVmCHrzcAXsRHgTHQURKcdpPzFdZQnNkxwfS1akA3fW5icr+U6WZIxIe56sHYEaBg7VXR1RiGW/qNOAhSvbJGva75iUllTiELa2FL2gEb8bNhVOy3+bQr5Z7RMeHFiC4FFmbMvaQhd5ss3yR5+bqKufEuJPDpFap93XHUoczXH+lXp1v90Cia1gskHsSl+YgfGWQAc89yOxETwFOSqr3CScZGV6oJpGM2rsflN5arFS/8JqDwuemttfrt74wDdKR4Mk94tcqXqMrledUsXR1NEjWAEWW6QMj05ztZ76TkT2hKpG+WVmUTaJjNKS+RJnf4WKzv1vo2EHZuAuPvwR21NGVYTxvV4o3Zvs4YODGXiUxQgeF5LFA3jbZw9ODyloStUV7zIPqzL7qJEIehnMtkjo2JPav5ORz6B7GwVrDC4LJHn95on3/3Voo3mPeyepoz1gFoh3iovTKAc+IXQXGOhT7cATP9DAWLO/Epct7hWPCEflm+oSS4rNiVbMW/61O3yIpxgkJ/oTsixLk6LOhWNdr2hfP95nAtD+It7LSsJABmWJ0FVO9RtQC7fLmEPaoGdZIdeRk/0yig9vA78Y+q46B6LBalmZO+0V60rdLdrnggJsyt3DZKM/4Z+QUwe494NodE7hU9U=
+      draft: true
+      on:
+        repo: pacien/ldgallery
+        branch:
+        - master
+        - staging
+      overwrite: true
+      skip_cleanup: true
+      file:
+      - viewer.tar.gz
+
     cache:
       directories:
       - viewer/node_modules
+      - "$HOME/.stack"
+
+    before_install:
+    - nvm install 12
+    - mkdir -p ~/.local/bin
+    - export PATH=$HOME/.local/bin:$PATH
+    - travis_retry curl -L https://get.haskellstack.org/stable/linux-x86_64.tar.gz
+      | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+
     install:
     - cd viewer
     - npm install
-    script:
-    - npm run lint
-    - npm run build
-
-  - name: compiler
-    language: haskell
-    cache:
-      directories:
-      - $HOME/.stack
-    before_install:
-    - mkdir -p ~/.local/bin
-    - export PATH=$HOME/.local/bin:$PATH
-    - travis_retry curl -L https://get.haskellstack.org/stable/linux-x86_64.tar.gz | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
-    install:
+    - cd ..
     - cd compiler
     - stack setup --no-terminal
+    - cd ..
+
     script:
+    - cd viewer
+    - npm run lint
+    - npm run build
+    - cd ..
+    - tar -czvf viewer.tar.gz viewer/dist
+    - cp -r viewer/dist compiler/data/viewer
+    - cd compiler
     - stack build --no-terminal
+    - cd ..
