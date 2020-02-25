@@ -30,6 +30,7 @@
     size="is-medium"
     class="paneltag-input"
     @typing="searchTags"
+    @click.capture.native="onClick"
   >
     <template slot-scope="props">{{displayOption(props.option)}}</template>
     <template slot="empty">{{$t('tagInput.nomatch')}}</template>
@@ -57,6 +58,13 @@ export default class LdTagInput extends Vue {
     this.filteredTags = IndexFactory.searchTags(this.tagsIndex, filter)
       .filter(newSearch => !this.model.find(currentSearch => currentSearch.tag === newSearch.tag))
       .sort((a, b) => b.items.length - a.items.length);
+  }
+
+  // Prevents the keyboard from opening on mobile when removing a tag
+  onClick(e: MouseEvent) {
+    const target = e.target;
+    if (target instanceof HTMLAnchorElement)
+      target.addEventListener("click", e => e.stopPropagation());
   }
 }
 </script>
