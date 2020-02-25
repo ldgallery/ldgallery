@@ -50,7 +50,8 @@ instance FromJSON TagsFromDirectoriesConfig where
 
 
 data GalleryConfig = GalleryConfig
-  { includedDirectories :: [String]
+  { galleryTitle :: String
+  , includedDirectories :: [String]
   , excludedDirectories :: [String]
   , includedFiles :: [String]
   , excludedFiles :: [String]
@@ -61,7 +62,8 @@ data GalleryConfig = GalleryConfig
 
 instance FromJSON GalleryConfig where
   parseJSON = withObject "GalleryConfig" $ \v -> GalleryConfig
-    <$> v .:? "includedDirectories" .!= ["*"]
+    <$> v .:? "galleryTitle" .!= "ldgallery"
+    <*> v .:? "includedDirectories" .!= ["*"]
     <*> v .:? "excludedDirectories" .!= []
     <*> v .:? "includedFiles" .!= ["*"]
     <*> v .:? "excludedFiles" .!= []
@@ -75,7 +77,8 @@ readConfig = decodeYamlFile
 
 data ViewerConfig = ViewerConfig
   { -- TODO: add viewer config keys (tag groups...)
+    galleryTitle :: String
   } deriving (Generic, ToJSON, Show)
 
 viewerConfig :: GalleryConfig -> ViewerConfig
-viewerConfig _ = ViewerConfig -- TODO
+viewerConfig GalleryConfig{galleryTitle} = ViewerConfig galleryTitle

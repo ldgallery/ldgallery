@@ -1,5 +1,7 @@
 # ldgallery example gallery configuration file
 
+#galleryTitle: "ldgallery"
+
 #includedDirectories: ["*"]
 #excludedDirectories: []
 
