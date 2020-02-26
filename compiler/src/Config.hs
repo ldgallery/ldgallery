@@ -55,6 +55,8 @@ data GalleryConfig = GalleryConfig
   , excludedDirectories :: [String]
   , includedFiles :: [String]
   , excludedFiles :: [String]
+  , includedTags :: [String]
+  , excludedTags :: [String]
   , tagsFromDirectories :: TagsFromDirectoriesConfig
   , thumbnailMaxResolution :: Resolution
   , pictureMaxResolution :: Maybe Resolution
@@ -67,6 +69,8 @@ instance FromJSON GalleryConfig where
     <*> v .:? "excludedDirectories" .!= []
     <*> v .:? "includedFiles" .!= ["*"]
     <*> v .:? "excludedFiles" .!= []
+    <*> v .:? "includedTags" .!= ["*"]
+    <*> v .:? "excludedTags" .!= []
     <*> v .:? "tagsFromDirectories" .!= (TagsFromDirectoriesConfig 0 "")
     <*> v .:? "thumbnailMaxResolution" .!= (Resolution 400 300)
     <*> v .:? "pictureMaxResolution"

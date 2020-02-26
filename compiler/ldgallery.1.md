@@ -130,10 +130,19 @@ includedFiles[]
 excludedFiles[]
 : Glob patterns of file names to exclude from the gallery.  Defaults to [] (none).
 
+includedTags[]
+: Glob patterns of tags to include in the gallery.
+  Items with no tags can be matched with the empty pattern.
+  Defaults to ["*"] (matches all tags, includes untagged items).
+
+excludedTags[]
+: Glob patterns of tags to exclude from the gallery.
+  Defaults to [] (none).
+
 tagsFromDirectories.fromParents
 : Automatically generate tags from the name of parent directories,
   looking up in the hierarchy as far as indicated by this parameter.
-  Defaults to 0 (do not generate tags from parent directories).
+  Defaults to 0 (does not generate tags from parent directories).
 
 tagsFromDirectories.prefix
 : Prefix to use for tags automatically generated from the parent directories' names.
