@@ -25,6 +25,7 @@ module Compiler
 import GHC.Generics (Generic)
 import Control.Monad (liftM2, when)
 import Data.List (any)
+import Data.Maybe (fromMaybe)
 import System.FilePath ((</>))
 import qualified System.FilePath.Glob as Glob
 import System.Directory (canonicalizePath)
@@ -33,7 +34,7 @@ import Data.Aeson (ToJSON)
 import qualified Data.Aeson as JSON
 
 import Config
-import Input (readInputTree)
+import Input (InputTree, readInputTree, filterInputTree, sidecar, tags)
 import Resource (GalleryItem, buildGalleryTree, galleryCleanupResourceDir)
 import Files
   ( FileName
@@ -74,6 +75,15 @@ writeJSON outputPath object =
     ensureParentDir JSON.encodeFile outputPath object
 
 
+(&&&) :: (a -> Bool) -> (a -> Bool) -> a -> Bool
+(&&&) = liftM2 (&&)
+
+(|||) :: (a -> Bool) -> (a -> Bool) -> a -> Bool
+(|||) = liftM2 (||)
+
+anyPattern :: [String] -> String -> Bool
+anyPattern patterns string = any (flip Glob.match string) (map Glob.compile patterns)
+
 galleryDirFilter :: GalleryConfig -> [FilePath] -> FSNode -> Bool
 galleryDirFilter config excludedCanonicalDirs =
       (not . isHidden)
@@ -84,9 +94,6 @@ galleryDirFilter config excludedCanonicalDirs =
               (matchesFile $ anyPattern $ excludedFiles config)))
 
   where
-    (&&&) = liftM2 (&&)
-    (|||) = liftM2 (||)
-
     matchesDir :: (FileName -> Bool) -> FSNode -> Bool
     matchesDir cond dir@Dir{} = maybe False cond $ nodeName dir
     matchesDir _ File{} = False
@@ -95,12 +102,18 @@ galleryDirFilter config excludedCanonicalDirs =
     matchesFile cond file@File{} = maybe False cond $ nodeName file
     matchesFile _ Dir{} = False
 
-    anyPattern :: [String] -> FileName -> Bool
-    anyPattern patterns filename = any (flip Glob.match filename) (map Glob.compile patterns)
-
     isExcludedDir :: FSNode -> Bool
     isExcludedDir Dir{canonicalPath} = any (canonicalPath ==) excludedCanonicalDirs
     isExcludedDir File{} = False
+
+inputTreeFilter :: GalleryConfig -> InputTree -> Bool
+inputTreeFilter GalleryConfig{includedTags, excludedTags} =
+      (hasTagMatching $ anyPattern includedTags)
+  &&& (not . (hasTagMatching $ anyPattern excludedTags))
+
+  where
+    hasTagMatching :: (String -> Bool) -> InputTree -> Bool
+    hasTagMatching cond = (any cond) . (fromMaybe [""] . tags) . sidecar
 
 
 compileGallery :: FilePath -> FilePath -> FilePath -> FilePath -> [FilePath] -> Bool -> Bool -> IO ()
@@ -113,12 +126,13 @@ compileGallery configPath inputDirPath outputDirPath outputIndexPath excludedDir
     let sourceFilter = galleryDirFilter config excludedCanonicalDirs
     let sourceTree = filterDir sourceFilter inputDir
     inputTree <- readInputTree sourceTree
+    let curatedInputTree = filterInputTree (inputTreeFilter config) inputTree
 
     let cache = if rebuildAll then skipCached else withCached
     let itemProc = itemProcessor config cache
     let thumbnailProc = thumbnailProcessor config cache
     let galleryBuilder = buildGalleryTree itemProc thumbnailProc (tagsFromDirectories config)
-    resources <- galleryBuilder inputTree
+    resources <- galleryBuilder curatedInputTree
 
     when cleanOutput $ galleryCleanupResourceDir resources outputDirPath
     writeJSON (outputGalleryIndex outputIndexPath) $ GalleryIndex (viewerConfig config) resources

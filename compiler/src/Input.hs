@@ -19,7 +19,7 @@
 module Input
   ( decodeYamlFile
   , Sidecar(..)
-  , InputTree(..), readInputTree
+  , InputTree(..), readInputTree, filterInputTree
   ) where
 
 
@@ -132,3 +132,14 @@ readInputTree (AnchoredFSNode anchor root@Dir{}) = mkDirNode root
 
     findThumbnail :: [FSNode] -> Maybe Path
     findThumbnail = (fmap Files.path) . (find isThumbnail)
+
+-- | Filters an InputTree. The root is always returned.
+filterInputTree :: (InputTree -> Bool) -> InputTree -> InputTree
+filterInputTree cond = filterNode
+  where
+    filterNode :: InputTree -> InputTree
+    filterNode inputFile@InputFile{} = inputFile
+    filterNode inputDir@InputDir{items} =
+        filter cond items
+      & map filterNode
+      & \curatedItems -> inputDir { items = curatedItems } :: InputTree

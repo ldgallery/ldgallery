@@ -11,13 +11,16 @@ includedFiles:
 #excludedFiles:
 #  - "*.md"
 
-tagsFromDirectories:
-  fromParents: 0 # default
-  prefix: ''     # default
+#includedTags: ["*"]
+#excludedTags: []
 
-thumbnailMaxResolution:
-  width: 400  # default
-  height: 300 # default
+#tagsFromDirectories:
+#  fromParents: 0
+#  prefix: ''
+
+#thumbnailMaxResolution:
+#  width: 400
+#  height: 300
 
 pictureMaxResolution:
   width: 1024
