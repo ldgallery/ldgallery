@@ -107,7 +107,7 @@ description
 
 tags
 : List of tags for the item.
-  Tag groups can be defined using prefixes separated by "." (dot).
+  Tag groups can be defined using prefixes separated by ":" (colon).
   Tags specified in a directory metadata sidecar are applied to all items within that directory.
 
 
