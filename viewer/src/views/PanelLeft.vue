@@ -72,7 +72,7 @@ export default class PanelLeft extends Vue {
     const query = Object.keys(route.query);
     if (query.length > 0) {
       const tagsIndex = this.$galleryStore.tagsIndex;
-      this.searchFilters = Object.keys(route.query).flatMap(filter => IndexFactory.searchTags(tagsIndex, filter));
+      this.searchFilters = Object.keys(route.query).flatMap(filter => IndexFactory.searchTags(tagsIndex, filter, true));
       this.$galleryStore.setCurrentSearch([...this.searchFilters]);
     }
   }
