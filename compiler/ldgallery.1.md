@@ -47,9 +47,9 @@ Available options are:
 -c, \--clean-output
 : Remove unnecessary files from the output directory.
 
--w, \--with-viewer
-: Include the static web viewer in the output.
-  The compiled gallery itself is then placed in <\output-dir\>/gallery.
+-w, \--with-viewer[=_DIR_]
+: Deploy either the bundled or the given static web viewer to the output directory.
+  The compiled gallery itself is then placed in \<output-dir\>/gallery.
 
 -h, \--help
 : Display help message.

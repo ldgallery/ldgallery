@@ -21,6 +21,7 @@ module Main where
 import GHC.Generics (Generic)
 import Paths_ldgallery_compiler (version, getDataFileName)
 import Control.Monad (when)
+import Data.Maybe (isJust)
 import Data.Version (showVersion)
 import Data.Aeson (ToJSON)
 import System.FilePath ((</>))
@@ -43,7 +44,7 @@ data Options = Options
   , galleryConfig :: FilePath
   , rebuilAll :: Bool
   , cleanOutput :: Bool
-  , withViewer :: Bool
+  , withViewer :: Maybe FilePath
   } deriving (Show, Data, Typeable)
 
 options :: Options
@@ -82,11 +83,13 @@ options = Options
       &= name "clean-output"
       &= explicit
       &= help "Remove unnecessary files from the output directory"
-  , withViewer = False
+  , withViewer = Nothing
+      &= typDir
+      &= opt ("" :: FilePath)
       &= name "w"
       &= name "with-viewer"
       &= explicit
-      &= help "Include the static web viewer in the output"
+      &= help "Deploy either the bundled or the given static web viewer to the output directory"
   }
 
   &= summary ("ldgallery v" ++ (showVersion version) ++ " - a static web gallery generator with tags")
@@ -101,14 +104,22 @@ main =
   do
     opts <- cmdArgs options
     buildGallery opts
-    when (withViewer opts) $ do
-      when (cleanOutput opts) $ cleanViewerDir (outputDir opts)
-      copyViewer (outputDir opts)
-      writeViewerConfig (outputDir opts </> "config.json")
+
+    when (isJust $ withViewer opts) $ do
+      viewerDist <- viewerDistPath $ withViewer opts
+      deployViewer viewerDist opts
 
   where
     gallerySubdir :: String
     gallerySubdir = "gallery"
+
+    viewerConfig :: ViewerConfig
+    viewerConfig = ViewerConfig (gallerySubdir ++ "/")
+
+    viewerDistPath :: Maybe FilePath -> IO FilePath
+    viewerDistPath (Just "") = getDataFileName "viewer"
+    viewerDistPath (Just dist) = return dist
+    viewerDistPath Nothing = fail "No viewer distribution"
 
     buildGallery :: Options -> IO ()
     buildGallery opts =
@@ -122,28 +133,32 @@ main =
             (rebuilAll opts)
             (cleanOutput opts)
       where
+        checkDistinctPaths :: FilePath -> FilePath -> IO ()
         checkDistinctPaths a b = do
           canonicalA <- canonicalizePath a
           canonicalB <- canonicalizePath b
           when (canonicalA == canonicalB) $ error "Input and output paths refer to the same location."
 
-    galleryOutputDir :: Options -> FilePath
-    galleryOutputDir opts =
-      if withViewer opts then outputBase </> gallerySubdir else outputBase
-      where outputBase = outputDir opts
+        galleryOutputDir :: Options -> FilePath
+        galleryOutputDir Options{withViewer, outputDir}
+          | isJust withViewer = outputDir </> gallerySubdir
+          | otherwise = outputDir
 
-    cleanViewerDir :: FilePath -> IO ()
-    cleanViewerDir target =
-      listDirectory target
-      >>= return . filter (/= gallerySubdir)
-      >>= mapM_ remove . map (target </>)
+    deployViewer :: FilePath -> Options -> IO ()
+    deployViewer distPath Options{outputDir, cleanOutput} =
+      (when cleanOutput $ cleanViewerDir outputDir)
+      >> copyViewer distPath outputDir
+      >> writeJSON (outputDir </> "config.json") viewerConfig
 
-    copyViewer :: FilePath -> IO ()
-    copyViewer target =
-      putStrLn "Copying viewer webapp"
-      >>  getDataFileName "viewer"
-      >>= readDirectory
-      >>= copyTo target
+      where
+        cleanViewerDir :: FilePath -> IO ()
+        cleanViewerDir target =
+          listDirectory target
+          >>= return . filter (/= gallerySubdir)
+          >>= mapM_ remove . map (target </>)
 
-    writeViewerConfig :: FilePath -> IO ()
-    writeViewerConfig fileName = writeJSON fileName $ ViewerConfig (gallerySubdir ++ "/")
+        copyViewer :: FilePath -> FilePath -> IO ()
+        copyViewer dist target =
+          putStrLn "Copying viewer webapp"
+          >>  readDirectory dist
+          >>= copyTo target
