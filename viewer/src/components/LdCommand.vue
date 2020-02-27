@@ -55,7 +55,7 @@ export default class LdCommand extends Vue {
   }
 
   isEntryPoint(): boolean {
-    return history.state.ldgallery === "ENTRYPOINT"; // Set by MainLayout.vue
+    return history.state?.ldgallery === "ENTRYPOINT"; // Set by MainLayout.vue
   }
 
   parent(): RawLocation {

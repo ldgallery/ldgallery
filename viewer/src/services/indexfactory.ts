@@ -30,7 +30,6 @@ export default class IndexFactory {
 
   // Pushes all tags for a root item (and its children) to the index
   private static pushTagsForItem(tagsIndex: Tag.Index, item: Gallery.Item): void {
-    console.log("IndexingTagsFor: ", item.path);
     if (item.properties.type === "directory") {
       item.properties.items.forEach(item => this.pushTagsForItem(tagsIndex, item));
       return; // Directories are not indexed
@@ -39,27 +38,35 @@ export default class IndexFactory {
       const parts = tag.split(':');
       let lastPart: string | null = null;
       for (const part of parts) {
-        if (!tagsIndex[part]) tagsIndex[part] = { tag: part, tagfiltered: Navigation.normalize(part), items: [], children: {} };
-        if (!tagsIndex[part].items.includes(item)) tagsIndex[part].items.push(item);
-        if (lastPart) tagsIndex[lastPart].children[part] = tagsIndex[part];
+        tagsIndex[part] = IndexFactory.pushPartToIndex(tagsIndex[part], part, item);
+        if (lastPart) {
+          const children = tagsIndex[lastPart].children;
+          children[part] = IndexFactory.pushPartToIndex(children[part], part, item);
+        }
         lastPart = part;
       }
     }
   }
 
+  private static pushPartToIndex(index: Tag.Node, part: string, item: Gallery.Item): Tag.Node {
+    if (!index) index = { tag: part, tagfiltered: Navigation.normalize(part), items: [], children: {} };
+    if (!index.items.includes(item)) index.items.push(item);
+    return index;
+  }
+
   // ---
 
 
-  public static searchTags(tagsIndex: Tag.Index, filter: string): Tag.Search[] {
+  public static searchTags(tagsIndex: Tag.Index, filter: string, strict: boolean): Tag.Search[] {
     let search: Tag.Search[] = [];
     if (tagsIndex && filter) {
       const operation = IndexFactory.extractOperation(filter);
       if (operation !== Operation.INTERSECTION) filter = filter.slice(1);
       if (filter.includes(":")) {
         const filterParts = filter.split(":");
-        search = this.searchTagsFromFilterWithCategory(tagsIndex, operation, filterParts[0], filterParts[1]);
+        search = this.searchTagsFromFilterWithCategory(tagsIndex, operation, filterParts[0], filterParts[1], strict);
       } else {
-        search = this.searchTagsFromFilter(tagsIndex, operation, filter);
+        search = this.searchTagsFromFilter(tagsIndex, operation, filter, strict);
       }
     }
     return search;
@@ -80,22 +87,27 @@ export default class IndexFactory {
     tagsIndex: Tag.Index,
     operation: Operation,
     category: string,
-    disambiguation: string
+    disambiguation: string,
+    strict: boolean
   ): Tag.Search[] {
+    category = Navigation.normalize(category);
     disambiguation = Navigation.normalize(disambiguation);
     return Object.values(tagsIndex)
-      .filter(node => node.tag.includes(category))
+      .filter(node => strict || node.tagfiltered.includes(category))
+      .filter(node => !strict || node.tagfiltered === category)
       .flatMap(node =>
         Object.values(node.children)
-          .filter(child => child.tagfiltered.includes(disambiguation))
+          .filter(child => strict || child.tagfiltered.includes(disambiguation))
+          .filter(child => !strict || child.tagfiltered === disambiguation)
           .map(child => ({ ...child, parent: node, operation, display: `${operation}${node.tag}:${child.tag}` }))
       );
   }
 
-  private static searchTagsFromFilter(tagsIndex: Tag.Index, operation: Operation, filter: string): Tag.Search[] {
+  private static searchTagsFromFilter(tagsIndex: Tag.Index, operation: Operation, filter: string, strict: boolean): Tag.Search[] {
     filter = Navigation.normalize(filter);
     return Object.values(tagsIndex)
-      .filter(node => node.tagfiltered.includes(filter))
+      .filter(node => strict || node.tagfiltered.includes(filter))
+      .filter(node => !strict || node.tagfiltered === filter)
       .map(node => ({ ...node, operation, display: `${operation}${node.tag}` }));
   }
 }

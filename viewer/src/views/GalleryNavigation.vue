@@ -49,7 +49,6 @@ export default class GalleryNavigation extends Vue {
 
   @Watch("path")
   pathChanged() {
-    console.log("Path: ", this.path);
     this.$galleryStore.setCurrentPath(this.path);
   }
 
