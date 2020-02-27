@@ -22,22 +22,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from "vue-property-decorator";
+import { Component, Vue, Prop } from "vue-property-decorator";
 import { Operation } from "@/@types/Operation";
 import IndexSearch from "@/services/indexsearch";
-import IndexFactory from "@/services/indexfactory";
 
 @Component
 export default class GalleryPicture extends Vue {
   @Prop(String) readonly path!: string;
-  @Prop(Array) readonly query!: string[];
-
-  currentSearch: Tag.Search[] = [];
 
   mounted() {
     this.$uiStore.fullscreen = false;
     this.$uiStore.searchMode = true;
-    this.restoreSearchFilters();
   }
 
   destroyed() {
@@ -45,14 +40,7 @@ export default class GalleryPicture extends Vue {
   }
 
   items() {
-    return IndexSearch.search(this.currentSearch, this.path);
-  }
-
-  @Watch("query")
-  restoreSearchFilters() {
-    const tagsIndex = this.$galleryStore.tagsIndex;
-    this.currentSearch = this.query.flatMap(filter => IndexFactory.searchTags(tagsIndex, filter));
-    this.$uiStore.searchFilters = [...this.currentSearch];
+    return IndexSearch.search(this.$galleryStore.currentSearch, this.path);
   }
 }
 </script>

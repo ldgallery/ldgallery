@@ -29,7 +29,6 @@ export default class UIStore extends VuexModule {
     fullscreen: boolean = false;
     fullWidth: boolean = true;
     searchMode: boolean = false;
-    searchFilters: Tag.Search[] = [];
 
     // ---
 

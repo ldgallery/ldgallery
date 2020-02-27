@@ -29,9 +29,10 @@ const VuexModule = createModule({
 export default class GalleryStore extends VuexModule {
 
     config: Gallery.Config | null = null;
-    galleryItemsRoot: Gallery.Item | null = null;
+    galleryIndex: Gallery.Index | null = null;
     tagsIndex: Tag.Index = {};
     currentPath: string = "/";
+    currentSearch: Tag.Search[] = [];
 
     // ---
 
@@ -39,20 +40,26 @@ export default class GalleryStore extends VuexModule {
         this.config = config;
     }
 
-    @mutation setGalleryItemsRoot(galleryItemsRoot: Gallery.Item) {
-        this.galleryItemsRoot = galleryItemsRoot;
+    @mutation setGalleryIndex(galleryIndex: Gallery.Index) {
+        this.galleryIndex = Object.freeze(galleryIndex);
     }
 
     @mutation private setTagsIndex(tagsIndex: Tag.Index) {
-        this.tagsIndex = tagsIndex;
+        this.tagsIndex = Object.freeze(tagsIndex);
     }
 
     @mutation setCurrentPath(currentPath: string) {
         this.currentPath = currentPath;
     }
 
+    @mutation setCurrentSearch(currentSearch: Tag.Search[]) {
+        this.currentSearch = currentSearch;
+    }
+
+    // ---
+
     get currentItemPath(): Gallery.Item[] {
-        const root = this.galleryItemsRoot;
+        const root = this.galleryIndex?.tree;
         if (root)
             return Navigation.searchCurrentItemPath(root, this.currentPath);
         return [];
@@ -77,14 +84,14 @@ export default class GalleryStore extends VuexModule {
         const root = this.config?.galleryRoot ?? '';
         return fetch(`${process.env.VUE_APP_DATA_URL}${root}index.json`, { cache: "no-cache" })
             .then(response => response.json())
-            .then(index => index.tree)
-            .then(this.setGalleryItemsRoot)
+            .then(this.setGalleryIndex)
             .then(this.indexTags);
     }
 
     // Indexes the gallery
     @action async indexTags() {
-        this.setTagsIndex(IndexFactory.generateTags(this.galleryItemsRoot));
+        const root = this.galleryIndex?.tree ?? null;
+        this.setTagsIndex(IndexFactory.generateTags(root));
     }
 
 }

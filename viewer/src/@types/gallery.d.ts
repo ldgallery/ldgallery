@@ -27,8 +27,9 @@ declare namespace Gallery {
     }
     interface Index {
         properties: GalleryProperties,
-        tree: Item
+        tree: Directory
     }
+
     interface Other extends Item {
         properties: OtherProperties,
     }

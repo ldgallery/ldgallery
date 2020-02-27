@@ -53,7 +53,7 @@ import Navigation from "@/services/navigation";
 
 @Component
 export default class LdBreadcrumb extends Vue {
-  @Prop({ required: true }) readonly currentItemPath!: Gallery.Item[];
+  @Prop({ type: Array, required: true }) readonly currentItemPath!: Gallery.Item[];
   @Prop(Boolean) readonly searchMode!: boolean;
   @Ref() readonly breadcrumb!: HTMLUListElement;
 

@@ -19,7 +19,7 @@
 
 <template>
   <div>
-    <gallery-search v-if="query.length" :path="path" :query="query" />
+    <gallery-search v-if="query.length" :path="path" />
     <gallery-directory v-else-if="checkType('directory')" :directory="$galleryStore.currentItem" />
     <ld-picture v-else-if="checkType('picture')" :picture="$galleryStore.currentItem" />
     <div v-else>{{$t("gallery.unknowntype")}}</div>
