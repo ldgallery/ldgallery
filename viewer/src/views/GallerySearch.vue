@@ -49,7 +49,8 @@ export default class GalleryPicture extends Vue {
   }
 
   noResult() {
-    return `${this.$t("search.no-results")} • ${this.otherCount} ${this.$t("search.no-results.otherfolders")}`;
+    const params = [this.otherCount, this.otherCount > 1 ? "s" : ""];
+    return this.$t("search.no-results.otherfolders", params);
   }
 }
 </script>

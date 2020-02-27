@@ -2,6 +2,7 @@
   "tagInput.placeholder": "Filters",
   "tagInput.nomatch": "No match",
   "search.no-results": "No results",
+  "search.no-results.otherfolders": "No results • {0} result{1} in other folders",
   "panelLeft.propositions": "Related filters",
   "tag-propositions.substraction": "Exclude items with this tag",
   "tag-propositions.addition": "Include all items with this tag",
@@ -13,6 +14,5 @@
   "command.search.search": "Search",
   "command.back": "Go back",
   "command.parent": "Go to parent directory",
-  "directory.no-results": "Empty directory",
-  "search.no-results.otherfolders": "result(s) in other folders"
+  "directory.no-results": "Empty directory"
 }
