@@ -35,11 +35,11 @@ Available options are:
 
 -x, \--output-index _FILE_
 : Generated gallery index output path.
-  Defaults to $output-dir/index.json.
+  Defaults to \<output-dir\>/index.json.
 
 -g, \--gallery-config _FILE_
 : Gallery configuration file.
-  Defaults to $input-dir/gallery.yaml.
+  Defaults to \<input-dir\>/gallery.yaml.
 
 -r, \--rebuild-all
 : Invalidate cache and recompile everything.
@@ -49,7 +49,7 @@ Available options are:
 
 -w, \--with-viewer
 : Include the static web viewer in the output.
-  The compiled gallery itself is then placed in $output-dir/gallery.
+  The compiled gallery itself is then placed in <\output-dir\>/gallery.
 
 -h, \--help
 : Display help message.
