@@ -65,13 +65,13 @@ options = Options
       &= name "x"
       &= name "output-index"
       &= explicit
-      &= help "Generated gallery index output path (default=$output-dir/index.json)"
+      &= help "Generated gallery index output path (default=<output-dir>/index.json)"
   , galleryConfig = ""
       &= typFile
       &= name "g"
       &= name "gallery-config"
       &= explicit
-      &= help "Gallery configuration file (default=$input-dir/gallery.yaml)"
+      &= help "Gallery configuration file (default=<input-dir>/gallery.yaml)"
   , rebuilAll = False
       &= name "r"
       &= name "rebuild-all"
