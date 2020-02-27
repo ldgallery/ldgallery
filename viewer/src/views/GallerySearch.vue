@@ -18,7 +18,7 @@
 -->
 
 <template>
-  <ld-gallery :items="items()" :noresult="$t('search.no-results')" />
+  <ld-gallery :items="items()" :noresult="noResult()" />
 </template>
 
 <script lang="ts">
@@ -30,6 +30,8 @@ import IndexSearch from "@/services/indexsearch";
 export default class GalleryPicture extends Vue {
   @Prop(String) readonly path!: string;
 
+  otherCount: Number = 0;
+
   mounted() {
     this.$uiStore.fullscreen = false;
     this.$uiStore.searchMode = true;
@@ -40,7 +42,14 @@ export default class GalleryPicture extends Vue {
   }
 
   items() {
-    return IndexSearch.search(this.$galleryStore.currentSearch, this.path);
+    const searchResult = IndexSearch.search(this.$galleryStore.currentSearch);
+    const filteredByPath = searchResult.filter(item => item.path.startsWith(this.path));
+    this.otherCount = searchResult.length - filteredByPath.length;
+    return filteredByPath;
+  }
+
+  noResult() {
+    return `${this.$t("search.no-results")} • ${this.otherCount} ${this.$t("search.no-results.otherfolders")}`;
   }
 }
 </script>

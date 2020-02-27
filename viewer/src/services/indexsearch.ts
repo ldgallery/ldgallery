@@ -22,12 +22,11 @@ import { Operation } from '@/@types/Operation';
 export default class IndexSearch {
 
   // Results of the search (by tags)
-  public static search(searchTags: Tag.Search[], rootPath: string): Gallery.Item[] {
+  public static search(searchTags: Tag.Search[]): Gallery.Item[] {
     const byOperation = this.extractTagsByOperation(searchTags);
     const intersection = this.extractIntersection(byOperation);
     const substraction = this.extractSubstraction(byOperation);
-    return this.aggregateAll(byOperation, intersection, substraction)
-      .filter(item => item.path.startsWith(rootPath));
+    return this.aggregateAll(byOperation, intersection, substraction);
   }
 
   private static extractTagsByOperation(searchTags: Tag.Search[]): Tag.SearchByOperation {
