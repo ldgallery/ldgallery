@@ -49,14 +49,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Model, Prop } from "vue-property-decorator";
+import { Component, Vue, Prop, PropSync } from "vue-property-decorator";
 import { Operation } from "@/@types/Operation";
 
 @Component
 export default class LdProposition extends Vue {
   @Prop({ type: Array, required: true }) readonly currentTags!: string[];
   @Prop({ required: true }) readonly tagsIndex!: Tag.Index;
-  @Model() model!: Tag.Search[];
+  @PropSync("searchFilters", { type: Array, required: true }) model!: Tag.Search[];
 
   get Operation() {
     return Operation;

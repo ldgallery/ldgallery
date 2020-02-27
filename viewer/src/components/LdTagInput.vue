@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Model, Prop } from "vue-property-decorator";
+import { Component, Vue, Prop, PropSync } from "vue-property-decorator";
 import { Operation } from "@/@types/Operation";
 import Navigation from "@/services/navigation";
 import IndexFactory from "@/services/indexfactory";
@@ -46,7 +46,7 @@ import IndexFactory from "@/services/indexfactory";
 @Component
 export default class LdTagInput extends Vue {
   @Prop({ required: true }) readonly tagsIndex!: Tag.Index;
-  @Model() model!: Tag.Search[];
+  @PropSync("searchFilters", { type: Array, required: true }) model!: Tag.Search[];
 
   filteredTags: Tag.Search[] = [];
 

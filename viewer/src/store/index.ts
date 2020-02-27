@@ -30,7 +30,8 @@ const store = new Vuex.Store({
   modules: {
     ...extractVuexModule(UIStore),
     ...extractVuexModule(GalleryStore)
-  }
+  },
+  strict: process.env.NODE_ENV !== "production",
 });
 
 Vue.use((vue) => vue.prototype.$uiStore = createProxy(store, UIStore));

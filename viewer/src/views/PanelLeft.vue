@@ -19,11 +19,11 @@
 
 <template>
   <div class="flex-column sidebar">
-    <ld-tag-input v-model="$uiStore.searchFilters" :tags-index="$galleryStore.tagsIndex" />
+    <ld-tag-input :search-filters.sync="searchFilters" :tags-index="$galleryStore.tagsIndex" />
     <ld-command-search @clear="clear" @search="search" />
     <h1 class="title">{{$t('panelLeft.propositions')}}</h1>
     <ld-proposition
-      v-model="$uiStore.searchFilters"
+      :search-filters.sync="searchFilters"
       :tags-index="$galleryStore.tagsIndex"
       :current-tags="currentTags()"
       class="scrollbar no-scroll-x"
@@ -32,14 +32,21 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
-import { Dictionary } from "vue-router/types/router";
+import { Component, Vue, Prop, Watch } from "vue-property-decorator";
+import { Dictionary, Route } from "vue-router/types/router";
 import Navigation from "@/services/navigation";
+import IndexFactory from "@/services/indexfactory";
 
 @Component
 export default class PanelLeft extends Vue {
+  searchFilters: Tag.Search[] = [];
+
+  mounted() {
+    this.restoreSearchFilters(this.$route);
+  }
+
   clear() {
-    this.$uiStore.searchFilters = [];
+    this.searchFilters = [];
     this.search();
   }
 
@@ -52,12 +59,22 @@ export default class PanelLeft extends Vue {
 
   serializeSearch() {
     let query: Dictionary<null> = {};
-    this.$uiStore.searchFilters.forEach(filter => (query[filter.display] = null));
+    this.searchFilters.forEach(filter => (query[filter.display] = null));
     return query;
   }
 
   currentTags() {
     return this.$galleryStore.currentItem?.tags ?? [];
+  }
+
+  @Watch("$route")
+  restoreSearchFilters(route: Route) {
+    const query = Object.keys(route.query);
+    if (query.length > 0) {
+      const tagsIndex = this.$galleryStore.tagsIndex;
+      this.searchFilters = Object.keys(route.query).flatMap(filter => IndexFactory.searchTags(tagsIndex, filter));
+      this.$galleryStore.setCurrentSearch([...this.searchFilters]);
+    }
   }
 }
 </script>

@@ -44,7 +44,7 @@ import { RawLocation } from "vue-router";
 
 @Component
 export default class LdCommand extends Vue {
-  @Prop({ required: true }) readonly currentItemPath!: Gallery.Item[];
+  @Prop({ type: Array, required: true }) readonly currentItemPath!: Gallery.Item[];
 
   commandToggleSearchPanelIcon(): string {
     return this.$uiStore.fullWidth ? "search" : "angle-double-left";
