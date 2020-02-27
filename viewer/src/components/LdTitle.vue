@@ -22,7 +22,8 @@ import { Component, Vue, Watch, Prop } from "vue-property-decorator";
 
 @Component
 export default class LdTitle extends Vue {
-  @Prop({ required: true }) readonly currentItemPath!: Gallery.Item[];
+  @Prop({ required: true }) readonly galleryTitle!: string;
+  @Prop() readonly currentItem?: Gallery.Item;
 
   render() {
     return null;
@@ -32,13 +33,14 @@ export default class LdTitle extends Vue {
     this.changedCurrentItemPath();
   }
 
-  @Watch("currentItemPath")
+  @Watch("currentItem")
   changedCurrentItemPath() {
-    document.title = this.currentItemPath.map(this.extractTitle).join(" - ");
+    document.title = this.generateTitle();
   }
 
-  extractTitle(item: Gallery.Item, idx: number): string {
-    return item.title || (idx === 0 ? "LdGallery" : "???");
+  generateTitle(): string {
+    if (this.currentItem?.title) return `${this.galleryTitle} • ${this.currentItem.title}`;
+    return this.galleryTitle;
   }
 }
 </script>
