@@ -63,8 +63,7 @@ export default class LdTagInput extends Vue {
   // Prevents the keyboard from opening on mobile when removing a tag
   onClick(e: MouseEvent) {
     const target = e.target;
-    if (target instanceof HTMLAnchorElement)
-      target.addEventListener("click", e => e.stopPropagation());
+    if (target instanceof HTMLAnchorElement) target.addEventListener("click", e => e.stopPropagation(), true);
   }
 }
 </script>
