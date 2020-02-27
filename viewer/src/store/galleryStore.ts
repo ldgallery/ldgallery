@@ -70,6 +70,10 @@ export default class GalleryStore extends VuexModule {
         return path.length > 0 ? path[path.length - 1] : null;
     }
 
+    get galleryTitle(): string {
+        return this.galleryIndex?.properties.galleryTitle ?? "ldgallery";
+    }
+
     // ---
 
     // Fetches the gallery's JSON config
