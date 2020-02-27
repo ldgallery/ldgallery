@@ -74,7 +74,7 @@ export default class LdProposition extends Vue {
     } else {
       // Tags count from the current directory
       this.currentTags
-        .flatMap(tag => tag.split("."))
+        .flatMap(tag => tag.split(":"))
         .map(tag => this.tagsIndex[tag])
         .forEach(tagindex => (propositions[tagindex.tag] = tagindex.items.length));
     }
@@ -89,7 +89,7 @@ export default class LdProposition extends Vue {
   }
 
   rightmost(tag: Gallery.RawTag): Gallery.RawTag {
-    const dot = tag.lastIndexOf(".");
+    const dot = tag.lastIndexOf(":");
     return dot <= 0 ? tag : tag.substr(dot + 1);
   }
 

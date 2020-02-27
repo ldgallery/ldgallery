@@ -6,14 +6,14 @@
 #excludedDirectories: []
 
 includedFiles:
-  - "*.jpg"
+  - '*.jpg'
 
 #excludedFiles:
 #  - "*.md"
 
 tagsFromDirectories:
   fromParents: 0 # default
-  prefix: ""     # default
+  prefix: ''     # default
 
 thumbnailMaxResolution:
   width: 400  # default

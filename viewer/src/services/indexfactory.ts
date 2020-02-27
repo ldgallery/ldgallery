@@ -36,7 +36,7 @@ export default class IndexFactory {
       return; // Directories are not indexed
     }
     for (const tag of item.tags) {
-      const parts = tag.split('.');
+      const parts = tag.split(':');
       let lastPart: string | null = null;
       for (const part of parts) {
         if (!tagsIndex[part]) tagsIndex[part] = { tag: part, tagfiltered: Navigation.normalize(part), items: [], children: {} };
