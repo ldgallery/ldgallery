@@ -39,7 +39,7 @@ export default class LdTitle extends Vue {
   }
 
   generateTitle(): string {
-    if (this.currentItem?.title) return `${this.galleryTitle} • ${this.currentItem.title}`;
+    if (this.currentItem?.title) return `${this.currentItem.title} • ${this.galleryTitle}`;
     return this.galleryTitle;
   }
 }
