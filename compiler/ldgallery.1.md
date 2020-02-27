@@ -1,6 +1,6 @@
 ---
-pagetitle: User manual - ldgallery
-title: LDGALLERY(1) ldgallery user manual
+pagetitle: Compiler user manual - ldgallery
+title: LDGALLERY(1) ldgallery
 author: Pacien TRAN-GIRARD, Guillaume FOUET
 date: 2020-02-15 (v0.1.0.0-SNAPSHOT)
 ---
