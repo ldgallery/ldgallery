@@ -24,7 +24,7 @@
         <ld-thumbnail :item="item" />
       </router-link>
     </div>
-    <div v-if="hasNoResults()">{{noresult}}</div>
+    <div v-if="hasNoResults()" class="noresult">{{noresult}}</div>
   </div>
 </template>
 
@@ -44,4 +44,7 @@ export default class LdPicture extends Vue {
 </script>
 
 <style lang="scss">
+.thumbnail-tiles .noresult {
+  margin-top: 40px;
+}
 </style>
