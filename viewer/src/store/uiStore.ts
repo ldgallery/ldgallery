@@ -27,7 +27,7 @@ const VuexModule = createModule({
 export default class UIStore extends VuexModule {
 
     fullscreen: boolean = false;
-    fullWidth: boolean = true;
+    fullWidth: boolean = window.innerWidth < Number(process.env.VUE_APP_FULLWIDTH_LIMIT);
     searchMode: boolean = false;
 
     // ---
