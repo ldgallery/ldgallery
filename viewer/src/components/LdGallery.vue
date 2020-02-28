@@ -19,11 +19,9 @@
 
 <template>
   <div class="thumbnail-tiles">
-    <div v-for="item in items" :key="item.path">
-      <router-link :to="item.path">
-        <ld-thumbnail :item="item" />
-      </router-link>
-    </div>
+    <router-link v-for="item in items" :key="item.path" :to="item.path">
+      <ld-thumbnail :item="item" />
+    </router-link>
     <div v-if="hasNoResults()" class="noresult">{{noresult}}</div>
   </div>
 </template>

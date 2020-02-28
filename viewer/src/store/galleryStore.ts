@@ -95,7 +95,15 @@ export default class GalleryStore extends VuexModule {
     // Indexes the gallery
     @action async indexTags() {
         const root = this.galleryIndex?.tree ?? null;
-        this.setTagsIndex(IndexFactory.generateTags(root));
+        const index = IndexFactory.generateTags(root);
+        this.setTagsIndex(index);
+        return index;
     }
 
+    // Searches for tags
+    @action async search(filters: string[]) {
+        const results = filters.flatMap(filter => IndexFactory.searchTags(this.tagsIndex, filter, true));
+        this.setCurrentSearch(results);
+        return results;
+    }
 }

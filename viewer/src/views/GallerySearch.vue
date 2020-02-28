@@ -39,6 +39,7 @@ export default class GalleryPicture extends Vue {
 
   destroyed() {
     this.$uiStore.toggleSearchMode(false);
+    this.$galleryStore.setCurrentSearch([]);
   }
 
   items() {

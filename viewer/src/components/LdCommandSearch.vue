@@ -23,7 +23,7 @@
       <fa-icon icon="eraser" />
       <span>{{$t('command.search.clear')}}</span>
     </b-button>
-    <b-button expanded :loading="loading" @click="search">
+    <b-button expanded @click="search">
       <fa-icon icon="search" />
       <span>{{$t('command.search.search')}}</span>
     </b-button>
@@ -35,8 +35,6 @@ import { Component, Vue, Emit } from "vue-property-decorator";
 
 @Component
 export default class LdCommandSearch extends Vue {
-  loading: boolean = false;
-
   @Emit()
   clear(e: HTMLButtonElement) {
     return e;
@@ -44,8 +42,6 @@ export default class LdCommandSearch extends Vue {
 
   @Emit()
   search(e: HTMLButtonElement) {
-    this.loading = true;
-    this.$nextTick(() => (this.loading = false));
     return e;
   }
 }

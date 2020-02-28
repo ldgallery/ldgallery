@@ -70,11 +70,7 @@ export default class PanelLeft extends Vue {
   @Watch("$route")
   restoreSearchFilters(route: Route) {
     const query = Object.keys(route.query);
-    if (query.length > 0) {
-      const tagsIndex = this.$galleryStore.tagsIndex;
-      this.searchFilters = Object.keys(route.query).flatMap(filter => IndexFactory.searchTags(tagsIndex, filter, true));
-      this.$galleryStore.setCurrentSearch([...this.searchFilters]);
-    }
+    if (query.length > 0) this.$galleryStore.search(query).then(search => (this.searchFilters = [...search]));
   }
 }
 </script>

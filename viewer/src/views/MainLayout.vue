@@ -27,7 +27,7 @@
     <panel-left v-if="!isLoading" class="layout layout-left" />
     <router-view v-if="!isLoading" ref="content" class="layout layout-content scrollbar" />
     <b-loading :active="isLoading" is-full-page />
-    <ld-key-press :keycode="27" @action="$uiStore.fullscreen=false" />
+    <ld-key-press :keycode="27" @action="$uiStore.toggleFullscreen(false)" />
   </div>
 </template>
 
