@@ -30,7 +30,7 @@ export default class GalleryDirectory extends Vue {
   @Prop({ required: true }) readonly directory!: Gallery.Directory;
 
   mounted() {
-    this.$uiStore.fullscreen = false;
+    this.$uiStore.toggleFullscreen(false);
   }
 
   orderedItems() {

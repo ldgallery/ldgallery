@@ -33,12 +33,12 @@ export default class GalleryPicture extends Vue {
   otherCount: Number = 0;
 
   mounted() {
-    this.$uiStore.fullscreen = false;
-    this.$uiStore.searchMode = true;
+    this.$uiStore.toggleFullscreen(false);
+    this.$uiStore.toggleSearchMode(true);
   }
 
   destroyed() {
-    this.$uiStore.searchMode = false;
+    this.$uiStore.toggleSearchMode(false);
   }
 
   items() {

@@ -93,12 +93,10 @@ export default class IndexFactory {
     category = Navigation.normalize(category);
     disambiguation = Navigation.normalize(disambiguation);
     return Object.values(tagsIndex)
-      .filter(node => strict || node.tagfiltered.includes(category))
-      .filter(node => !strict || node.tagfiltered === category)
+      .filter(node => IndexFactory.matches(node, category, strict))
       .flatMap(node =>
         Object.values(node.children)
-          .filter(child => strict || child.tagfiltered.includes(disambiguation))
-          .filter(child => !strict || child.tagfiltered === disambiguation)
+          .filter(child => IndexFactory.matches(child, disambiguation, strict))
           .map(child => ({ ...child, parent: node, operation, display: `${operation}${node.tag}:${child.tag}` }))
       );
   }
@@ -106,8 +104,12 @@ export default class IndexFactory {
   private static searchTagsFromFilter(tagsIndex: Tag.Index, operation: Operation, filter: string, strict: boolean): Tag.Search[] {
     filter = Navigation.normalize(filter);
     return Object.values(tagsIndex)
-      .filter(node => strict || node.tagfiltered.includes(filter))
-      .filter(node => !strict || node.tagfiltered === filter)
+      .filter(node => IndexFactory.matches(node, filter, strict))
       .map(node => ({ ...node, operation, display: `${operation}${node.tag}` }));
+  }
+
+  private static matches(node: Tag.Node, filter: string, strict: boolean): boolean {
+    if (strict) return node.tagfiltered === filter;
+    return node.tagfiltered.includes(filter)
   }
 }

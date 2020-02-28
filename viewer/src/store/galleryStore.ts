@@ -36,7 +36,7 @@ export default class GalleryStore extends VuexModule {
 
     // ---
 
-    @mutation setConfig(config: Gallery.Config) {
+    @mutation private setConfig(config: Gallery.Config) {
         this.config = config;
     }
 
