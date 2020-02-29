@@ -23,7 +23,8 @@ declare namespace Gallery {
     }
 
     interface GalleryProperties {
-        galleryTitle: string
+        galleryTitle: string,
+        tagCategories: RawTag[]
     }
     interface Index {
         properties: GalleryProperties,
