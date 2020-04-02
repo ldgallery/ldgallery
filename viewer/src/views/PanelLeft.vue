@@ -19,7 +19,11 @@
 
 <template>
   <div class="flex-column sidebar">
-    <ld-tag-input :search-filters.sync="searchFilters" :tags-index="$galleryStore.tagsIndex" />
+    <ld-tag-input
+      :search-filters.sync="searchFilters"
+      :tags-index="$galleryStore.tagsIndex"
+      @onkeyenter-empty="search"
+    />
     <ld-command-search @clear="clear" @search="search" />
     <h1 class="title">{{$t('panelLeft.propositions')}}</h1>
     <ld-proposition
