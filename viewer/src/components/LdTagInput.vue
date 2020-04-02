@@ -30,7 +30,9 @@
     size="is-medium"
     class="paneltag-input"
     @typing="searchTags"
-    @click.capture.native="onClick"
+    @add="clearCurrentFilter"
+    @remove="clearCurrentFilter"
+    @keydown.enter.native="onKeyEnter"
   >
     <template slot-scope="props">{{displayOption(props.option)}}</template>
     <template slot="empty">{{$t('tagInput.nomatch')}}</template>
@@ -38,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, PropSync } from "vue-property-decorator";
+import { Component, Vue, Prop, PropSync, Emit } from "vue-property-decorator";
 import { Operation } from "@/@types/Operation";
 import Navigation from "@/services/navigation";
 import IndexFactory from "@/services/indexfactory";
@@ -48,6 +50,7 @@ export default class LdTagInput extends Vue {
   @Prop({ required: true }) readonly tagsIndex!: Tag.Index;
   @PropSync("searchFilters", { type: Array, required: true }) model!: Tag.Search[];
 
+  currentFilter: string = "";
   filteredTags: Tag.Search[] = [];
 
   displayOption(option: Tag.Search): string {
@@ -55,15 +58,27 @@ export default class LdTagInput extends Vue {
   }
 
   searchTags(filter: string) {
+    this.currentFilter = filter;
     this.filteredTags = IndexFactory.searchTags(this.tagsIndex, filter, false)
       .filter(newSearch => !this.model.find(currentSearch => currentSearch.tag === newSearch.tag))
       .sort((a, b) => b.items.length - a.items.length);
   }
 
-  // Prevents the keyboard from opening on mobile when removing a tag
-  onClick(e: MouseEvent) {
-    const target = e.target;
-    if (target instanceof HTMLAnchorElement) target.addEventListener("click", e => e.stopPropagation(), true);
+  clearCurrentFilter() {
+    // Necessary for @keydown.enter.native, nexttick is too short
+    setTimeout(() => {
+      this.currentFilter = "";
+      this.filteredTags = [];
+    });
+  }
+
+  onKeyEnter(e: KeyboardEvent) {
+    if (!this.currentFilter) this.onkeyenterEmpty(e);
+  }
+
+  @Emit()
+  onkeyenterEmpty(e: KeyboardEvent) {
+    return e;
   }
 }
 </script>
