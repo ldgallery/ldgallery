@@ -1,6 +1,6 @@
 @echo off
-set NODE_VERSION=12.14.0
-set VUECLI_VERSION=4.2.2
+set NODE_VERSION=12.16.1
+set VUECLI_VERSION=4.2.3
 cd ..\viewer\
 
 chcp 65001
@@ -19,7 +19,7 @@ if errorlevel 1 (
   cmd /c npm install -g @vue/cli@%VUECLI_VERSION%
 )
 echo.
-npm view -g @vue/cli version | find /i "%VUECLI_VERSION%"
+vue --version | find /i "%VUECLI_VERSION%"
 if errorlevel 1 (
   echo ======================================================================
   echo Warning: vue/cli doesn't match the requested version: %VUECLI_VERSION%
