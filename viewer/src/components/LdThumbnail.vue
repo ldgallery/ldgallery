@@ -29,7 +29,7 @@
     />
     <div v-else class="thumbnail-other flex-column flex-center">
       <fa-icon :icon="getIcon()" size="4x" />
-      {{item.title}}
+      {{item.title | underscore-to-space}}
     </div>
   </div>
 </template>
@@ -66,6 +66,8 @@ export default class LdThumbnail extends Vue {
   width: $thumbnail-other-size;
   height: $thumbnail-other-size;
   text-align: center;
+  word-break: break-all;
+  overflow: hidden;
 }
 
 .preload {
