@@ -20,10 +20,7 @@
 
 <template>
   <div class="proposition">
-    <h2
-      v-if="showTitle && proposedTags.length"
-      class="subtitle category"
-    >{{title || $t('panelLeft.propositions.other')}}</h2>
+    <h2 v-if="showCategory && proposedTags.length" class="subtitle category">{{title}}</h2>
     <div v-for="proposed in proposedTags" :key="proposed.rawTag">
       <a
         class="operation-btns link"
@@ -58,8 +55,8 @@ import { Operation } from "@/@types/Operation";
 
 @Component
 export default class LdProposition extends Vue {
-  @Prop({ type: String, required: true }) readonly title!: string;
-  @Prop({ type: Boolean, required: true }) readonly showTitle!: boolean;
+  @Prop() readonly category?: Tag.Node;
+  @Prop({ type: Boolean, required: true }) readonly showCategory!: boolean;
   @Prop({ type: Array, required: true }) readonly currentTags!: string[];
   @Prop({ required: true }) readonly tagsIndex!: Tag.Index;
   @PropSync("searchFilters", { type: Array, required: true }) model!: Tag.Search[];
@@ -91,6 +88,10 @@ export default class LdProposition extends Vue {
       .map(entry => ({ rawTag: entry[0], count: entry[1] }));
   }
 
+  get title() {
+    return this.category?.tag ?? this.$t("panelLeft.propositions.other");
+  }
+
   extractDistinctItems(currentTags: Tag.Search[]): Gallery.Item[] {
     return [...new Set(currentTags.flatMap(tag => tag.items))];
   }
@@ -102,8 +103,8 @@ export default class LdProposition extends Vue {
 
   add(operation: Operation, rawTag: Gallery.RawTag) {
     const node = this.tagsIndex[rawTag];
-    const search: Tag.Search = { ...node, operation, display: `${operation}${node.tag}` };
-    this.model.push(search);
+    const display = this.category ? `${operation}${this.category.tag}:${node.tag}` : `${operation}${node.tag}`;
+    this.model.push({ ...node, parent: this.category, operation, display });
   }
 }
 </script>

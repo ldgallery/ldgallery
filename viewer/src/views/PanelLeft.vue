@@ -26,8 +26,8 @@
       <ld-proposition
         v-for="(category) in $galleryStore.tagsCategories"
         :key="category.tag"
-        :title="category.tag"
-        :show-title="$galleryStore.tagsCategories.length > 1"
+        :category="$galleryStore.tagsIndex[category.tag]"
+        :show-category="$galleryStore.tagsCategories.length > 1"
         :search-filters.sync="searchFilters"
         :tags-index="category.index"
         :current-tags="currentTags()"

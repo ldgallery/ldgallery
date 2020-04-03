@@ -54,9 +54,16 @@ export default class LdTagInput extends Vue {
     return `${option.display} (${option.items.length})`;
   }
 
+  filterAlreadyPresent(newSearch: Tag.Search) {
+    return !this.model.find(
+      currentSearch =>
+        currentSearch.tag === newSearch.tag && (!currentSearch.parent || currentSearch.parent === newSearch.parent)
+    );
+  }
+
   searchTags(filter: string) {
     this.filteredTags = IndexFactory.searchTags(this.tagsIndex, filter, false)
-      .filter(newSearch => !this.model.find(currentSearch => currentSearch.tag === newSearch.tag))
+      .filter(this.filterAlreadyPresent)
       .sort((a, b) => b.items.length - a.items.length);
   }
 
