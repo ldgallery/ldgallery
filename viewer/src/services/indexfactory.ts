@@ -112,4 +112,23 @@ export default class IndexFactory {
     if (strict) return node.tagfiltered === filter;
     return node.tagfiltered.includes(filter)
   }
+
+  // ---
+
+  public static generateCategories(tagsIndex: Tag.Index, tags?: Gallery.RawTag[]): Tag.Category[] {
+    if (!tags?.length) return [{ tag: "", index: tagsIndex }];
+
+    const tagsCategories: Tag.Category[] = [];
+    const tagsRemaining = new Map(Object.entries(tagsIndex));
+    tags
+      .map(tag => ({ tag, index: tagsIndex[tag]?.children }))
+      .filter(category => category.index && Object.keys(category.index).length)
+      .forEach(category => {
+        tagsCategories.push(category);
+        tagsRemaining.delete(category.tag);
+        Object.values(category.index).map(node => node.tag).forEach(tag => tagsRemaining.delete(tag));
+      });
+    tagsCategories.push({ tag: "", index: Object.fromEntries(tagsRemaining) });
+    return tagsCategories;
+  }
 }

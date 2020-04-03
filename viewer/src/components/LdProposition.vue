@@ -19,8 +19,12 @@
 -->
 
 <template>
-  <div>
-    <div v-for="proposed in proposedTags" :key="proposed.rawTag" class="proposition">
+  <div class="proposition">
+    <h2
+      v-if="showTitle && proposedTags.length"
+      class="subtitle category"
+    >{{title || $t('panelLeft.propositions.other')}}</h2>
+    <div v-for="proposed in proposedTags" :key="proposed.rawTag">
       <a
         class="operation-btns link"
         :title="$t('tag-propositions.substraction')"
@@ -54,6 +58,8 @@ import { Operation } from "@/@types/Operation";
 
 @Component
 export default class LdProposition extends Vue {
+  @Prop({ type: String, required: true }) readonly title!: string;
+  @Prop({ type: Boolean, required: true }) readonly showTitle!: boolean;
   @Prop({ type: Array, required: true }) readonly currentTags!: string[];
   @Prop({ required: true }) readonly tagsIndex!: Tag.Index;
   @PropSync("searchFilters", { type: Array, required: true }) model!: Tag.Search[];
@@ -69,13 +75,14 @@ export default class LdProposition extends Vue {
       this.extractDistinctItems(this.model)
         .flatMap(item => item.tags)
         .map(this.rightmost)
-        .filter(rawTag => !this.model.find(search => search.tag === rawTag))
+        .filter(rawTag => this.tagsIndex[rawTag] && !this.model.find(search => search.tag === rawTag))
         .forEach(rawTag => (propositions[rawTag] = (propositions[rawTag] ?? 0) + 1));
     } else {
       // Tags count from the current directory
       this.currentTags
         .flatMap(tag => tag.split(":"))
         .map(tag => this.tagsIndex[tag])
+        .filter(Boolean)
         .forEach(tagindex => (propositions[tagindex.tag] = tagindex.items.length));
     }
 
@@ -105,19 +112,29 @@ export default class LdProposition extends Vue {
 @import "@/assets/scss/theme.scss";
 
 .proposition {
-  display: flex;
-  align-items: center;
-  padding-right: 7px;
-  .operation-tag {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    flex-grow: 1;
-    cursor: pointer;
+  .subtitle {
+    background-color: $proposed-category-bgcolor;
+    width: 100%;
+    padding: 0 0 6px 0;
+    margin: 0;
+    text-align: center;
+    font-variant: small-caps;
   }
-  .operation-btns {
-    padding: 2px 7px;
-    cursor: pointer;
+  > div {
+    display: flex;
+    align-items: center;
+    padding-right: 7px;
+    .operation-tag {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      flex-grow: 1;
+      cursor: pointer;
+    }
+    .operation-btns {
+      padding: 2px 7px;
+      cursor: pointer;
+    }
   }
 }
 </style>

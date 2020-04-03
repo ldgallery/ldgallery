@@ -31,4 +31,9 @@ declare namespace Tag {
     }
     type SearchByOperation = { [index: string]: Tag.Search[] };
     type Index = { [index: string]: Node };
+
+    interface Category {
+        tag: string;
+        index: Index;
+    }
 }

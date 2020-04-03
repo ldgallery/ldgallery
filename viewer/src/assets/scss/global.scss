@@ -85,8 +85,8 @@ button svg + span {
   overflow: auto;
 }
 .scrollbar::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: $scrollbar_width;
+  height: $scrollbar_width;
 }
 .scrollbar::-webkit-scrollbar-corner {
   background-color: transparent;
