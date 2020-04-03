@@ -21,6 +21,7 @@ declare namespace Tag {
     interface Node {
         tag: Gallery.RawTag;
         tagfiltered: Gallery.RawTag;
+        rootPart: boolean;
         items: Gallery.Item[];
         children: Index;
     }
