@@ -31,8 +31,6 @@ import(/* webpackChunkName: "ui" */ "@/plugins/dragscroll");
 import(/* webpackChunkName: "ui" */ "@/plugins/fontawesome");
 const MainLayout = () => import(/* webpackChunkName: "ui" */ "@/views/MainLayout.vue");
 
-Vue.filter("underscore-to-space", (input: string) => input.replace(/_/g, ' '));
-
 new Vue({
   router,
   i18n,
