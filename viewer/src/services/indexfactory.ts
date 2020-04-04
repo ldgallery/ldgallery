@@ -38,18 +38,19 @@ export default class IndexFactory {
       const parts = tag.split(':');
       let lastPart: string | null = null;
       for (const part of parts) {
-        tagsIndex[part] = IndexFactory.pushPartToIndex(tagsIndex[part], part, item);
+        tagsIndex[part] = IndexFactory.pushPartToIndex(tagsIndex[part], part, item, !Boolean(lastPart));
         if (lastPart) {
           const children = tagsIndex[lastPart].children;
-          children[part] = IndexFactory.pushPartToIndex(children[part], part, item);
+          children[part] = IndexFactory.pushPartToIndex(children[part], part, item, false);
         }
         lastPart = part;
       }
     }
   }
 
-  private static pushPartToIndex(index: Tag.Node, part: string, item: Gallery.Item): Tag.Node {
-    if (!index) index = { tag: part, tagfiltered: Navigation.normalize(part), items: [], children: {} };
+  private static pushPartToIndex(index: Tag.Node, part: string, item: Gallery.Item, rootPart: boolean): Tag.Node {
+    if (!index) index = { tag: part, tagfiltered: Navigation.normalize(part), rootPart, items: [], children: {} };
+    else if (rootPart) index.rootPart = true;
     if (!index.items.includes(item)) index.items.push(item);
     return index;
   }
@@ -111,5 +112,26 @@ export default class IndexFactory {
   private static matches(node: Tag.Node, filter: string, strict: boolean): boolean {
     if (strict) return node.tagfiltered === filter;
     return node.tagfiltered.includes(filter)
+  }
+
+  // ---
+
+  public static generateCategories(tagsIndex: Tag.Index, tags?: Gallery.RawTag[]): Tag.Category[] {
+    if (!tags?.length) return [{ tag: "", index: tagsIndex }];
+
+    const tagsCategories: Tag.Category[] = [];
+    const tagsRemaining = new Map(Object.entries(tagsIndex));
+    tags
+      .map(tag => ({ tag, index: tagsIndex[tag]?.children }))
+      .filter(category => category.index && Object.keys(category.index).length)
+      .forEach(category => {
+        tagsCategories.push(category);
+
+        [category.tag, ...Object.values(category.index).map(node => node.tag)]
+          .filter(tag => !tagsIndex[tag].rootPart)
+          .forEach(tag => tagsRemaining.delete(tag));
+      });
+    tagsCategories.push({ tag: "", index: Object.fromEntries(tagsRemaining) });
+    return tagsCategories;
   }
 }

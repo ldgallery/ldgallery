@@ -21,6 +21,7 @@ declare namespace Tag {
     interface Node {
         tag: Gallery.RawTag;
         tagfiltered: Gallery.RawTag;
+        rootPart: boolean;
         items: Gallery.Item[];
         children: Index;
     }
@@ -31,4 +32,9 @@ declare namespace Tag {
     }
     type SearchByOperation = { [index: string]: Tag.Search[] };
     type Index = { [index: string]: Node };
+
+    interface Category {
+        tag: string;
+        index: Index;
+    }
 }

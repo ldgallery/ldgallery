@@ -14,6 +14,10 @@ includedFiles:
 #includedTags: ["*"]
 #excludedTags: []
 
+tagCategories:
+  - photographer
+  - location
+
 #tagsFromDirectories:
 #  fromParents: 0
 #  prefix: ''

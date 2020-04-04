@@ -26,12 +26,17 @@
     />
     <ld-command-search @clear="clear" @search="search" />
     <h1 class="title">{{$t('panelLeft.propositions')}}</h1>
-    <ld-proposition
-      :search-filters.sync="searchFilters"
-      :tags-index="$galleryStore.tagsIndex"
-      :current-tags="currentTags()"
-      class="scrollbar no-scroll-x"
-    />
+    <div v-dragscroll class="scrollbar no-scroll-x">
+      <ld-proposition
+        v-for="(category) in $galleryStore.tagsCategories"
+        :key="category.tag"
+        :category="$galleryStore.tagsIndex[category.tag]"
+        :show-category="$galleryStore.tagsCategories.length > 1"
+        :search-filters.sync="searchFilters"
+        :tags-index="category.index"
+        :current-tags="currentTags()"
+      />
+    </div>
   </div>
 </template>
 
@@ -80,9 +85,14 @@ export default class PanelLeft extends Vue {
 </script>
 
 <style lang="scss">
+@import "@/assets/scss/theme.scss";
+
 .sidebar {
   .title {
-    margin: 0.2em 0.5em !important;
+    background-color: $proposed-category-bgcolor;
+    padding: 0.2em 0.5em;
+    margin: 0 0 1px 0;
+    font-variant: small-caps;
   }
 }
 </style>

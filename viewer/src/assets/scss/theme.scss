@@ -42,6 +42,8 @@ $radius: 0;
 $loading-background: $palette-800;
 $title-color: $palette-200;
 $title-size: $size-5;
+$subtitle-color: $palette-200;
+$subtitle-size: $size-5;
 $tag-background-color: $palette-800;
 $button-color: $palette-100;
 $button-active-color: $palette-100;
@@ -62,11 +64,13 @@ $panel-left-txtcolor: $primary;
 $command-buttons-bgcolor: $palette-700;
 $content-bgcolor: $palette-900;
 $scrollbar-color: $palette-300;
+$scrollbar-width: 10px;
 $loader-color: $palette-800;
 $input-tag-delete-background-color: $palette-700;
 $breadcrumb-margins: 12px;
 $breadcrumb-overflow-mask-size: $breadcrumb-margins + 60px;
 $thumbnail-other-size: $body-line-height * 9em;
+$proposed-category-bgcolor: $palette-700;
 
 // Layout
 
