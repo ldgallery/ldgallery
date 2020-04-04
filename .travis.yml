@@ -31,6 +31,8 @@ jobs:
     - export PATH=$HOME/.local/bin:$PATH
     - travis_retry curl -L https://get.haskellstack.org/stable/linux-x86_64.tar.gz
       | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+    - sudo apt-get update -qq
+    - sudo apt-get install -y pandoc
 
     install:
     - cd viewer
@@ -50,4 +52,7 @@ jobs:
     - stack build --no-terminal
     - stack install --local-bin-path ../dist/
     - cd ..
+    - pandoc --standalone --to man compiler/ldgallery.1.md --output dist/ldgallery.1
+    - pandoc --standalone --to man viewer/ldgallery-viewer.7.md --output dist/ldgallery-viewer.7
+    - cp changelog.md license.md dist/
     - tar -cvzf ldgallery-linux-amd64.tar.gz dist
