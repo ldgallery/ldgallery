@@ -57,6 +57,7 @@ data GalleryConfig = GalleryConfig
   , excludedFiles :: [String]
   , includedTags :: [String]
   , excludedTags :: [String]
+  , tagCategories :: [String]
   , tagsFromDirectories :: TagsFromDirectoriesConfig
   , thumbnailMaxResolution :: Resolution
   , pictureMaxResolution :: Maybe Resolution
@@ -71,6 +72,7 @@ instance FromJSON GalleryConfig where
     <*> v .:? "excludedFiles" .!= []
     <*> v .:? "includedTags" .!= ["*"]
     <*> v .:? "excludedTags" .!= []
+    <*> v .:? "tagCategories" .!= []
     <*> v .:? "tagsFromDirectories" .!= (TagsFromDirectoriesConfig 0 "")
     <*> v .:? "thumbnailMaxResolution" .!= (Resolution 400 300)
     <*> v .:? "pictureMaxResolution"
@@ -80,9 +82,9 @@ readConfig = decodeYamlFile
 
 
 data ViewerConfig = ViewerConfig
-  { -- TODO: add viewer config keys (tag groups...)
-    galleryTitle :: String
+  { galleryTitle :: String
+  , tagCategories :: [String]
   } deriving (Generic, ToJSON, Show)
 
 viewerConfig :: GalleryConfig -> ViewerConfig
-viewerConfig GalleryConfig{galleryTitle} = ViewerConfig galleryTitle
+viewerConfig GalleryConfig{galleryTitle, tagCategories} = ViewerConfig galleryTitle tagCategories

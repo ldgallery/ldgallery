@@ -107,7 +107,7 @@ description
 
 tags
 : List of tags for the item.
-  Tag groups can be defined using prefixes separated by ":" (colon).
+  Tag categories can be defined using prefixes separated by ":" (colon).
   Tags specified in a directory metadata sidecar are applied to all items within that directory.
 
 
@@ -137,6 +137,10 @@ includedTags[]
 
 excludedTags[]
 : Glob patterns of tags to exclude from the gallery.
+  Defaults to [] (none).
+
+tagCategories[]
+: Top-level tag categories.
   Defaults to [] (none).
 
 tagsFromDirectories.fromParents

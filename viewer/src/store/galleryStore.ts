@@ -31,6 +31,7 @@ export default class GalleryStore extends VuexModule {
     config: Gallery.Config | null = null;
     galleryIndex: Gallery.Index | null = null;
     tagsIndex: Tag.Index = {};
+    tagsCategories: Tag.Category[] = [];
     currentPath: string = "/";
     currentSearch: Tag.Search[] = [];
 
@@ -46,6 +47,10 @@ export default class GalleryStore extends VuexModule {
 
     @mutation private setTagsIndex(tagsIndex: Tag.Index) {
         this.tagsIndex = Object.freeze(tagsIndex);
+    }
+
+    @mutation private setTagsCategories(tagsCategories: Tag.Category[]) {
+        this.tagsCategories = tagsCategories;
     }
 
     @mutation setCurrentPath(currentPath: string) {
@@ -89,7 +94,8 @@ export default class GalleryStore extends VuexModule {
         return fetch(`${process.env.VUE_APP_DATA_URL}${root}index.json`, { cache: "no-cache" })
             .then(response => response.json())
             .then(this.setGalleryIndex)
-            .then(this.indexTags);
+            .then(this.indexTags)
+            .then(this.indexTagCategories);
     }
 
     // Indexes the gallery
@@ -98,6 +104,13 @@ export default class GalleryStore extends VuexModule {
         const index = IndexFactory.generateTags(root);
         this.setTagsIndex(index);
         return index;
+    }
+
+    // Indexes the proposed categories
+    @action async indexTagCategories() {
+        const categories = IndexFactory.generateCategories(this.tagsIndex, this.galleryIndex?.properties.tagCategories);
+        this.setTagsCategories(categories);
+        return categories;
     }
 
     // Searches for tags
