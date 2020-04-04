@@ -28,7 +28,9 @@
       @load="loading=false"
     />
     <div v-else class="thumbnail-other flex-column flex-center">
-      <fa-icon :icon="getIcon()" size="4x" />
+      <div>
+        <fa-icon :icon="getIcon()" size="4x" />
+      </div>
       {{item.title}}
     </div>
   </div>
@@ -65,7 +67,13 @@ export default class LdThumbnail extends Vue {
 .thumbnail-other {
   width: $thumbnail-other-size;
   height: $thumbnail-other-size;
+  padding-top: $body-line-height * 2em;
   text-align: center;
+  word-break: break-word;
+  overflow: hidden;
+  > div {
+    min-height: $body-line-height * 3em;
+  }
 }
 
 .preload {

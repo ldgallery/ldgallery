@@ -37,5 +37,3 @@ new Vue({
   store,
   render: h => h(MainLayout)
 }).$mount("#ldgallery")
-
-
