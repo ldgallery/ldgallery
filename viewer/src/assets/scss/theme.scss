@@ -51,6 +51,7 @@ $button-border-color: $palette-500;
 $button-focus-color: $button-color;
 $button-focus-border-color: $link;
 $button-focus-box-shadow-size: 0;
+$body-line-height: 1.5;
 
 // Custom components
 
@@ -65,7 +66,7 @@ $loader-color: $palette-800;
 $input-tag-delete-background-color: $palette-700;
 $breadcrumb-margins: 12px;
 $breadcrumb-overflow-mask-size: $breadcrumb-margins + 60px;
-$thumbnail-other-size: 10em;
+$thumbnail-other-size: $body-line-height * 9em;
 
 // Layout
 
