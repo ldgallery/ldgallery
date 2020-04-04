@@ -127,11 +127,7 @@ export default class IndexFactory {
       .forEach(category => {
         tagsCategories.push(category);
 
-        if (!tagsIndex[category.tag].rootPart)
-          tagsRemaining.delete(category.tag);
-
-        Object.values(category.index)
-          .map(node => node.tag)
+        [category.tag, ...Object.values(category.index).map(node => node.tag)]
           .filter(tag => !tagsIndex[tag].rootPart)
           .forEach(tag => tagsRemaining.delete(tag));
       });
