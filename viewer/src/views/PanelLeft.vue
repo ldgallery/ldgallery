@@ -26,7 +26,7 @@
     />
     <ld-command-search @clear="clear" @search="search" />
     <h1 class="title">{{$t('panelLeft.propositions')}}</h1>
-    <div v-dragscroll class="scrollbar no-scroll-x">
+    <div class="scrollbar no-scroll-x">
       <ld-proposition
         v-for="(category) in $galleryStore.tagsCategories"
         :key="category.tag"
