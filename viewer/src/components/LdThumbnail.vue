@@ -67,7 +67,7 @@ export default class LdThumbnail extends Vue {
 .thumbnail-other {
   width: $thumbnail-other-size;
   height: $thumbnail-other-size;
-  padding-top: $body-line-height * 2em;
+  padding-top: $body-line-height * 1em;
   text-align: center;
   word-break: break-word;
   overflow: hidden;
