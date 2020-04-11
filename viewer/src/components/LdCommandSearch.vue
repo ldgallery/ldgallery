@@ -18,7 +18,7 @@
 -->
 
 <template>
-  <div class="flex">
+  <div class="command-search-btn-row">
     <b-button @click="clear">
       <fa-icon icon="eraser" />
       <span>{{$t('command.search.clear')}}</span>
@@ -48,4 +48,8 @@ export default class LdCommandSearch extends Vue {
 </script>
 
 <style lang="scss">
+.command-search-btn-row {
+  display: flex;
+  flex: none;
+}
 </style>
