@@ -22,6 +22,7 @@ declare namespace Tag {
         tag: Gallery.RawTag;
         tagfiltered: Gallery.RawTag;
         rootPart: boolean;
+        childPart: boolean;
         items: Gallery.Item[];
         children: Index;
     }

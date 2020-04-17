@@ -45,12 +45,15 @@ export default class IndexFactory {
         }
         lastPart = part;
       }
+      if (lastPart) tagsIndex[lastPart].childPart = true;
     }
   }
 
   private static pushPartToIndex(index: Tag.Node, part: string, item: Gallery.Item, rootPart: boolean): Tag.Node {
-    if (!index) index = { tag: part, tagfiltered: Navigation.normalize(part), rootPart, items: [], children: {} };
+    if (!index) index = { tag: part, tagfiltered: Navigation.normalize(part), rootPart, childPart: !rootPart, items: [], children: {} };
     else if (rootPart) index.rootPart = true;
+    else index.childPart = true;
+
     if (!index.items.includes(item)) index.items.push(item);
     return index;
   }
@@ -116,22 +119,25 @@ export default class IndexFactory {
 
   // ---
 
-  public static generateCategories(tagsIndex: Tag.Index, tags?: Gallery.RawTag[]): Tag.Category[] {
-    if (!tags?.length) return [{ tag: "", index: tagsIndex }];
+  public static generateCategories(tagsIndex: Tag.Index, categoryTags?: Gallery.RawTag[]): Tag.Category[] {
+    if (!categoryTags?.length) return [{ tag: "", index: tagsIndex }];
 
     const tagsCategories: Tag.Category[] = [];
     const tagsRemaining = new Map(Object.entries(tagsIndex));
-    tags
+    categoryTags
       .map(tag => ({ tag, index: tagsIndex[tag]?.children }))
       .filter(category => category.index && Object.keys(category.index).length)
       .forEach(category => {
         tagsCategories.push(category);
-
         [category.tag, ...Object.values(category.index).map(node => node.tag)]
-          .filter(tag => !tagsIndex[tag].rootPart)
+          .filter(tag => IndexFactory.isDiscriminantTagOnly(categoryTags, tagsIndex[tag]))
           .forEach(tag => tagsRemaining.delete(tag));
       });
     tagsCategories.push({ tag: "", index: Object.fromEntries(tagsRemaining) });
     return tagsCategories;
+  }
+
+  private static isDiscriminantTagOnly(tags: Gallery.RawTag[], node: Tag.Node): boolean {
+    return !tags.includes(node.tag) || !node.childPart;
   }
 }
