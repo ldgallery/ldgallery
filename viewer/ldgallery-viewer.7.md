@@ -2,7 +2,7 @@
 pagetitle: Viewer user manual - ldgallery
 title: LDGALLERY-VIEWER(7) ldgallery
 author: Pacien TRAN-GIRARD, Guillaume FOUET
-date: 2020-04-05 (v0.1.0.0-SNAPSHOT)
+date: 2020-04-17 (v1.0-SNAPSHOT)
 ---
 
 
@@ -21,8 +21,7 @@ Its responsiveness allows it to be used from either a desktop browser or some mo
 
 # USER INTERFACE
 
-The viewer's user interface is split into a main item view and a side search panel,
-which can be opened by using the appropriate button in the toolbar at the top-left corner.
+The viewer's user interface is split into a main item view and a side search panel, which can be opened by using the appropriate button in the toolbar at the top-left corner.
 
 The main view displays the gallery's directories and items as a thumbnail grid.
 
@@ -42,16 +41,13 @@ Tags which belong to multiple categories may be disambiguated by adding their ca
 The following modifiers can be used in queries as prefixes of tags:
 
 `+`
-: Include all items having the associated tag,
-  independently of simple tag restrictions.
+: Include all items having the associated tag, independently of simple tag restrictions.
 
 `-`
-: Exclude all items having the associated tag,
-  independently of simple tag restrictions and inclusions.
+: Exclude all items having the associated tag, independently of simple tag restrictions and inclusions.
 
 Autocompletion suggestions are shown as filters are being typed in the query field.
-In the case of disambiguated tags, both the category and the tag components are allowed to be partially entered,
-allowing "loc:fra" to expand into "location:france" for example.
+In the case of disambiguated tags, both the category and the tag components are allowed to be partially entered, allowing "loc:fra" to expand into "location:france" for example.
 
 
 # VIEWER CONFIGURATION
@@ -64,8 +60,7 @@ galleryRoot
 
 # PROGRESSIVE WEB APPLICATION
 
-This web application can be "installed" on some user's mobile device as a progressive web application,
-i.e. a shortcut giving the web page the appearance of a native application.
+This web application can be "installed" on some user's mobile device as a progressive web application, i.e. a shortcut giving the web page the appearance of a native application.
 
 This feature can be enabled by adding a PWA manifest in the viewer's directory when deployed.
 An example of such manifest and an associated icon are available in the example folder packaged with the viewer.

@@ -2,7 +2,7 @@
 pagetitle: Compiler user manual - ldgallery
 title: LDGALLERY(1) ldgallery
 author: Pacien TRAN-GIRARD, Guillaume FOUET
-date: 2020-02-15 (v0.1.0.0-SNAPSHOT)
+date: 2020-04-17 (v1.0-SNAPSHOT)
 ---
 
 
@@ -15,7 +15,9 @@ ldgallery - a static web gallery generator with tags
 
 ldgallery is a static gallery generator which turns a collection of tagged pictures into a searchable web gallery.
 
-The ldgallery compiler program processes pictures and aggregates metadata from plain text sidecar files to generate an indexed version of the gallery.  It can optionally output a static web viewer along, which allows the content to be presented and searched through from a JavaScript-enabled web browser.  This client-side web application does not require any special software on the server's side.
+The ldgallery compiler program processes pictures and aggregates metadata from plain text sidecar files to generate an indexed version of the gallery.
+It can optionally output a static web viewer along, which allows the content to be presented and searched through from a JavaScript-enabled web browser.
+This client-side web application does not require any special software on the server's side.
 
 
 # COMMAND
@@ -97,13 +99,17 @@ title
 : Title of the item.
   Defaults to the name of the file or directory.
 
+<!-- not used in the viewer yet --
 datetime
 : ISO 8601 zoned date and time.
   Defaults to the last modification time of the file itself,
   or the most recent modification date of a directory's items.
+-->
 
+<!-- not used in the viewer yet --
 description
 : Description for the item.
+-->
 
 tags
 : List of tags for the item.
@@ -116,19 +122,24 @@ tags
 The gallery settings reside in a file named "gallery.yaml" located at the root of the gallery's source directory.
 
 galleryTitle
-: Title of the gallery.  Defaults to "ldgallery".
+: Title of the gallery.
+  Defaults to "ldgallery".
 
 includedDirectories[]
-: Glob patterns of directory names to include in the gallery.  Defaults to ["*"] (matches all directory names).
+: Glob patterns of directory names to include in the gallery.
+  Defaults to ["*"] (matches all directory names).
 
 excludedDirectories[]
-: Glob patterns of directory names to exclude from the gallery.  Defaults to [] (none).
+: Glob patterns of directory names to exclude from the gallery.
+  Defaults to [] (none).
 
 includedFiles[]
-: Glob patterns of file names to include in the gallery.  Defaults to ["*"] (matches all file names).
+: Glob patterns of file names to include in the gallery.
+  Defaults to ["*"] (matches all file names).
 
 excludedFiles[]
-: Glob patterns of file names to exclude from the gallery.  Defaults to [] (none).
+: Glob patterns of file names to exclude from the gallery.
+  Defaults to [] (none).
 
 includedTags[]
 : Glob patterns of tags to include in the gallery.
@@ -144,8 +155,7 @@ tagCategories[]
   Defaults to [] (none).
 
 tagsFromDirectories.fromParents
-: Automatically generate tags from the name of parent directories,
-  looking up in the hierarchy as far as indicated by this parameter.
+: Automatically generate tags from the name of parent directories, looking up in the hierarchy as far as indicated by this parameter.
   Defaults to 0 (does not generate tags from parent directories).
 
 tagsFromDirectories.prefix
@@ -172,4 +182,5 @@ Copyright (C) 2019-2020  Pacien TRAN-GIRARD and Guillaume FOUET.
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details <https://www.gnu.org/licenses/agpl-3.0.html>.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU Affero General Public License for more details <https://www.gnu.org/licenses/agpl-3.0.html>.
