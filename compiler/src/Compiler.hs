@@ -24,7 +24,6 @@ module Compiler
 
 import GHC.Generics (Generic)
 import Control.Monad (liftM2, when)
-import Data.List (any)
 import Data.Maybe (fromMaybe)
 import System.FilePath ((</>))
 import qualified System.FilePath.Glob as Glob

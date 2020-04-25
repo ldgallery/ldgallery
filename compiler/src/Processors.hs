@@ -28,7 +28,6 @@ import Control.Exception (Exception, throwIO)
 import Control.Monad (when)
 import Data.Function ((&))
 import Data.Char (toLower)
-import Data.List (break)
 import Text.Read (readMaybe)
 
 import System.Directory hiding (copyFile)

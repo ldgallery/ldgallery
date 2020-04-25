@@ -28,7 +28,6 @@ module Files
   ) where
 
 
-import Control.Monad (mapM)
 import Data.List (isPrefixOf, length, subsequences, sortOn)
 import Data.Function ((&))
 import Data.Text (pack)
