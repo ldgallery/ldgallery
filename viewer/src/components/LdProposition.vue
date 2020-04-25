@@ -110,7 +110,7 @@ export default class LdProposition extends Vue {
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/theme.scss";
+@import "~@/assets/scss/theme.scss";
 
 .proposition {
   .subtitle {

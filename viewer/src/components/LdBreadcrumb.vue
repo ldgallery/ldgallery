@@ -89,7 +89,7 @@ export default class LdBreadcrumb extends Vue {
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/theme.scss";
+@import "~@/assets/scss/theme.scss";
 
 .ld-breadcrumb-overflow-mask {
   position: absolute;

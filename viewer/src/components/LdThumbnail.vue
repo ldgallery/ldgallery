@@ -62,7 +62,7 @@ export default class LdThumbnail extends Vue {
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/theme.scss";
+@import "~@/assets/scss/theme.scss";
 
 .thumbnail-other {
   width: $thumbnail-other-size;

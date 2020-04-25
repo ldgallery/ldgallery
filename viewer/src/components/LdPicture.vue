@@ -83,7 +83,7 @@ export default class LdPicture extends Vue {
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/theme.scss";
+@import "~@/assets/scss/theme.scss";
 
 .ld-picture-loader {
   position: relative;

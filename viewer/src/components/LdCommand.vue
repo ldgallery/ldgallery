@@ -67,8 +67,8 @@ export default class LdCommand extends Vue {
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/_buefy_variables.scss";
-@import "@/assets/scss/theme.scss";
+@import "~@/assets/scss/_buefy_variables.scss";
+@import "~@/assets/scss/theme.scss";
 
 .command-btns {
   background-color: $command-buttons-bgcolor;
