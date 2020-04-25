@@ -115,6 +115,7 @@ img {
 
 img {
   display: block;
+  image-orientation: from-image;
   &.v-lazy-image {
     opacity: 0;
     transition: opacity 0.4s;
