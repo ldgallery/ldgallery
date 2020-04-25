@@ -81,7 +81,7 @@ export default class MainLayout extends Vue {
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/theme.scss";
+@import "~@/assets/scss/theme.scss";
 
 body,
 html {

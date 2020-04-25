@@ -85,7 +85,7 @@ export default class PanelLeft extends Vue {
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/theme.scss";
+@import "~@/assets/scss/theme.scss";
 
 .sidebar {
   .title {
