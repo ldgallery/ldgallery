@@ -28,7 +28,7 @@ export default class LdZoom {
   readonly imageElement: HTMLImageElement;
   readonly maxScaleFactor: number;
   readonly zoomSpeed: number;
-  scaleFactor: number;
+  scaleFactor: number = 0.0;
 
   constructor(
     containerElement: HTMLDivElement, imageElement: HTMLImageElement,
@@ -38,9 +38,12 @@ export default class LdZoom {
     this.imageElement = imageElement;
     this.maxScaleFactor = maxScaleFactor;
     this.zoomSpeed = zoomSpeed;
-    this.scaleFactor = imageElement.clientWidth / imageElement.naturalWidth;
   }
 
+  /**
+   * Register event listeners.
+   * The dimension of the image should be known before calling this method.
+   */
   public install() {
     new ResizeObserver(() => {
       this.setImageScale(this.scaleFactor);
@@ -53,8 +56,6 @@ export default class LdZoom {
     });
 
     // TODO: handle pinch-to-zoom.
-
-    this.recenterImageElement();
   }
 
   /**
