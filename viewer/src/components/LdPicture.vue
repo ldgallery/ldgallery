@@ -19,31 +19,37 @@
 
 <template>
   <div
+    ref="containerElement"
     v-dragscroll
-    class="scrollbar"
-    :class="{'fit-to-screen': !$uiStore.fullscreen, 'original-size': $uiStore.fullscreen}"
+    class="scrollbar ld-picture-container"
     @click.capture="e => dragScrollClickFix.onClickCapture(e)"
-    @click="$uiStore.toggleFullscreen()"
+    @dblclick="$uiStore.toggleFullscreen()"
+    @dragstart.prevent
     @dragscrollstart="dragScrollClickFix.onDragScrollStart()"
     @dragscrollend="dragScrollClickFix.onDragScrollEnd()"
   >
     <v-lazy-image
+      ref="imageElement"
       :src="pictureSrc(picture.properties.resource)"
+      class="ld-picture-element"
       :class="{'slow-loading': Boolean(slowLoadingStyle)}"
       :style="slowLoadingStyle"
-      @load="clearSlowLoading"
+      @load="lazyImageLoaded"
     />
     <b-loading :active="loader" :is-full-page="false" class="ld-picture-loader" />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Vue, Prop, Ref } from "vue-property-decorator";
+import LdZoom from "@/services/ldzoom";
 import DragScrollClickFix from "@/services/dragscrollclickfix";
 
 @Component
 export default class LdPicture extends Vue {
   @Prop({ required: true }) readonly picture!: Gallery.Picture;
+  @Ref() readonly containerElement!: HTMLDivElement;
+  @Ref() readonly imageElement!: any; // FIXME: no typedef for v-lazy-image
 
   readonly SLOW_LOADING_TIMEOUT_MS: number = 1500;
   readonly dragScrollClickFix = new DragScrollClickFix();
@@ -58,6 +64,11 @@ export default class LdPicture extends Vue {
 
   destroyed() {
     this.clearSlowLoading();
+  }
+
+  lazyImageLoaded() {
+    this.clearSlowLoading();
+    new LdZoom(this.containerElement, this.imageElement.$el, 10, 1 / 5).install();
   }
 
   clearSlowLoading() {
@@ -85,13 +96,17 @@ export default class LdPicture extends Vue {
 <style lang="scss">
 @import "~@/assets/scss/theme.scss";
 
-.ld-picture-loader {
-  position: relative;
-  & .loading-background {
-    background: none !important;
-  }
+.ld-picture-container {
+  height: 100%;
 }
-img.slow-loading {
+
+.ld-picture-element {
+  max-width: unset;
+  max-height: unset;
+  cursor: grab;
+}
+
+.slow-loading {
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -99,25 +114,11 @@ img.slow-loading {
   background-blend-mode: soft-light;
   opacity: 1 !important;
 }
-.fit-to-screen {
-  display: flex;
-  justify-content: space-around;
-  height: 100%;
-  & > img {
-    object-fit: contain;
-    cursor: zoom-in;
-  }
-}
-.original-size {
-  display: block;
-  text-align: center;
-  cursor: grab;
-  height: 100%;
-  & > img {
-    max-width: unset;
-    max-height: unset;
-    object-fit: none;
-    cursor: zoom-out;
+
+.ld-picture-loader {
+  position: relative;
+  & .loading-background {
+    background: none !important;
   }
 }
 </style>

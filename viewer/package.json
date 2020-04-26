@@ -15,6 +15,7 @@
     "@fortawesome/vue-fontawesome": "^0.1.9",
     "buefy": "^0.8.15",
     "core-js": "^3.6.4",
+    "resize-observer-polyfill": "^1.5.1",
     "v-lazy-image": "^1.4.0",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
