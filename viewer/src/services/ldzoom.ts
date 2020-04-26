@@ -19,25 +19,26 @@
 
 // polyfill still required for IE and Safari, see https://caniuse.com/#feat=resizeobserver
 import ResizeObserver from 'resize-observer-polyfill';
+import "hammerjs";
 
 /**
- * Mousewheel picture zoom helper.
+ * Mousewheel and pinch zoom handler.
  */
 export default class LdZoom {
   readonly containerElement: HTMLDivElement;
   readonly imageElement: HTMLImageElement;
   readonly maxScaleFactor: number;
-  readonly zoomSpeed: number;
+  readonly scrollZoomSpeed: number;
   scaleFactor: number = 0.0;
 
   constructor(
     containerElement: HTMLDivElement, imageElement: HTMLImageElement,
-    maxScaleFactor: number, zoomSpeed: number
+    maxScaleFactor: number, scrollZoomSpeed: number
   ) {
     this.containerElement = containerElement;
     this.imageElement = imageElement;
     this.maxScaleFactor = maxScaleFactor;
-    this.zoomSpeed = zoomSpeed;
+    this.scrollZoomSpeed = scrollZoomSpeed;
   }
 
   /**
@@ -52,10 +53,30 @@ export default class LdZoom {
 
     this.containerElement.addEventListener('wheel', wheelEvent => {
       wheelEvent.preventDefault();
-      this.zoom(wheelEvent);
+      const zoomDelta = -Math.sign(wheelEvent.deltaY) * this.scrollZoomSpeed;
+      this.zoom(wheelEvent.offsetX, wheelEvent.offsetY, zoomDelta);
     });
 
-    // TODO: handle pinch-to-zoom.
+    const pinchListener = new Hammer(this.containerElement);
+    pinchListener.get('pinch').set({enable: true});
+    this.installPinchHandler(pinchListener);
+  }
+
+  private installPinchHandler(pinchListener: HammerManager) {
+    let lastScaleFactor = 0.0;
+
+    pinchListener.on('pinchstart', (pinchEvent: HammerInput) => {
+      lastScaleFactor = pinchEvent.scale;
+    });
+
+    pinchListener.on('pinchmove', (pinchEvent: HammerInput) => {
+      // FIXME: pinchEvent.center isn't always well-centered
+      const focusX = pinchEvent.center.x + this.containerElement.scrollLeft;
+      const focusY = pinchEvent.center.y + this.containerElement.scrollTop;
+      const zoomDelta = pinchEvent.scale - lastScaleFactor;
+      lastScaleFactor = pinchEvent.scale;
+      this.zoom(focusX, focusY, zoomDelta);
+    });
   }
 
   /**
@@ -69,15 +90,12 @@ export default class LdZoom {
     this.imageElement.style.marginTop = `${marginTop}px`;
   }
 
-  private zoom(wheelEvent: WheelEvent) {
-    const ratioX = wheelEvent.offsetX / this.imageElement.clientWidth;
-    const ratioY = wheelEvent.offsetY / this.imageElement.clientHeight;
-
-    const zoomDelta = -Math.sign(wheelEvent.deltaY) * this.zoomSpeed;
+  private zoom(focusX: number, focusY: number, zoomDelta: number) {
+    const ratioX = focusX / this.imageElement.clientWidth;
+    const ratioY = focusY / this.imageElement.clientHeight;
     this.setImageScale(Math.min(this.scaleFactor + zoomDelta, this.maxScaleFactor));
-
-    this.containerElement.scrollLeft -= wheelEvent.offsetX - ratioX * this.imageElement.clientWidth;
-    this.containerElement.scrollTop -= wheelEvent.offsetY - ratioY * this.imageElement.clientHeight;
+    this.containerElement.scrollLeft -= focusX - ratioX * this.imageElement.clientWidth;
+    this.containerElement.scrollTop -= focusY - ratioY * this.imageElement.clientHeight;
   }
 
   private setImageScale(newScaleFactor: number) {
