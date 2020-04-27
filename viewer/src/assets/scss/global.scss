@@ -96,18 +96,6 @@ button svg + span {
   background-color: $scrollbar-color;
 }
 
-// === Thumbnail tiles alignment
-
-.thumbnail-tiles {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-evenly;
-  & > a {
-    margin: 2px;
-  }
-}
-
 // === Effect to apply on lazy-image loading
 
 img {

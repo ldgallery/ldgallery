@@ -42,7 +42,16 @@ export default class LdPicture extends Vue {
 </script>
 
 <style lang="scss">
-.thumbnail-tiles .noresult {
-  margin-top: 40px;
+.thumbnail-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-evenly;
+  & > a {
+    margin: 2px;
+  }
+  & .noresult {
+    margin-top: 40px;
+  }
 }
 </style>
