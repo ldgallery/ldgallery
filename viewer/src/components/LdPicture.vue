@@ -18,6 +18,7 @@
 -->
 
 <template>
+  <!-- FIXME: v-dragscroll interferes with pinch-to-zoom -->
   <div
     ref="containerElement"
     v-dragscroll
@@ -34,7 +35,7 @@
       class="ld-picture-element"
       :class="{'slow-loading': Boolean(slowLoadingStyle)}"
       :style="slowLoadingStyle"
-      @load="lazyImageLoaded"
+      @load="clearSlowLoading"
     />
     <b-loading :active="loader" :is-full-page="false" class="ld-picture-loader" />
   </div>
@@ -49,7 +50,7 @@ import DragScrollClickFix from "@/services/dragscrollclickfix";
 export default class LdPicture extends Vue {
   @Prop({ required: true }) readonly picture!: Gallery.Picture;
   @Ref() readonly containerElement!: HTMLDivElement;
-  @Ref() readonly imageElement!: any; // FIXME: no typedef for v-lazy-image
+  @Ref() readonly imageElement!: Vue;
 
   readonly SLOW_LOADING_TIMEOUT_MS: number = 1500;
   readonly dragScrollClickFix = new DragScrollClickFix();
@@ -60,15 +61,11 @@ export default class LdPicture extends Vue {
 
   mounted() {
     this.timer = setTimeout(this.generateSlowLoadingStyle, this.SLOW_LOADING_TIMEOUT_MS);
+    new LdZoom(this.containerElement, this.imageElement.$el as HTMLImageElement, this.picture.properties, 10, 1 / 5).install();
   }
 
   destroyed() {
     this.clearSlowLoading();
-  }
-
-  lazyImageLoaded() {
-    this.clearSlowLoading();
-    new LdZoom(this.containerElement, this.imageElement.$el, 10, 1 / 5).install();
   }
 
   clearSlowLoading() {
