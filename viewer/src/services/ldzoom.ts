@@ -53,8 +53,8 @@ export default class LdZoom {
 
     this.containerElement.addEventListener('wheel', wheelEvent => {
       wheelEvent.preventDefault();
-      const zoomDelta = -Math.sign(wheelEvent.deltaY) * this.scrollZoomSpeed;
-      this.zoom(wheelEvent.offsetX, wheelEvent.offsetY, zoomDelta);
+      const scaleFactor = this.scaleFactor - Math.sign(wheelEvent.deltaY) * this.scrollZoomSpeed;
+      this.zoom(wheelEvent.offsetX, wheelEvent.offsetY, scaleFactor);
     });
 
     const pinchListener = new Hammer(this.containerElement);
@@ -63,19 +63,18 @@ export default class LdZoom {
   }
 
   private installPinchHandler(pinchListener: HammerManager) {
-    let lastScaleFactor = 0.0;
+    let startScaleFactor = 0.0;
 
     pinchListener.on('pinchstart', (pinchEvent: HammerInput) => {
-      lastScaleFactor = pinchEvent.scale;
+      startScaleFactor = this.scaleFactor;
     });
 
     pinchListener.on('pinchmove', (pinchEvent: HammerInput) => {
-      // FIXME: pinchEvent.center isn't always well-centered
+      // FIXME: v-dragscroll interferes with our focus point scroll adjustment
       const focusX = pinchEvent.center.x + this.containerElement.scrollLeft;
       const focusY = pinchEvent.center.y + this.containerElement.scrollTop;
-      const zoomDelta = pinchEvent.scale - lastScaleFactor;
-      lastScaleFactor = pinchEvent.scale;
-      this.zoom(focusX, focusY, zoomDelta);
+      const scaleFactor = pinchEvent.scale * startScaleFactor;
+      this.zoom(focusX, focusY, scaleFactor);
     });
   }
 
@@ -90,10 +89,10 @@ export default class LdZoom {
     this.imageElement.style.marginTop = `${marginTop}px`;
   }
 
-  private zoom(focusX: number, focusY: number, zoomDelta: number) {
+  private zoom(focusX: number, focusY: number, scaleFactor: number) {
     const ratioX = focusX / this.imageElement.clientWidth;
     const ratioY = focusY / this.imageElement.clientHeight;
-    this.setImageScale(Math.min(this.scaleFactor + zoomDelta, this.maxScaleFactor));
+    this.setImageScale(Math.min(scaleFactor, this.maxScaleFactor));
     this.containerElement.scrollLeft -= focusX - ratioX * this.imageElement.clientWidth;
     this.containerElement.scrollTop -= focusY - ratioY * this.imageElement.clientHeight;
   }
