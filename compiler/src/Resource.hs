@@ -72,7 +72,9 @@ instance ToJSON Resource where
 
 data GalleryItemProps =
     Directory { items :: [GalleryItem] }
-  | Picture { resource :: Resource }
+  | Picture
+    { resource :: Resource
+    , resolution :: Resolution }
   | Other { resource :: Resource }
   deriving (Generic, Show)
 

@@ -138,6 +138,17 @@ getImageResolution fsPath =
         (Just w, Just h) -> return $ Resolution w h
         _ -> throwIO $ ProcessingException fsPath "Unable to read image resolution."
 
+getPictureProps :: ItemDescriber
+getPictureProps fsPath resource =
+      getImageResolution fsPath
+  >>= return . Picture resource
+
+
+type ItemDescriber =
+     FilePath
+  -> Resource
+  -> IO GalleryItemProps
+
 
 type ItemFileProcessor =
      FileName        -- ^ Input base path
@@ -147,19 +158,20 @@ type ItemFileProcessor =
 
 itemFileProcessor :: Maybe Resolution -> Cache -> ItemFileProcessor
 itemFileProcessor maxResolution cached inputBase outputBase resClass inputRes =
-  cached processor inPath outPath
-  >> resourceAt outPath relOutPath
-  >>= return . props
+      cached processor inPath outPath
+  >>  resourceAt outPath relOutPath
+  >>= descriptor outPath
   where
     relOutPath = resClass /> inputRes
     inPath = localPath $ inputBase /> inputRes
     outPath = localPath $ outputBase /> relOutPath
-    (processor, props) = processorFor maxResolution $ formatFromPath inputRes
+    (processor, descriptor) = processorFor (formatFromPath inputRes) maxResolution
 
-    processorFor :: Maybe Resolution -> Format -> (FileProcessor, Resource -> GalleryItemProps)
-    processorFor (Just maxRes) PictureFormat = (resizePictureUpTo maxRes, Picture)
-    processorFor Nothing PictureFormat = (copyFileProcessor, Picture)
-    processorFor _ Unknown = (copyFileProcessor, Other) -- TODO: handle video reencoding and others?
+    processorFor :: Format -> Maybe Resolution -> (FileProcessor, ItemDescriber)
+    processorFor PictureFormat (Just maxRes) = (resizePictureUpTo maxRes, getPictureProps)
+    processorFor PictureFormat Nothing = (copyFileProcessor, getPictureProps)
+    -- TODO: handle video reencoding and others?
+    processorFor Unknown _ = (copyFileProcessor, const $ return . Other)
 
 
 type ThumbnailFileProcessor =

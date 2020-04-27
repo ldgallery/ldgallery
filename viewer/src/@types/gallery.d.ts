@@ -49,12 +49,17 @@ declare namespace Gallery {
         thumbnail?: Thumbnail
         properties: OtherProperties | PictureProperties | DirectoryProperties,
     }
+    interface Resolution {
+        width: number,
+        height: number,
+    }
     interface OtherProperties {
         type: "other",
     }
     interface PictureProperties {
         type: "picture",
         resource: string,
+        resolution: Resolution
     }
     interface DirectoryProperties {
         type: "directory",
@@ -62,10 +67,7 @@ declare namespace Gallery {
     }
     interface Thumbnail {
         resource: string,
-        resolution: {
-            width: number,
-            height: number,
-        }
+        resolution: Resolution
     }
     type RawTag = string;
     type ItemType = "other" | "picture" | "directory";
