@@ -28,10 +28,10 @@ module.exports = {
     },
   },
   chainWebpack: (config) => {
-    config.plugins.delete('prefetch');
+    config.plugins.delete("prefetch");
   },
   configureWebpack: {
-    devtool: 'source-map'
+    devtool: "source-map"
   },
   productionSourceMap: false,
   devServer: {
@@ -41,7 +41,7 @@ module.exports = {
       app.get(`/${process.env.VUE_APP_DATA_URL}*`, (req, res) => {
         const fs = require("fs");
         const url = req.url.slice(process.env.VUE_APP_DATA_URL.length);
-        const paramIdx = url.indexOf('?');
+        const paramIdx = url.indexOf("?");
         const filepath = paramIdx < 0 ? url : url.substring(0, paramIdx);
         const fullpath = `${process.env.VUE_APP_DEVSERVER_CONFIG_PATH}${decodeURIComponent(filepath)}`;
         const file = fs.readFileSync(fullpath);

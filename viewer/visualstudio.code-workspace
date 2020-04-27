@@ -1,20 +1,22 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {
-		"editor.formatOnSave": true,
-		"editor.wordBasedSuggestions": false,
-		"files.insertFinalNewline": true,
-		"files.trimFinalNewlines": true,
-		"javascript.format.semicolons": "insert",
-		"typescript.disableAutomaticTypeAcquisition": true,
-		"vue-i18n-ally.keystyle": "flat",
-		"vue-i18n-ally.localesPaths": "src/locales",
-		"i18n-ally.localesPaths": "src/locales",
-	}
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true,
+    "editor.wordBasedSuggestions": false,
+    "editor.detectIndentation": false,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "javascript.format.semicolons": "insert",
+    "typescript.disableAutomaticTypeAcquisition": true,
+    "vue-i18n-ally.keystyle": "flat",
+    "vue-i18n-ally.localesPaths": "src/locales",
+    "i18n-ally.localesPaths": "src/locales",
+  },
 }
 // Recommended Visual Studio Code extensions:
 // - Vetur
