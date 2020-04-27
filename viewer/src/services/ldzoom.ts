@@ -60,6 +60,8 @@ export default class LdZoom {
     const pinchListener = new Hammer(this.containerElement);
     pinchListener.get('pinch').set({enable: true});
     this.installPinchHandler(pinchListener);
+
+    this.setImageScale(this.scaleFactor);
   }
 
   private installPinchHandler(pinchListener: HammerManager) {
