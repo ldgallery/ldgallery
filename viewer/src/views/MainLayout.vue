@@ -49,6 +49,11 @@ export default class MainLayout extends Vue {
   mounted() {
     history.replaceState({ ldgallery: "ENTRYPOINT" }, "");
     this.fetchGalleryItems();
+    document.body.addEventListener("fullscreenchange", this.onFullscreenChange);
+  }
+
+  destroyed() {
+    document.body.removeEventListener("fullscreenchange", this.onFullscreenChange);
   }
 
   @Watch("$route")
@@ -76,6 +81,16 @@ export default class MainLayout extends Vue {
       indefinite: true,
       onAction: this.fetchGalleryItems,
     });
+  }
+
+  @Watch("$uiStore.fullscreen")
+  applyFullscreen(fullscreen: boolean) {
+    if (fullscreen && !document.fullscreen) document.body.requestFullscreen();
+    else if (document.fullscreen) document.exitFullscreen();
+  }
+
+  onFullscreenChange() {
+    this.$uiStore.toggleFullscreen(document.fullscreen);
   }
 }
 </script>
