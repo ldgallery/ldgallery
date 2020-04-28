@@ -54,6 +54,8 @@ Builds of this software embed and make use of the following libraries:
   * fortawesome/vue-fontawesome, licensed under the MIT License
   * buefy, licensed under the MIT License
   * core-js, licensed under the MIT License
+  * resize-observer-polyfill, licensed under the MIT License
+  * hammerjs, licensed under the MIT License
   * v-lazy-image, licensed under the MIT License
   * vue, licensed under the MIT License
   * vue-class-component, licensed under the MIT License

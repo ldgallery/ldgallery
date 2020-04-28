@@ -87,6 +87,7 @@ body,
 html {
   height: 100%;
   overflow: hidden;
+  touch-action: none;
   background-color: $content-bgcolor;
   --layout-top: #{$layout-top};
   --layout-left: #{$layout-left};
