@@ -18,7 +18,7 @@
 */
 
 // polyfill still required for IE and Safari, see https://caniuse.com/#feat=resizeobserver
-import ResizeObserver from 'resize-observer-polyfill';
+import ResizeObserver from "resize-observer-polyfill";
 import "hammerjs";
 
 /**
@@ -54,25 +54,25 @@ export default class LdZoom {
       this.updateImageScale(this.scaleFactor);
     }).observe(this.containerElement);
 
-    this.containerElement.addEventListener('wheel', wheelEvent => {
+    this.containerElement.addEventListener("wheel", wheelEvent => {
       wheelEvent.preventDefault();
       const scaleFactor = this.scaleFactor - Math.sign(wheelEvent.deltaY) * this.scrollZoomSpeed;
       this.zoom(wheelEvent.offsetX, wheelEvent.offsetY, scaleFactor);
     });
 
     const pinchListener = new Hammer(this.containerElement);
-    pinchListener.get('pinch').set({enable: true});
+    pinchListener.get("pinch").set({ enable: true });
     this.installPinchHandler(pinchListener);
   }
 
   private installPinchHandler(pinchListener: HammerManager) {
     let startScaleFactor = 0.0;
 
-    pinchListener.on('pinchstart', (pinchEvent: HammerInput) => {
+    pinchListener.on("pinchstart", (pinchEvent: HammerInput) => {
       startScaleFactor = this.scaleFactor;
     });
 
-    pinchListener.on('pinchmove', (pinchEvent: HammerInput) => {
+    pinchListener.on("pinchmove", (pinchEvent: HammerInput) => {
       const focusX = pinchEvent.center.x + this.containerElement.scrollLeft;
       const focusY = pinchEvent.center.y + this.containerElement.scrollTop;
       const scaleFactor = pinchEvent.scale * startScaleFactor;

@@ -18,24 +18,24 @@
 */
 
 declare namespace Tag {
-    interface Node {
-        tag: Gallery.RawTag;
-        tagfiltered: Gallery.RawTag;
-        rootPart: boolean;
-        childPart: boolean;
-        items: Gallery.Item[];
-        children: Index;
-    }
-    interface Search extends Node {
-        parent?: Node;
-        operation: string; // Enum Operation
-        display: string;
-    }
-    type SearchByOperation = { [index: string]: Tag.Search[] };
-    type Index = { [index: string]: Node };
+  interface Node {
+    tag: Gallery.RawTag;
+    tagfiltered: Gallery.RawTag;
+    rootPart: boolean;
+    childPart: boolean;
+    items: Gallery.Item[];
+    children: Index;
+  }
+  interface Search extends Node {
+    parent?: Node;
+    operation: string; // Enum Operation
+    display: string;
+  }
+  type SearchByOperation = { [index: string]: Tag.Search[] };
+  type Index = { [index: string]: Node };
 
-    interface Category {
-        tag: string;
-        index: Index;
-    }
+  interface Category {
+    tag: string;
+    index: Index;
+  }
 }

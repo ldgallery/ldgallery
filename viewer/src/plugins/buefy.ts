@@ -20,13 +20,13 @@
 import Vue from "vue";
 
 // @ts-ignore
-import Taginput from 'buefy/src/components/taginput';
+import Taginput from "buefy/src/components/taginput";
 // @ts-ignore
-import Loading from 'buefy/src/components/loading';
+import Loading from "buefy/src/components/loading";
 // @ts-ignore
-import Button from 'buefy/src/components/button';
+import Button from "buefy/src/components/button";
 // @ts-ignore
-import SnackBar from 'buefy/src/components/snackbar';
+import SnackBar from "buefy/src/components/snackbar";
 
 import "@/assets/scss/buefy.scss";
 
@@ -35,8 +35,8 @@ Vue.use(Loading);
 Vue.use(Button);
 Vue.use(SnackBar);
 
-declare module 'vue/types/vue' {
-    interface Vue {
-        $buefy: any;
-    }
+declare module "vue/types/vue" {
+  interface Vue {
+    $buefy: any;
+  }
 }

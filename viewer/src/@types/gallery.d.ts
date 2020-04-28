@@ -18,57 +18,57 @@
 */
 
 declare namespace Gallery {
-    interface Config {
-        galleryRoot: string,
-    }
+  interface Config {
+    galleryRoot: string,
+  }
 
-    interface GalleryProperties {
-        galleryTitle: string,
-        tagCategories: RawTag[]
-    }
-    interface Index {
-        properties: GalleryProperties,
-        tree: Directory
-    }
+  interface GalleryProperties {
+    galleryTitle: string,
+    tagCategories: RawTag[]
+  }
+  interface Index {
+    properties: GalleryProperties,
+    tree: Directory
+  }
 
-    interface Other extends Item {
-        properties: OtherProperties,
-    }
-    interface Picture extends Item {
-        properties: PictureProperties,
-    }
-    interface Directory extends Item {
-        properties: DirectoryProperties,
-    }
-    interface Item {
-        title: string,
-        datetime: string,
-        description: string,
-        tags: RawTag[],
-        path: string,
-        thumbnail?: Thumbnail
-        properties: OtherProperties | PictureProperties | DirectoryProperties,
-    }
-    interface Resolution {
-        width: number,
-        height: number,
-    }
-    interface OtherProperties {
-        type: "other",
-    }
-    interface PictureProperties {
-        type: "picture",
-        resource: string,
-        resolution: Resolution
-    }
-    interface DirectoryProperties {
-        type: "directory",
-        items: Item[]
-    }
-    interface Thumbnail {
-        resource: string,
-        resolution: Resolution
-    }
-    type RawTag = string;
-    type ItemType = "other" | "picture" | "directory";
+  interface Other extends Item {
+    properties: OtherProperties,
+  }
+  interface Picture extends Item {
+    properties: PictureProperties,
+  }
+  interface Directory extends Item {
+    properties: DirectoryProperties,
+  }
+  interface Item {
+    title: string,
+    datetime: string,
+    description: string,
+    tags: RawTag[],
+    path: string,
+    thumbnail?: Thumbnail
+    properties: OtherProperties | PictureProperties | DirectoryProperties,
+  }
+  interface Resolution {
+    width: number,
+    height: number,
+  }
+  interface OtherProperties {
+    type: "other",
+  }
+  interface PictureProperties {
+    type: "picture",
+    resource: string,
+    resolution: Resolution
+  }
+  interface DirectoryProperties {
+    type: "directory",
+    items: Item[]
+  }
+  interface Thumbnail {
+    resource: string,
+    resolution: Resolution
+  }
+  type RawTag = string;
+  type ItemType = "other" | "picture" | "directory";
 }

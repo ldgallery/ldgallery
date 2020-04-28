@@ -17,8 +17,8 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { Operation } from '@/@types/Operation';
-import Navigation from '@/services/navigation';
+import { Operation } from "@/@types/Operation";
+import Navigation from "@/services/navigation";
 
 export default class IndexFactory {
 
@@ -35,7 +35,7 @@ export default class IndexFactory {
       return; // Directories are not indexed
     }
     for (const tag of item.tags) {
-      const parts = tag.split(':');
+      const parts = tag.split(":");
       let lastPart: string | null = null;
       for (const part of parts) {
         tagsIndex[part] = IndexFactory.pushPartToIndex(tagsIndex[part], part, item, !Boolean(lastPart));

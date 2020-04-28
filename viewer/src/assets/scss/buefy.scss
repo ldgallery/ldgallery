@@ -32,12 +32,12 @@
 $addColors: (
   "green": (
     $green,
-    $green-invert
+    $green-invert,
   ),
   "purple": (
     $purple,
-    $purple-invert
-  )
+    $purple-invert,
+  ),
 );
 $colors: map-merge($colors, $addColors);
 

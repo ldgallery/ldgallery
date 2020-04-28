@@ -17,7 +17,7 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { Operation } from '@/@types/Operation';
+import { Operation } from "@/@types/Operation";
 
 export default class IndexSearch {
 
