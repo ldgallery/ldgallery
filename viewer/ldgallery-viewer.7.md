@@ -2,7 +2,7 @@
 pagetitle: Viewer user manual - ldgallery
 title: LDGALLERY-VIEWER(7) ldgallery
 author: Pacien TRAN-GIRARD, Guillaume FOUET
-date: 2020-04-17 (v1.0-SNAPSHOT)
+date: 2020-04-30 (v1.0)
 ---
 
 
