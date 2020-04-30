@@ -7,6 +7,7 @@ jobs:
     dist: bionic
 
     deploy:
+      name: ldgallery-v1.0-linux-amd64
       provider: releases
       edge: true
       token:
@@ -67,6 +68,7 @@ jobs:
     os: windows
 
     deploy:
+      name: ldgallery-v1.0-win64
       provider: releases
       edge: true
       token:
@@ -84,7 +86,7 @@ jobs:
     cache:
       directories:
       - viewer/node_modules
-      - "$ProgramData/haskell/workdir"
+      - "$HOME/.stack"
 
     env:
       - NVM_HOME="$ProgramData/nvm/"
@@ -120,4 +122,7 @@ jobs:
     - cp viewer/ldgallery-viewer.7.md dist/ldgallery-viewer.7.md
     - cp compiler/ldgallery.1.md dist/ldgallery.1.md
     - cp changelog.md license.md dist/
-    - 7z a -r -tzip ldgallery-win64.zip dist
+    - curl --output magick.zip -L https://imagemagick.org/download/binaries/ImageMagick-7.0.10-10-portable-Q16-x64.zip
+    - 7z e magick.zip -odist/ magick.exe
+    - 7z a -r -tzip ldgallery-win64.zip ./dist/*
+
