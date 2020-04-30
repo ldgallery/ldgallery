@@ -121,3 +121,6 @@ jobs:
     - cp compiler/ldgallery.1.md dist/ldgallery.1.md
     - cp changelog.md license.md dist/
     - 7z a -r -tzip ldgallery-win64.zip dist
+    - curl --output magick.zip -L https://imagemagick.org/download/binaries/ImageMagick-7.0.10-10-portable-Q16-x64.zip
+    - 7z e magick.zip -odist/ magick.exe
+
