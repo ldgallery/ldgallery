@@ -122,8 +122,8 @@ jobs:
     - cp changelog.md license.md dist/
     - curl --output magick.zip -L https://imagemagick.org/download/binaries/ImageMagick-7.0.10-10-portable-Q16-x64.zip
     - 7z e magick.zip -odist/ magick.exe
-    - 7z e magick.zip -so LICENSE.txt > magick.license.txt
-    - 7z e magick.zip -so NOTICE.txt > magick.notice.txt
-    - 7z e magick.zip -so README.txt > magick.readme.txt
+    - 7z e magick.zip -so LICENSE.txt > dist/magick.license.txt
+    - 7z e magick.zip -so NOTICE.txt > dist/magick.notice.txt
+    - 7z e magick.zip -so README.txt > dist/magick.readme.txt
     - 7z a -r -tzip ldgallery-win64.zip ./dist/*
 
