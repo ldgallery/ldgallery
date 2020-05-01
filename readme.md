@@ -17,6 +17,7 @@ Build
 The man pages can be generated using [Pandoc]:
 
 ```
+pandoc --standalone --to man ldgallery-quickstart.7.md --output ldgallery-quickstart.7
 pandoc --standalone --to man compiler/ldgallery.1.md --output ldgallery.1
 pandoc --standalone --to man viewer/ldgallery-viewer.7.md --output ldgallery-viewer.7
 ```

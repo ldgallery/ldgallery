@@ -68,7 +68,12 @@ An example of such manifest and an associated icon are available in the example 
 
 # SEE ALSO
 
+Related manual pages: __ldgallery__(1), __ldgallery-quickstart__(7)
+
 The ldgallery source code is available on <https://ldgallery.pacien.org>.
+
+
+# LICENSE
 
 Copyright (C) 2019-2020  Pacien TRAN-GIRARD and Guillaume FOUET.
 

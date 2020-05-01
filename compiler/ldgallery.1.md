@@ -176,7 +176,12 @@ pictureMaxResolution.height
 
 # SEE ALSO
 
+Related manual pages: __ldgallery-quickstart__(7), __ldgallery-viewer__(7)
+
 The ldgallery source code is available on <https://ldgallery.pacien.org>.
+
+
+# LICENSE
 
 Copyright (C) 2019-2020  Pacien TRAN-GIRARD and Guillaume FOUET.
 
