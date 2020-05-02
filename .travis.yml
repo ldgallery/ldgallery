@@ -59,7 +59,7 @@ jobs:
   #=============================================================
 
   - name: release-win64
-    if: branch IN (master, staging)
+    if: tag IS present OR branch IN (master, staging)
     language: shell
     os: windows
 
