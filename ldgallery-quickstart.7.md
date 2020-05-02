@@ -65,14 +65,14 @@ If the compiler was installed manually through the extraction of a pre-built arc
 <installation path>/ldgallery --with-viewer=<installation path>/viewer --input-dir <source gallery path>
 ```
 
-Running the command above produces a directory named "out" within the input gallery directory, which contains the compiled gallery and a web viewer, ready to be deployed on some web server.
+Running the command above produces a directory named "out" in the current directory, which contains the compiled gallery and a web viewer ready to be deployed on some web server.
 
 ## Step 5: deploying the gallery
 
 The content of the "out" directory generated at the previous step can now simply be uploaded to some web host, for example with an FTP client like FileZilla or through rsync/SSH with the following command:
 
 ```sh
-rsync -Prz <source gallery path>/out/* user@webhost:publication_path/
+rsync -Prz out/* user@webhost:publication_path/
 ```
 
 The target web host doesn't need to run any additional software besides a web server correctly configured to serve flat static files.
