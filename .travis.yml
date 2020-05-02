@@ -118,6 +118,8 @@ jobs:
     - stack build --no-terminal
     - stack install --local-bin-path ../dist/
     - cd ..
+    - mkdir dist/scripts
+    - cp scripts/win_* dist/scripts/
     - cp ldgallery-quickstart.7.md dist/ldgallery-quickstart.7.md
     - cp viewer/ldgallery-viewer.7.md dist/ldgallery-viewer.7.md
     - cp compiler/ldgallery.1.md dist/ldgallery.1.md
