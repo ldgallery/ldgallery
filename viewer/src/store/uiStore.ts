@@ -20,37 +20,27 @@
 import { createModule, mutation, action } from "vuex-class-component";
 
 const VuexModule = createModule({
-    namespaced: "uiStore",
-    strict: false
+  namespaced: "uiStore",
+  strict: true
 })
 
 export default class UIStore extends VuexModule {
 
-    fullscreen: boolean = false;
-    mode: "navigation" | "search" = "navigation";
-    currentTags: Tag.Search[] = [];
+  fullscreen: boolean = false;
+  fullWidth: boolean = window.innerWidth < Number(process.env.VUE_APP_FULLWIDTH_LIMIT);
+  searchMode: boolean = false;
 
-    // ---
+  // ---
 
-    get isModeSearch() {
-        return this.mode === "search";
-    }
+  @mutation toggleFullscreen(value?: boolean) {
+    this.fullscreen = value ?? !this.fullscreen;
+  }
 
-    get isModeNavigation() {
-        return this.mode === "navigation";
-    }
+  @mutation toggleFullWidth(value?: boolean) {
+    this.fullWidth = value ?? !this.fullWidth;
+  }
 
-    // ---
-
-    @mutation toggleFullscreen() {
-        this.fullscreen = !this.fullscreen;
-    }
-
-    @mutation setModeNavigation() {
-        this.mode = "navigation";
-    }
-
-    @mutation setModeSearch() {
-        this.mode = "search";
-    }
+  @mutation toggleSearchMode(value?: boolean) {
+    this.searchMode = value ?? !this.searchMode;
+  }
 }

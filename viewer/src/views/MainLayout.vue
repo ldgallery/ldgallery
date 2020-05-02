@@ -18,34 +18,56 @@
 -->
 
 <template>
-  <div :class="{fullscreen: $uiStore.fullscreen}">
-    <panel-top class="layout layout-top" />
-    <panel-left class="layout layout-left" />
-    <router-view class="layout layout-content" />
-    <ld-button-fullscreen />
+  <div :class="{'fullscreen': $uiStore.fullscreen, 'fullwidth': $uiStore.fullWidth}">
+    <ld-title
+      :gallery-title="$galleryStore.galleryTitle"
+      :current-item="$galleryStore.currentItem"
+    />
+    <panel-top v-if="!isLoading" class="layout layout-top" />
+    <panel-left v-if="!isLoading" class="layout layout-left" />
+    <router-view v-if="!isLoading" ref="content" class="layout layout-content scrollbar" />
     <b-loading :active="isLoading" is-full-page />
+    <ld-key-press :keycode="27" @action="$uiStore.toggleFullscreen(false)" />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Ref, Watch } from "vue-property-decorator";
 import PanelLeft from "./PanelLeft.vue";
 import PanelTop from "./PanelTop.vue";
+import { Route } from "vue-router";
 
 @Component({
   components: { PanelLeft, PanelTop },
 })
 export default class MainLayout extends Vue {
-  isLoading: boolean = false;
+  @Ref() readonly content!: Vue;
+
+  isLoading: boolean = true;
+  scrollPositions: ScrollPosition = {};
 
   mounted() {
+    history.replaceState({ ldgallery: "ENTRYPOINT" }, "");
     this.fetchGalleryItems();
+    document.body.addEventListener("fullscreenchange", this.onFullscreenChange);
+  }
+
+  destroyed() {
+    document.body.removeEventListener("fullscreenchange", this.onFullscreenChange);
+  }
+
+  @Watch("$route")
+  routeChanged(newRoute: Route, oldRoute: Route) {
+    const el = this.content.$el;
+    this.scrollPositions[oldRoute.path] = el.scrollTop;
+    this.$nextTick(() => (el.scrollTop = this.scrollPositions[newRoute.path]));
   }
 
   fetchGalleryItems() {
     this.isLoading = true;
     this.$galleryStore
-      .fetchGalleryItems(`${process.env.VUE_APP_DATA_URL}/index.json`)
+      .fetchConfig()
+      .then(this.$galleryStore.fetchGalleryItems)
       .finally(() => (this.isLoading = false))
       .catch(this.displayError);
   }
@@ -60,16 +82,28 @@ export default class MainLayout extends Vue {
       onAction: this.fetchGalleryItems,
     });
   }
+
+  @Watch("$uiStore.fullscreen")
+  applyFullscreen(fullscreen: boolean) {
+    if (fullscreen && !document.fullscreen) document.body.requestFullscreen();
+    else if (document.fullscreen) document.exitFullscreen();
+  }
+
+  onFullscreenChange() {
+    this.$uiStore.toggleFullscreen(document.fullscreen);
+  }
 }
 </script>
 
 <style lang="scss">
-@import "@/assets/scss/theme.scss";
+@import "~@/assets/scss/theme.scss";
 
 body,
 html {
   height: 100%;
   overflow: hidden;
+  touch-action: none;
+  background-color: $content-bgcolor;
   --layout-top: #{$layout-top};
   --layout-left: #{$layout-left};
 }
@@ -93,11 +127,15 @@ html {
     top: var(--layout-top);
     left: var(--layout-left);
     z-index: 3;
+    overflow-x: hidden;
   }
 }
 .fullscreen {
-  --layout-left: 0px;
   --layout-top: 0px;
+  @extend .fullwidth;
+}
+.fullwidth {
+  --layout-left: 0px;
   .layout {
     &.layout-left {
       transform: translate(-$layout-left, 0);
@@ -118,4 +156,15 @@ html {
     background-color: $content-bgcolor;
   }
 }
+
+// TODO: Remove when #21 (remove explicit navigation/search modes) is resolved
+// Forced at the bottom right corner so we can continue working on the sidebar without interference
+.tmp-mode-selector {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 100;
+  opacity: 0.75;
+}
+// =====
 </style>

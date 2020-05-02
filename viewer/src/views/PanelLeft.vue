@@ -18,25 +18,81 @@
 -->
 
 <template>
-  <div class="flex-column">
-    <h1>{{$t('panelLeft.mode')}}</h1>
-    <ld-mode-radio />
-    <h1>{{$t('panelLeft.filters')}}</h1>
-    <ld-tag-input />
-    <h1>{{$t('panelLeft.propositions')}}</h1>
-    <ld-proposition />
+  <div class="flex-column sidebar">
+    <ld-tag-input
+      :search-filters.sync="searchFilters"
+      :tags-index="$galleryStore.tagsIndex"
+      @onkeyenter-empty="search"
+    />
+    <ld-command-search @clear="clear" @search="search" />
+    <h1 class="title">{{$t('panelLeft.propositions')}}</h1>
+    <div class="scrollbar no-scroll-x">
+      <ld-proposition
+        v-for="(category) in $galleryStore.tagsCategories"
+        :key="category.tag"
+        :category="$galleryStore.tagsIndex[category.tag]"
+        :show-category="$galleryStore.tagsCategories.length > 1"
+        :search-filters.sync="searchFilters"
+        :tags-index="category.index"
+        :current-tags="currentTags()"
+      />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Vue, Prop, Watch } from "vue-property-decorator";
+import { Dictionary, Route } from "vue-router/types/router";
+import Navigation from "@/services/navigation";
+import IndexFactory from "@/services/indexfactory";
 
 @Component
-export default class PanelLeft extends Vue {}
+export default class PanelLeft extends Vue {
+  searchFilters: Tag.Search[] = [];
+
+  mounted() {
+    this.restoreSearchFilters(this.$route);
+  }
+
+  clear() {
+    this.searchFilters = [];
+    this.search();
+  }
+
+  search() {
+    const lastDirectory = Navigation.getLastDirectory(this.$galleryStore.currentItemPath);
+    this.$router.push({ path: lastDirectory.path, query: this.serializeSearch() }).catch(err => {
+      if (err.name !== "NavigationDuplicated") throw err;
+    });
+  }
+
+  serializeSearch() {
+    let query: Dictionary<null> = {};
+    this.searchFilters.forEach(filter => (query[filter.display] = null));
+    return query;
+  }
+
+  currentTags() {
+    return this.$galleryStore.currentItem?.tags ?? [];
+  }
+
+  @Watch("$route")
+  restoreSearchFilters(route: Route) {
+    const query = Object.keys(route.query);
+    if (query.length > 0) this.$galleryStore.search(query).then(search => (this.searchFilters = [...search]));
+  }
+}
 </script>
 
 <style lang="scss">
-.label {
-  color: white;
+@import "~@/assets/scss/theme.scss";
+
+.sidebar {
+  .title {
+    background-color: $proposed-category-bgcolor;
+    padding: 0.2em 0.5em;
+    margin: 0 0 1px 0;
+    font-variant: small-caps;
+  }
 }
 </style>

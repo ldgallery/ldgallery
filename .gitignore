@@ -1,1 +1,6 @@
+# compiled man pages
 *.1
+*.7
+
+# editor and IDE
+.idea

@@ -28,9 +28,7 @@ module Files
   ) where
 
 
-import Control.Monad (mapM)
-import Data.Bool (bool)
-import Data.List (isPrefixOf, length, subsequences)
+import Data.List (isPrefixOf, length, subsequences, sortOn)
 import Data.Function ((&))
 import Data.Text (pack)
 import Data.Aeson (ToJSON)
@@ -39,6 +37,7 @@ import qualified Data.Aeson as JSON
 import System.Directory
   ( doesDirectoryExist
   , doesPathExist
+  , canonicalizePath
   , getModificationTime
   , listDirectory
   , createDirectoryIfMissing
@@ -53,7 +52,7 @@ type FileName = String
 type LocalPath = String
 type WebPath = String
 
- -- | Reversed path component list
+-- | Reversed path component list
 data Path = Path [FileName] deriving Show
 
 instance ToJSON Path where
@@ -94,8 +93,13 @@ webPath (Path path) = System.FilePath.Posix.joinPath $ reverse path
 
 
 data FSNode =
-    File { path :: Path }
-  | Dir { path :: Path, items :: [FSNode] }
+    File
+      { path :: Path
+      , canonicalPath :: FilePath }
+  | Dir
+      { path :: Path
+      , canonicalPath :: FilePath
+      , items :: [FSNode] }
   deriving Show
 
 data AnchoredFSNode = AnchoredFSNode
@@ -115,8 +119,8 @@ isHidden = hiddenName . nodeName
 
 -- | DFS with intermediate dirs first.
 flattenDir :: FSNode -> [FSNode]
-flattenDir file@(File _) = [file]
-flattenDir dir@(Dir _ items) = dir:(concatMap flattenDir items)
+flattenDir file@File{} = [file]
+flattenDir dir@Dir{items} = dir:(concatMap flattenDir items)
 
 -- | Filters a dir tree. The root is always returned.
 filterDir :: (FSNode -> Bool) -> AnchoredFSNode -> AnchoredFSNode
@@ -124,35 +128,42 @@ filterDir cond (AnchoredFSNode anchor root) =
   AnchoredFSNode anchor (filterNode root)
   where
   filterNode :: FSNode -> FSNode
-  filterNode file@(File _) = file
-  filterNode (Dir path items) =
-    filter cond items & map filterNode & Dir path
+  filterNode file@File{} = file
+  filterNode Dir{path, canonicalPath, items} =
+    filter cond items & map filterNode & Dir path canonicalPath
 
 readDirectory :: LocalPath -> IO AnchoredFSNode
 readDirectory root = mkNode (Path []) >>= return . AnchoredFSNode root
   where
     mkNode :: Path -> IO FSNode
     mkNode path =
-      (doesDirectoryExist $ localPath (root /> path))
-      >>= bool (mkFileNode path) (mkDirNode path)
+      do
+        let relPath = localPath (root /> path)
+        canonicalPath <- canonicalizePath relPath
+        isDir <- doesDirectoryExist relPath
+        if isDir then
+          mkDirNode path canonicalPath
+        else
+          mkFileNode path canonicalPath
 
-    mkFileNode :: Path -> IO FSNode
-    mkFileNode path = return $ File path
+    mkFileNode :: Path -> FilePath -> IO FSNode
+    mkFileNode path canonicalPath = return $ File path canonicalPath
 
-    mkDirNode :: Path -> IO FSNode
-    mkDirNode path =
+    mkDirNode :: Path -> FilePath -> IO FSNode
+    mkDirNode path canonicalPath =
       (listDirectory $ localPath (root /> path))
       >>= mapM (mkNode . ((</) path))
-      >>= return . Dir path
+      >>= return . sortOn nodeName
+      >>= return . Dir path canonicalPath
 
 copyTo :: FilePath -> AnchoredFSNode -> IO ()
 copyTo target AnchoredFSNode{anchor, root} = copyNode root
   where
     copyNode :: FSNode -> IO ()
-    copyNode (File path) =
+    copyNode File{path} =
       copyFile (localPath $ anchor /> path) (localPath $ target /> path)
 
-    copyNode (Dir path items) =
+    copyNode Dir{path, items} =
       createDirectoryIfMissing True (localPath $ target /> path)
       >> mapM_ copyNode items
 

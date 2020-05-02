@@ -18,26 +18,24 @@
 -->
 
 <template>
-  <div>
-    <div class="flex">
-      <div v-for="(item) in directory.properties.items" :key="item.path">
-        <router-link :to="item.path">
-          <gallery-thumbnail :item="item" />
-        </router-link>
-      </div>
-    </div>
-  </div>
+  <ld-gallery :items="orderedItems()" :noresult="$t('directory.no-results')" />
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import GalleryThumbnail from "./GalleryThumbnail.vue";
+import Navigation from "@/services/navigation";
 
-@Component({
-  components: { GalleryThumbnail },
-})
+@Component
 export default class GalleryDirectory extends Vue {
   @Prop({ required: true }) readonly directory!: Gallery.Directory;
+
+  mounted() {
+    this.$uiStore.toggleFullscreen(false);
+  }
+
+  orderedItems() {
+    return Navigation.directoriesFirst(this.directory.properties.items);
+  }
 }
 </script>
 

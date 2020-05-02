@@ -18,93 +18,105 @@
 */
 
 import { createModule, mutation, action } from "vuex-class-component";
+import IndexFactory from "@/services/indexfactory";
+import Navigation from "@/services/navigation";
 
 const VuexModule = createModule({
-    namespaced: "galleryStore",
-    strict: true
+  namespaced: "galleryStore",
+  strict: true
 })
 
 export default class GalleryStore extends VuexModule {
 
-    galleryItemsRoot: Gallery.Item | null = null;
-    tags: Tag.Index = {};
-    currentPath: string = "/";
+  config: Gallery.Config | null = null;
+  galleryIndex: Gallery.Index | null = null;
+  tagsIndex: Tag.Index = {};
+  tagsCategories: Tag.Category[] = [];
+  currentPath: string = "/";
+  currentSearch: Tag.Search[] = [];
 
-    // ---
+  // ---
 
-    @mutation setGalleryItemsRoot(galleryItemsRoot: Gallery.Item) {
-        this.galleryItemsRoot = galleryItemsRoot;
-    }
+  @mutation private setConfig(config: Gallery.Config) {
+    this.config = config;
+  }
 
-    @mutation private setTags(tags: Tag.Index) {
-        this.tags = tags;
-    }
+  @mutation setGalleryIndex(galleryIndex: Gallery.Index) {
+    this.galleryIndex = Object.freeze(galleryIndex);
+  }
 
-    @mutation setCurrentPath(currentPath: string) {
-        this.currentPath = currentPath;
-    }
+  @mutation private setTagsIndex(tagsIndex: Tag.Index) {
+    this.tagsIndex = Object.freeze(tagsIndex);
+  }
 
-    get currentItemPath(): Gallery.Item[] {
-        const galleryItemsRoot = this.galleryItemsRoot;
-        if (galleryItemsRoot)
-            return GalleryStore.searchCurrentItemPath(galleryItemsRoot, this.currentPath);
-        return [];
-    }
+  @mutation private setTagsCategories(tagsCategories: Tag.Category[]) {
+    this.tagsCategories = tagsCategories;
+  }
 
-    get currentItem(): Gallery.Item | null {
-        const currentItemPath = this.currentItemPath;
-        return currentItemPath.length > 0 ? currentItemPath[currentItemPath.length - 1] : null;
-    }
+  @mutation setCurrentPath(currentPath: string) {
+    this.currentPath = currentPath;
+  }
 
-    // ---
+  @mutation setCurrentSearch(currentSearch: Tag.Search[]) {
+    this.currentSearch = currentSearch;
+  }
 
-    // Fetches the gallery's JSON metadata
-    @action async fetchGalleryItems(url: string) {
-        fetch(url)
-            .then(response => response.json())
-            .then(this.setGalleryItemsRoot)
-            .then(this.indexTags);
-    }
+  // ---
 
-    // Indexes the gallery
-    @action async indexTags() {
-        let index = {};
-        if (this.galleryItemsRoot)
-            GalleryStore.pushTagsForItem(index, this.galleryItemsRoot);
-        console.log("Index: ", index);
-        this.setTags(index);
-    }
+  get currentItemPath(): Gallery.Item[] {
+    const root = this.galleryIndex?.tree;
+    if (root)
+      return Navigation.searchCurrentItemPath(root, this.currentPath);
+    return [];
+  }
 
-    // ---
+  get currentItem(): Gallery.Item | null {
+    const path = this.currentItemPath;
+    return path.length > 0 ? path[path.length - 1] : null;
+  }
 
-    // Pushes all tags for a root item (and its children) to the index
-    private static pushTagsForItem(index: Tag.Index, item: Gallery.Item) {
-        console.log("IndexingTagsFor: ", item.path);
-        if (item.properties.type === "directory") {
-            item.properties.items.forEach(item => this.pushTagsForItem(index, item));
-            return; // Directories are not indexed
-        }
-        for (const tag of item.tags) {
-            const parts = tag.split('.');
-            let lastPart: string | null = null;
-            for (const part of parts) {
-                if (!index[part]) index[part] = { tag: part, items: [], children: {} };
-                if (!index[part].items.includes(item)) index[part].items.push(item);
-                if (lastPart) index[lastPart].children[part] = index[part];
-                lastPart = part;
-            }
-        }
-    }
+  get galleryTitle(): string {
+    return this.galleryIndex?.properties.galleryTitle ?? "ldgallery";
+  }
 
-    // Searches for an item by path from a root item (navigation)
-    private static searchCurrentItemPath(item: Gallery.Item, path: string): Gallery.Item[] {
-        if (path === item.path) return [item];
-        if (item.properties.type === "directory" && path.startsWith(item.path)) {
-            const itemChain = item.properties.items
-                .map(item => this.searchCurrentItemPath(item, path))
-                .find(itemChain => itemChain.length > 0);
-            if (itemChain) return [item, ...itemChain];
-        }
-        return [];
-    }
+  // ---
+
+  // Fetches the gallery's JSON config
+  @action async fetchConfig() {
+    return fetch(`${process.env.VUE_APP_DATA_URL}config.json`, { cache: "no-cache" })
+      .then(response => response.json())
+      .then(this.setConfig);
+  }
+
+  // Fetches the gallery's JSON metadata
+  @action async fetchGalleryItems() {
+    const root = this.config?.galleryRoot ?? "";
+    return fetch(`${process.env.VUE_APP_DATA_URL}${root}index.json`, { cache: "no-cache" })
+      .then(response => response.json())
+      .then(this.setGalleryIndex)
+      .then(this.indexTags)
+      .then(this.indexTagCategories);
+  }
+
+  // Indexes the gallery
+  @action async indexTags() {
+    const root = this.galleryIndex?.tree ?? null;
+    const index = IndexFactory.generateTags(root);
+    this.setTagsIndex(index);
+    return index;
+  }
+
+  // Indexes the proposed categories
+  @action async indexTagCategories() {
+    const categories = IndexFactory.generateCategories(this.tagsIndex, this.galleryIndex?.properties.tagCategories);
+    this.setTagsCategories(categories);
+    return categories;
+  }
+
+  // Searches for tags
+  @action async search(filters: string[]) {
+    const results = filters.flatMap(filter => IndexFactory.searchTags(this.tagsIndex, filter, true));
+    this.setCurrentSearch(results);
+    return results;
+  }
 }

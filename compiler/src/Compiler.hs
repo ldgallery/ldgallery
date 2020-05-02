@@ -18,20 +18,23 @@
 
 module Compiler
   ( compileGallery
+  , writeJSON
   ) where
 
 
-import Control.Monad (liftM2)
-import Data.List (any)
+import GHC.Generics (Generic)
+import Control.Monad (liftM2, when)
+import Data.Maybe (fromMaybe)
 import System.FilePath ((</>))
 import qualified System.FilePath.Glob as Glob
+import System.Directory (canonicalizePath)
 
 import Data.Aeson (ToJSON)
 import qualified Data.Aeson as JSON
 
 import Config
-import Input (readInputTree)
-import Resource (buildGalleryTree, galleryCleanupResourceDir)
+import Input (InputTree, readInputTree, filterInputTree, sidecar, tags)
+import Resource (GalleryItem, buildGalleryTree, galleryCleanupResourceDir)
 import Files
   ( FileName
   , FSNode(..)
@@ -45,23 +48,23 @@ import Processors
   , skipCached, withCached )
 
 
-galleryConf :: String
-galleryConf = "gallery.yaml"
+defaultGalleryConf :: String
+defaultGalleryConf = "gallery.yaml"
 
-indexFile :: String
-indexFile = "index.json"
-
-viewerMainFile :: String
-viewerMainFile = "index.html"
-
-viewerConfFile :: String
-viewerConfFile = "viewer.json"
+defaultIndexFile :: String
+defaultIndexFile = "index.json"
 
 itemsDir :: String
 itemsDir = "items"
 
 thumbnailsDir :: String
 thumbnailsDir = "thumbnails"
+
+
+data GalleryIndex = GalleryIndex
+  { properties :: ViewerConfig
+  , tree :: GalleryItem
+  } deriving (Generic, Show, ToJSON)
 
 
 writeJSON :: ToJSON a => FileName -> a -> IO ()
@@ -71,61 +74,82 @@ writeJSON outputPath object =
     ensureParentDir JSON.encodeFile outputPath object
 
 
-galleryDirFilter :: ([Glob.Pattern], [Glob.Pattern]) -> FSNode -> Bool
-galleryDirFilter (inclusionPatterns, exclusionPatterns) =
+(&&&) :: (a -> Bool) -> (a -> Bool) -> a -> Bool
+(&&&) = liftM2 (&&)
+
+(|||) :: (a -> Bool) -> (a -> Bool) -> a -> Bool
+(|||) = liftM2 (||)
+
+anyPattern :: [String] -> String -> Bool
+anyPattern patterns string = any (flip Glob.match string) (map Glob.compile patterns)
+
+galleryDirFilter :: GalleryConfig -> [FilePath] -> FSNode -> Bool
+galleryDirFilter config excludedCanonicalDirs =
       (not . isHidden)
-  &&& (matchName True $ anyPattern inclusionPatterns)
-  &&& (not . isConfigFile)
-  &&& (not . containsOutputGallery)
-  &&& (not . (matchName False $ anyPattern exclusionPatterns))
+  &&& (not . isExcludedDir)
+  &&& ((matchesDir $ anyPattern $ includedDirectories config) |||
+       (matchesFile $ anyPattern $ includedFiles config))
+  &&& (not . ((matchesDir $ anyPattern $ excludedDirectories config) |||
+              (matchesFile $ anyPattern $ excludedFiles config)))
 
   where
-    (&&&) = liftM2 (&&)
-    (|||) = liftM2 (||)
+    matchesDir :: (FileName -> Bool) -> FSNode -> Bool
+    matchesDir cond dir@Dir{} = maybe False cond $ nodeName dir
+    matchesDir _ File{} = False
 
-    matchName :: Bool -> (FileName -> Bool) -> FSNode -> Bool
-    matchName matchDir _ Dir{} = matchDir
-    matchName _ cond file@File{} = maybe False cond $ nodeName file
+    matchesFile :: (FileName -> Bool) -> FSNode -> Bool
+    matchesFile cond file@File{} = maybe False cond $ nodeName file
+    matchesFile _ Dir{} = False
 
-    anyPattern :: [Glob.Pattern] -> FileName -> Bool
-    anyPattern patterns filename = any (flip Glob.match filename) patterns
+    isExcludedDir :: FSNode -> Bool
+    isExcludedDir Dir{canonicalPath} = any (canonicalPath ==) excludedCanonicalDirs
+    isExcludedDir File{} = False
 
-    isConfigFile = matchName False (== galleryConf)
-    isGalleryIndex = matchName False (== indexFile)
-    isViewerIndex = matchName False (== viewerMainFile)
-    containsOutputGallery File{} = False
-    containsOutputGallery Dir{items} = any (isGalleryIndex ||| isViewerIndex) items
+inputTreeFilter :: GalleryConfig -> InputTree -> Bool
+inputTreeFilter GalleryConfig{includedTags, excludedTags} =
+      (hasTagMatching $ anyPattern includedTags)
+  &&& (not . (hasTagMatching $ anyPattern excludedTags))
+
+  where
+    hasTagMatching :: (String -> Bool) -> InputTree -> Bool
+    hasTagMatching cond = (any cond) . (fromMaybe [""] . tags) . sidecar
 
 
-compileGallery :: FilePath -> FilePath -> Bool -> IO ()
-compileGallery inputDirPath outputDirPath rebuildAll =
+compileGallery :: FilePath -> FilePath -> FilePath -> FilePath -> [FilePath] -> Bool -> Bool -> IO ()
+compileGallery configPath inputDirPath outputDirPath outputIndexPath excludedDirs rebuildAll cleanOutput =
   do
-    fullConfig <- readConfig inputGalleryConf
-    let config = compiler fullConfig
+    config <- readConfig $ inputGalleryConf configPath
 
     inputDir <- readDirectory inputDirPath
-    let inclusionPatterns = map Glob.compile $ includeFiles config
-    let exclusionPatterns = map Glob.compile $ excludeFiles config
-    let sourceFilter = galleryDirFilter (inclusionPatterns, exclusionPatterns)
+    excludedCanonicalDirs <- mapM canonicalizePath excludedDirs
+    let sourceFilter = galleryDirFilter config excludedCanonicalDirs
     let sourceTree = filterDir sourceFilter inputDir
     inputTree <- readInputTree sourceTree
+    let curatedInputTree = filterInputTree (inputTreeFilter config) inputTree
 
     let cache = if rebuildAll then skipCached else withCached
-    let itemProc = itemProcessor (pictureMaxResolution config) cache
-    let thumbnailProc = thumbnailProcessor (thumbnailMaxResolution config) cache
+    let itemProc = itemProcessor config cache
+    let thumbnailProc = thumbnailProcessor config cache
     let galleryBuilder = buildGalleryTree itemProc thumbnailProc (tagsFromDirectories config)
-    resources <- galleryBuilder (galleryName config) inputTree
+    resources <- galleryBuilder curatedInputTree
 
-    galleryCleanupResourceDir resources outputDirPath
-    writeJSON outputIndex resources
-    writeJSON outputViewerConf $ viewer fullConfig
+    when cleanOutput $ galleryCleanupResourceDir resources outputDirPath
+    writeJSON (outputGalleryIndex outputIndexPath) $ GalleryIndex (viewerConfig config) resources
 
   where
-    inputGalleryConf = inputDirPath </> galleryConf
-    outputIndex = outputDirPath </> indexFile
-    outputViewerConf = outputDirPath </> viewerConfFile
+    inputGalleryConf :: FilePath -> FilePath
+    inputGalleryConf "" = inputDirPath </> defaultGalleryConf
+    inputGalleryConf file = file
 
-    itemProcessor maxRes cache =
-      itemFileProcessor maxRes cache inputDirPath outputDirPath itemsDir
-    thumbnailProcessor thumbRes cache =
-      thumbnailFileProcessor thumbRes cache inputDirPath outputDirPath thumbnailsDir
+    outputGalleryIndex :: FilePath -> FilePath
+    outputGalleryIndex "" = outputDirPath </> defaultIndexFile
+    outputGalleryIndex file = file
+
+    itemProcessor config cache =
+      itemFileProcessor
+        (pictureMaxResolution config) cache
+        inputDirPath outputDirPath itemsDir
+    thumbnailProcessor config cache =
+      thumbnailFileProcessor
+        (thumbnailMaxResolution config) cache
+        inputDirPath outputDirPath thumbnailsDir

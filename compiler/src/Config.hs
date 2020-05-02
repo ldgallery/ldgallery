@@ -17,44 +17,74 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 module Config
-  ( GalleryConfig(..)
-  , CompilerConfig(..)
-  , readConfig
+  ( GalleryConfig(..), readConfig
+  , ViewerConfig(..), viewerConfig
+  , TagsFromDirectoriesConfig(..)
+  , Resolution(..)
   ) where
 
 
 import GHC.Generics (Generic)
-import Data.Aeson (FromJSON, withObject, (.:?), (.!=))
+import Data.Aeson (ToJSON, FromJSON, withObject, (.:?), (.!=))
 import qualified Data.Aeson as JSON
 
 import Files (FileName)
 import Input (decodeYamlFile)
-import Resource (Resolution(..))
 
 
-data CompilerConfig = CompilerConfig
-  { galleryName :: String
-  , includeFiles :: [String]
-  , excludeFiles :: [String]
-  , tagsFromDirectories :: Int
+data Resolution = Resolution
+  { width :: Int
+  , height :: Int
+  } deriving (Generic, Show, ToJSON, FromJSON)
+
+
+data TagsFromDirectoriesConfig = TagsFromDirectoriesConfig
+  { fromParents :: Int
+  , prefix :: String
+  } deriving (Generic, Show)
+
+instance FromJSON TagsFromDirectoriesConfig where
+  parseJSON = withObject "TagsFromDirectoriesConfig" $ \v -> TagsFromDirectoriesConfig
+    <$> v .:? "fromParents" .!= 0
+    <*> v .:? "prefix" .!= ""
+
+
+data GalleryConfig = GalleryConfig
+  { galleryTitle :: String
+  , includedDirectories :: [String]
+  , excludedDirectories :: [String]
+  , includedFiles :: [String]
+  , excludedFiles :: [String]
+  , includedTags :: [String]
+  , excludedTags :: [String]
+  , tagCategories :: [String]
+  , tagsFromDirectories :: TagsFromDirectoriesConfig
   , thumbnailMaxResolution :: Resolution
   , pictureMaxResolution :: Maybe Resolution
   } deriving (Generic, Show)
 
-instance FromJSON CompilerConfig where
-  parseJSON = withObject "CompilerConfig" $ \v -> CompilerConfig
-    <$> v .:? "galleryName" .!= "Gallery"
-    <*> v .:? "includeFiles" .!= ["*"]
-    <*> v .:? "excludeFiles" .!= []
-    <*> v .:? "tagsFromDirectories" .!= 0
-    <*> v .:? "thumbnailMaxResolution" .!= (Resolution 400 400)
+instance FromJSON GalleryConfig where
+  parseJSON = withObject "GalleryConfig" $ \v -> GalleryConfig
+    <$> v .:? "galleryTitle" .!= "ldgallery"
+    <*> v .:? "includedDirectories" .!= ["*"]
+    <*> v .:? "excludedDirectories" .!= []
+    <*> v .:? "includedFiles" .!= ["*"]
+    <*> v .:? "excludedFiles" .!= []
+    <*> v .:? "includedTags" .!= ["*"]
+    <*> v .:? "excludedTags" .!= []
+    <*> v .:? "tagCategories" .!= []
+    <*> v .:? "tagsFromDirectories" .!= (TagsFromDirectoriesConfig 0 "")
+    <*> v .:? "thumbnailMaxResolution" .!= (Resolution 400 300)
     <*> v .:? "pictureMaxResolution"
-
-
-data GalleryConfig = GalleryConfig
-  { compiler :: CompilerConfig
-  , viewer :: JSON.Object
-  } deriving (Generic, FromJSON, Show)
 
 readConfig :: FileName -> IO GalleryConfig
 readConfig = decodeYamlFile
+
+
+data ViewerConfig = ViewerConfig
+  { galleryTitle :: String
+  , tagCategories :: [String]
+  } deriving (Generic, ToJSON, Show)
+
+viewerConfig :: GalleryConfig -> ViewerConfig
+viewerConfig GalleryConfig{galleryTitle, tagCategories} = ViewerConfig galleryTitle tagCategories

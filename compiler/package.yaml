@@ -1,10 +1,11 @@
 name:                ldgallery-compiler
-version:             0.1.0.0
+version:             1.0
+homepage:            https://ldgallery.pacien.org
 github:              "pacien/ldgallery"
 license:             AGPL-3
 author:              "Pacien TRAN-GIRARD, Guillaume FOUET"
 maintainer:          ""
-copyright:           "2019 Pacien TRAN-GIRARD, Guillaume FOUET"
+copyright:           "2019-2020 Pacien TRAN-GIRARD, Guillaume FOUET"
 
 extra-source-files:
 - readme.md
@@ -12,23 +13,23 @@ extra-source-files:
 # Metadata used when publishing your package
 synopsis:            A static generator which turns a collection of tagged pictures into a searchable web gallery
 category:            Web
-description:         Please see the README on GitHub at <https://github.com/pacien/ldgallery>
+description:         Please see the project's website at <https://ldgallery.pacien.org>
 
 dependencies:
 - base >= 4.7 && < 5
 - containers
+- data-ordlist
 - filepath
 - directory
 - text
 - aeson
 - yaml
 - cmdargs
-- JuicyPixels
-- JuicyPixels-extra
 - parallel-io
 - Glob
 - safe
 - time
+- process
 
 default-extensions:
 - DuplicateRecordFields
@@ -54,7 +55,7 @@ library:
   source-dirs: src
 
 executables:
-  ldgallery-compiler-exe:
+  ldgallery:
     main:                Main.hs
     source-dirs:         app
     ghc-options:

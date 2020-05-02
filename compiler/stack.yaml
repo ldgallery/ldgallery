@@ -17,7 +17,13 @@
 #
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
-resolver: lts-14.17
+
+# Important:
+# ghc 8.8.2 is required on Windows (crash during compilation)
+# version 15.3 is the latest 8.8.2, do not upgrade until this issue has been resolved
+# https://gitlab.haskell.org/ghc/ghc/issues/17926
+resolver: lts-15.3
+
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.

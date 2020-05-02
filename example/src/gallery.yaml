@@ -1,0 +1,31 @@
+# ldgallery example gallery configuration file
+
+#galleryTitle: "ldgallery"
+
+#includedDirectories: ["*"]
+#excludedDirectories: []
+
+includedFiles:
+  - '*.jpg'
+
+#excludedFiles:
+#  - "*.md"
+
+#includedTags: ["*"]
+#excludedTags: []
+
+tagCategories:
+  - photographer
+  - location
+
+#tagsFromDirectories:
+#  fromParents: 0
+#  prefix: ''
+
+#thumbnailMaxResolution:
+#  width: 400
+#  height: 300
+
+pictureMaxResolution:
+  width: 1024
+  height: 768

@@ -25,20 +25,20 @@ module Processors
 
 
 import Control.Exception (Exception, throwIO)
+import Control.Monad (when)
 import Data.Function ((&))
-import Data.Ratio ((%))
 import Data.Char (toLower)
+import Text.Read (readMaybe)
 
 import System.Directory hiding (copyFile)
 import qualified System.Directory
 import System.FilePath
 
-import Codec.Picture
-import Codec.Picture.Extra -- TODO: compare DCT and bilinear (and Lanczos, but it's not implemented)
+import System.Process (callProcess, readProcess)
 
 import Resource
   ( ItemProcessor, ThumbnailProcessor
-  , GalleryItemProps(..), Resolution(..) )
+  , GalleryItemProps(..), Resolution(..), Resource(..), Thumbnail(..) )
 
 import Files
 
@@ -47,10 +47,8 @@ data ProcessingException = ProcessingException FilePath String deriving Show
 instance Exception ProcessingException
 
 
-data PictureFileFormat = Bmp | Jpg | Png | Tiff | Hdr | Gif
-
 -- TODO: handle video, music, text...
-data Format = PictureFormat PictureFileFormat | Unknown
+data Format = PictureFormat | Unknown
 
 formatFromPath :: Path -> Format
 formatFromPath =
@@ -60,14 +58,15 @@ formatFromPath =
   . fileName
   where
     fromExt :: String -> Format
-    fromExt ".bmp" = PictureFormat Bmp
-    fromExt ".jpg" = PictureFormat Jpg
-    fromExt ".jpeg" = PictureFormat Jpg
-    fromExt ".png" = PictureFormat Png
-    fromExt ".tiff" = PictureFormat Tiff
-    fromExt ".hdr" = PictureFormat Hdr
-    fromExt ".gif" = PictureFormat Gif
-    fromExt _ = Unknown
+    fromExt ext = case ext of
+      ".bmp" -> PictureFormat
+      ".jpg" -> PictureFormat
+      ".jpeg" -> PictureFormat
+      ".png" -> PictureFormat
+      ".tiff" -> PictureFormat
+      ".hdr" -> PictureFormat
+      ".gif" -> PictureFormat
+      _ -> Unknown
 
 
 type FileProcessor =
@@ -80,43 +79,20 @@ copyFileProcessor inputPath outputPath =
   (putStrLn $ "Copying:\t" ++ outputPath)
   >> ensureParentDir (flip System.Directory.copyFile) outputPath inputPath
 
-resizeStaticImageUpTo :: PictureFileFormat -> Resolution -> FileProcessor
-resizeStaticImageUpTo Bmp = resizeStaticGeneric readBitmap saveBmpImage
--- TODO: parameterise export quality for jpg
-resizeStaticImageUpTo Jpg = resizeStaticGeneric readJpeg (saveJpgImage 80)
-resizeStaticImageUpTo Png = resizeStaticGeneric readPng savePngImage
-resizeStaticImageUpTo Tiff = resizeStaticGeneric readTiff saveTiffImage
-resizeStaticImageUpTo Hdr = resizeStaticGeneric readHDR saveRadianceImage
-resizeStaticImageUpTo Gif = resizeStaticGeneric readGif saveGifImage'
-  where
-    saveGifImage' :: StaticImageWriter
-    saveGifImage' outputPath image =
-      saveGifImage outputPath image
-      & either (throwIO . ProcessingException outputPath) id
-
-
-type StaticImageReader = FilePath -> IO (Either String DynamicImage)
-type StaticImageWriter = FilePath -> DynamicImage -> IO ()
-
-resizeStaticGeneric :: StaticImageReader -> StaticImageWriter -> Resolution -> FileProcessor
-resizeStaticGeneric reader writer maxRes inputPath outputPath =
+resizePictureUpTo :: Resolution -> FileProcessor
+resizePictureUpTo maxResolution inputPath outputPath =
   (putStrLn $ "Generating:\t" ++ outputPath)
-  >>  reader inputPath
-  >>= either (throwIO . ProcessingException inputPath) return
-  >>= return . (fitDynamicImage maxRes)
-  >>= ensureParentDir writer outputPath
-
-fitDynamicImage :: Resolution -> DynamicImage -> DynamicImage
-fitDynamicImage (Resolution boxWidth boxHeight) image =
-  convertRGBA8 image
-  & scaleBilinear targetWidth targetHeight
-  & ImageRGBA8
+  >> ensureParentDir (flip resize) outputPath inputPath
   where
-    picWidth = dynamicMap imageWidth image
-    picHeight = dynamicMap imageHeight image
-    resizeRatio = min (boxWidth % picWidth) (boxHeight % picHeight)
-    targetWidth = floor $ resizeRatio * (picWidth % 1)
-    targetHeight = floor $ resizeRatio * (picHeight % 1)
+    maxSize :: Resolution -> String
+    maxSize Resolution{width, height} = show width ++ "x" ++ show height ++ ">"
+
+    resize :: FileName -> FileName -> IO ()
+    resize input output = callProcess "magick"
+      [ input
+      , "-auto-orient"
+      , "-resize", maxSize maxResolution
+      , output ]
 
 
 type Cache = FileProcessor -> FileProcessor
@@ -130,7 +106,7 @@ withCached :: Cache
 withCached processor inputPath outputPath =
   do
     isDir <- doesDirectoryExist outputPath
-    if isDir then removePathForcibly outputPath else noop
+    when isDir $ removePathForcibly outputPath
 
     fileExists <- doesFileExist outputPath
     if fileExists then
@@ -141,9 +117,37 @@ withCached processor inputPath outputPath =
       update
 
   where
-    noop = return ()
     update = processor inputPath outputPath
     skip = putStrLn $ "Skipping:\t" ++ outputPath
+
+
+resourceAt :: FilePath -> Path -> IO Resource
+resourceAt fsPath resPath = getModificationTime fsPath >>= return . Resource resPath
+
+getImageResolution :: FilePath -> IO Resolution
+getImageResolution fsPath =
+  readProcess "magick" ["identify", "-format", "%w %h", firstFrame] []
+  >>= parseResolution . break (== ' ')
+  where
+    firstFrame :: FilePath
+    firstFrame = fsPath ++ "[0]"
+
+    parseResolution :: (String, String) -> IO Resolution
+    parseResolution (widthString, heightString) =
+      case (readMaybe widthString, readMaybe heightString) of
+        (Just w, Just h) -> return $ Resolution w h
+        _ -> throwIO $ ProcessingException fsPath "Unable to read image resolution."
+
+getPictureProps :: ItemDescriber
+getPictureProps fsPath resource =
+      getImageResolution fsPath
+  >>= return . Picture resource
+
+
+type ItemDescriber =
+     FilePath
+  -> Resource
+  -> IO GalleryItemProps
 
 
 type ItemFileProcessor =
@@ -154,23 +158,20 @@ type ItemFileProcessor =
 
 itemFileProcessor :: Maybe Resolution -> Cache -> ItemFileProcessor
 itemFileProcessor maxResolution cached inputBase outputBase resClass inputRes =
-  cached processor inPath outPath
-  >> return (props relOutPath)
+      cached processor inPath outPath
+  >>  resourceAt outPath relOutPath
+  >>= descriptor outPath
   where
     relOutPath = resClass /> inputRes
     inPath = localPath $ inputBase /> inputRes
     outPath = localPath $ outputBase /> relOutPath
-    (processor, props) = processorFor maxResolution $ formatFromPath inputRes
+    (processor, descriptor) = processorFor (formatFromPath inputRes) maxResolution
 
-    processorFor :: Maybe Resolution -> Format -> (FileProcessor, Path -> GalleryItemProps)
-    processorFor Nothing _ =
-      (copyFileProcessor, Other)
-    processorFor _ (PictureFormat Gif) =
-      (copyFileProcessor, Picture) -- TODO: handle animated gif resizing
-    processorFor (Just maxRes) (PictureFormat picFormat) =
-      (resizeStaticImageUpTo picFormat maxRes, Picture)
-    processorFor _ Unknown =
-      (copyFileProcessor, Other) -- TODO: handle video reencoding and others?
+    processorFor :: Format -> Maybe Resolution -> (FileProcessor, ItemDescriber)
+    processorFor PictureFormat (Just maxRes) = (resizePictureUpTo maxRes, getPictureProps)
+    processorFor PictureFormat Nothing = (copyFileProcessor, getPictureProps)
+    -- TODO: handle video reencoding and others?
+    processorFor Unknown _ = (copyFileProcessor, const $ return . Other)
 
 
 type ThumbnailFileProcessor =
@@ -188,14 +189,15 @@ thumbnailFileProcessor maxRes cached inputBase outputBase resClass inputRes =
     inPath = localPath $ inputBase /> inputRes
     outPath = localPath $ outputBase /> relOutPath
 
-    process :: Maybe FileProcessor -> IO (Maybe Path)
+    process :: Maybe FileProcessor -> IO (Maybe Thumbnail)
     process Nothing = return Nothing
     process (Just proc) =
-      proc inPath outPath
-      >> return (Just relOutPath)
+      do
+        proc inPath outPath
+        resource <- resourceAt outPath relOutPath
+        resolution <- getImageResolution outPath
+        return $ Just $ Thumbnail resource resolution
 
     processorFor :: Format -> Maybe FileProcessor
-    processorFor (PictureFormat picFormat) =
-      Just $ resizeStaticImageUpTo picFormat maxRes
-    processorFor _ =
-      Nothing
+    processorFor PictureFormat = Just $ resizePictureUpTo maxRes
+    processorFor _ = Nothing

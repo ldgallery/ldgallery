@@ -1,11 +1,19 @@
 {
-  "tagInput.placeholder": "Tags",
-  "panelLeft.filters": "Filters",
+  "tagInput.placeholder": "Filters",
   "tagInput.nomatch": "No match",
-  "panelLeft.mode": "Mode",
-  "mode.navigation": "Navigation",
-  "mode.search": "Search",
   "search.no-results": "No results",
-  "panelLeft.propositions": "Proposed tags",
-  "gallery.unknowntype": "Unknown item type"
+  "search.no-results.otherfolders": "No results • {0} result{1} in other folders",
+  "panelLeft.propositions": "Related filters",
+  "tag-propositions.substraction": "Exclude items with this tag",
+  "tag-propositions.addition": "Include all items with this tag",
+  "tag-propositions.intersection": "Search for this tag",
+  "tag-propositions.item-count": "Item count",
+  "gallery.unknowntype": "Unknown item type",
+  "command.search": "Open/close search panel",
+  "command.search.clear": "Clear",
+  "command.search.search": "Search",
+  "command.back": "Go back",
+  "command.parent": "Go to parent directory",
+  "directory.no-results": "Empty directory",
+  "panelLeft.propositions.other": "other filters"
 }

@@ -19,7 +19,7 @@
 module Input
   ( decodeYamlFile
   , Sidecar(..)
-  , InputTree(..), readInputTree
+  , InputTree(..), readInputTree, filterInputTree
   ) where
 
 
@@ -58,6 +58,7 @@ data InputTree =
     | InputDir
       { path :: Path
       , modTime :: UTCTime
+      , sidecar :: Sidecar
       , dirThumbnailPath :: Maybe Path
       , items :: [InputTree] }
   deriving Show
@@ -78,6 +79,12 @@ emptySidecar = Sidecar
 
 sidecarExt :: String
 sidecarExt = "yaml"
+
+dirPropFile :: String
+dirPropFile = "_directory"
+
+dirSidecar :: Path
+dirSidecar = Path [dirPropFile] <.> sidecarExt
 
 readSidecarFile :: FilePath -> IO Sidecar
 readSidecarFile filepath =
@@ -107,7 +114,8 @@ readInputTree (AnchoredFSNode anchor root@Dir{}) = mkDirNode root
       do
         dirItems <- mapM mkInputNode items
         modTime <- getModificationTime $ localPath (anchor /> path)
-        return $ InputDir path modTime (findThumbnail items) (catMaybes dirItems)
+        sidecar <- readSidecarFile $ localPath (anchor /> path </> dirSidecar)
+        return $ InputDir path modTime sidecar (findThumbnail items) (catMaybes dirItems)
 
     isSidecar :: FSNode -> Bool
     isSidecar Dir{} = False
@@ -120,7 +128,18 @@ readInputTree (AnchoredFSNode anchor root@Dir{}) = mkDirNode root
     isThumbnail File{path} =
       fileName path
       & fmap dropExtension
-      & (maybe False ("thumbnail" ==))
+      & (maybe False (dirPropFile ==))
 
     findThumbnail :: [FSNode] -> Maybe Path
     findThumbnail = (fmap Files.path) . (find isThumbnail)
+
+-- | Filters an InputTree. The root is always returned.
+filterInputTree :: (InputTree -> Bool) -> InputTree -> InputTree
+filterInputTree cond = filterNode
+  where
+    filterNode :: InputTree -> InputTree
+    filterNode inputFile@InputFile{} = inputFile
+    filterNode inputDir@InputDir{items} =
+        filter cond items
+      & map filterNode
+      & \curatedItems -> inputDir { items = curatedItems } :: InputTree

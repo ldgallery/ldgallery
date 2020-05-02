@@ -143,7 +143,14 @@ Serialised item structure:
   ],
 
   "path": "[resource path]",
-  "thumbnail": "[resource path | null]",
+
+  "thumbnail": null | {
+    "resource": "[resource path]",
+    "resolution": {
+      "width": 400,
+      "height": 200
+    }
+  },
 
 
   "_comment": "type-dependent",
@@ -227,6 +234,6 @@ By default, the content is rendered in the same ordered as listed in `index.json
 
 Items other than directories are displayed by this view, making use of most of the screen space to render the element.
 
-This view should as well display the title, description, date, tags and other information associated to the item.  Tags in particular are displayed in a grouped manner as determined in `viewer.json`.
+This view should as well display the title, description, date, tags and other information associated to the item.  Tags in particular are displayed in a grouped manner as determined in `index.json`.
 
 It should be possible to navigate between items of the same directory as the current one through a thumbnail reel and previous/next links.
