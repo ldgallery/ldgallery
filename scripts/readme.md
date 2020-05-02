@@ -5,15 +5,15 @@ Prefix the filename of your custom script with "local_", they are git-ignored.
 
 ## Build
 
-### win_build.cmd
+### dev_win_build.cmd
 
 Build the compiler. See {../compiler/readme.md}
 
-### win_help.cmd
+### dev_win_help.cmd
 
 Shows the compiler's command line help.
 
-### win_compile_example.cmd
+### dev_win_compile_example.cmd
 
 Compile the example gallery, for demonstration purposes. See {../example/readme.md}
 
