@@ -14,7 +14,7 @@ This document is a step-by-step guide showing how to create, compile and deploy 
 
 ## Step 1: setting up the compiler
 
-The _ldgallery_ compiler's job is to transform a directory containing pictures and other types of items, alongside additional metadata to associate to those, into a gallery that can be viewed in a web browser.
+The _ldgallery_ compiler's job is to transform a directory containing pictures and other types of items, alongside additional metadata, into a gallery that can be viewed in a web browser.
 
 This compiler program is typically installed and runs on the computer of the gallery's owner.
 
