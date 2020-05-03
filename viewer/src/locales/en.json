@@ -1,8 +1,7 @@
 {
   "tagInput.placeholder": "Filters",
   "tagInput.nomatch": "No match",
-  "search.no-results": "No results",
-  "search.no-results.otherfolders": "No results • {0} result{1} in other folders",
+  "search.no-result-fmt": "No result<br>({0} match in other folders) | No result<br>({0} matches in other folders)",
   "panelLeft.propositions": "Related filters",
   "tag-propositions.substraction": "Exclude items with this tag",
   "tag-propositions.addition": "Include all items with this tag",

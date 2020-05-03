@@ -29,8 +29,7 @@ import IndexSearch from "@/services/indexsearch";
 @Component
 export default class GalleryPicture extends Vue {
   @Prop(String) readonly path!: string;
-
-  otherCount: Number = 0;
+  otherCount: number = 0;
 
   mounted() {
     this.$uiStore.toggleFullscreen(false);
@@ -50,8 +49,7 @@ export default class GalleryPicture extends Vue {
   }
 
   noResult() {
-    const params = [this.otherCount, this.otherCount > 1 ? "s" : ""];
-    return this.$t("search.no-results.otherfolders", params);
+    return this.$tc("search.no-result-fmt", this.otherCount, [this.otherCount]);
   }
 }
 </script>
