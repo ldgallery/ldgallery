@@ -35,6 +35,7 @@ import {
   faAngleRight,
   faAngleDoubleLeft,
   faFile,
+  faFileDownload,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -51,6 +52,7 @@ library.add(
   faAngleRight,
   faAngleDoubleLeft,
   faFile,
+  faFileDownload,
 );
 
 config.autoAddCss = false;

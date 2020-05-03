@@ -65,10 +65,7 @@ export default class GalleryNavigation extends Vue {
         return { component: "ld-picture", properties: { picture: this.$galleryStore.currentItem } };
 
       default:
-        return {
-          component: "ld-error",
-          properties: { icon: "file", message: this.$t("gallery.unknown-type") }
-        };
+        return { component: "ld-download", properties: { item: this.$galleryStore.currentItem } };
     }
   }
 }

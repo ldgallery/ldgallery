@@ -55,6 +55,7 @@ declare namespace Gallery {
   }
   interface OtherProperties {
     type: "other",
+    resource: string
   }
   interface PictureProperties {
     type: "picture",
