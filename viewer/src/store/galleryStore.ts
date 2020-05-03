@@ -79,6 +79,10 @@ export default class GalleryStore extends VuexModule {
     return this.galleryIndex?.properties.galleryTitle ?? "ldgallery";
   }
 
+  get resourceRoot(): string {
+    return process.env.VUE_APP_DATA_URL + this.config!.galleryRoot;
+  }
+
   // ---
 
   // Fetches the gallery's JSON config

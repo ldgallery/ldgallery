@@ -47,7 +47,7 @@ export default class LdThumbnail extends Vue {
   loading: boolean = false;
 
   pictureSrc(resource: string) {
-    return `${process.env.VUE_APP_DATA_URL}${this.$galleryStore.config!.galleryRoot}${resource}`;
+    return this.$galleryStore.resourceRoot + resource;
   }
 
   pictureStyle() {

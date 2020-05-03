@@ -76,7 +76,7 @@ export default class LdPicture extends Vue {
   }
 
   pictureSrc(resource: string) {
-    return `${process.env.VUE_APP_DATA_URL}${this.$galleryStore.config!.galleryRoot}${resource}`;
+    return this.$galleryStore.resourceRoot + resource;
   }
 
   generateSlowLoadingStyle() {
