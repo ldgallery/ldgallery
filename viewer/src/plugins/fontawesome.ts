@@ -23,6 +23,7 @@ import { library, config } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import {
   faFolder,
+  faFolderOpen,
   faEraser,
   faSearch,
   faPlus,
@@ -38,6 +39,7 @@ import {
 
 library.add(
   faFolder,
+  faFolderOpen,
   faEraser,
   faSearch,
   faPlus,

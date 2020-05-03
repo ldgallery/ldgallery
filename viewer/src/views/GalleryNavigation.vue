@@ -18,18 +18,14 @@
 -->
 
 <template>
+  <!-- TODO: eliminate intermediate div -->
   <div>
-    <gallery-search v-if="query.length" :path="path" />
-    <gallery-directory v-else-if="checkType('directory')" :directory="$galleryStore.currentItem" />
-    <ld-picture v-else-if="checkType('picture')" :picture="$galleryStore.currentItem" />
-    <div v-else>{{$t("gallery.unknowntype")}}</div>
+    <component :is="dispatch().component" v-bind="dispatch().properties" />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { Operation } from "@/@types/Operation";
-import Navigation from "@/services/navigation";
 import GalleryDirectory from "./GalleryDirectory.vue";
 import GallerySearch from "@/views/GallerySearch.vue";
 
@@ -52,8 +48,28 @@ export default class GalleryNavigation extends Vue {
     this.$galleryStore.setCurrentPath(this.path);
   }
 
-  private checkType(type: Gallery.ItemType): boolean {
-    return Navigation.checkType(this.$galleryStore.currentItem, type);
+  dispatch(): { component: string, properties: {} } {
+    switch (this.$galleryStore.currentItem?.properties.type ?? null) {
+      case null:
+        return {
+          component: "ld-error",
+          properties: { icon: "folder-open", message: this.$t("gallery.unknown-resource") }
+        };
+
+      case "directory":
+        return this.query.length > 0
+          ? { component: "gallery-search", properties: { path: this.path } }
+          : { component: "gallery-directory", properties: { directory: this.$galleryStore.currentItem } };
+
+      case "picture":
+        return { component: "ld-picture", properties: { picture: this.$galleryStore.currentItem } };
+
+      default:
+        return {
+          component: "ld-error",
+          properties: { icon: "file", message: this.$t("gallery.unknown-type") }
+        };
+    }
   }
 }
 </script>
