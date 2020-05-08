@@ -19,7 +19,7 @@
 -->
 
 <template>
-  <div :class="$style.container">
+  <div class="container-vh-centering">
     <div :class="$style.content">
       <fa-icon :class="$style.icon" :icon="icon" size="6x" />
       <div :class="$style.message" v-html="message"></div>
@@ -38,13 +38,6 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 
 <style lang="scss" module>
 @import "~@/assets/scss/theme.scss";
-
-.container {
-  min-height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 .content {
   text-align: center;

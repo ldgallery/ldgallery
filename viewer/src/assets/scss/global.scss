@@ -51,6 +51,17 @@ button svg + span {
   align-items: center;
 }
 
+/**
+ * Class for containers that centers its content vertically and horizontally,
+ * preferably sticking to the container start if the container is smaller than the content.
+ */
+.container-vh-centering {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 // === Links
 
 .link {

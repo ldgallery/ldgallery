@@ -19,7 +19,7 @@
 -->
 
 <template>
-  <div :class="$style.container">
+  <div class="container-vh-centering">
     <a :class="$style.content" :download="itemFileName()" :href="itemDownloadUrl()">
       <!-- TODO: show thumbnail instead of this generic file download icon? -->
       <fa-icon :class="$style.icon" icon="file-download" size="6x" />
@@ -50,13 +50,6 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 </script>
 
 <style lang="scss" module>
-.container {
-  min-height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .content {
   text-align: center;
 }
