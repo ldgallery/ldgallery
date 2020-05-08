@@ -20,10 +20,10 @@
 
 <template>
   <div :class="$style.container">
-    <a :class="$style.content" :download="itemFileName" :href="itemDownloadUrl">
+    <a :class="$style.content" :download="itemFileName()" :href="itemDownloadUrl()">
       <!-- TODO: show thumbnail instead of this generic file download icon? -->
       <fa-icon :class="$style.icon" icon="file-download" size="6x" />
-      <div>{{ $t("download.download-file-fmt", [itemFileName]) }}</div>
+      <div>{{ $t("download.download-file-fmt", [itemFileName()]) }}</div>
     </a>
   </div>
 </template>
@@ -32,19 +32,19 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component export default class LdDownload extends Vue {
-  @Prop({ required: true }) readonly item!: Gallery.Item;
+  @Prop({ required: true }) readonly item!: Gallery.Other;
 
-  get itemResource(): string {
-    return (this.item.properties as Gallery.OtherProperties).resource;
+  itemResource(): string {
+    return this.item.properties.resource;
   }
 
-  get itemFileName(): string {
-    const timeStamped = this.itemResource.split("/").pop() ?? "";
+  itemFileName(): string {
+    const timeStamped = this.itemResource().split("/").pop() ?? "";
     return timeStamped.split("?")[0];
   }
 
-  get itemDownloadUrl(): string {
-    return this.$galleryStore.resourceRoot + this.itemResource;
+  itemDownloadUrl(): string {
+    return this.$galleryStore.resourceRoot + this.itemResource();
   }
 }
 </script>
