@@ -31,8 +31,8 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component export default class LdError extends Vue {
-  @Prop({ required: true }) readonly icon!: string;
-  @Prop({ required: true }) readonly message!: string;
+  @Prop({ required: true, type: String }) readonly icon!: string;
+  @Prop({ required: true, type: String }) readonly message!: string;
 }
 </script>
 
