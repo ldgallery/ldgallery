@@ -41,7 +41,7 @@ export default class Navigation {
 
   // Checks if the type of an item matches
   public static checkType(item: Gallery.Item | null, type: Gallery.ItemType | null): boolean {
-    return item?.properties.type === type;
+    return (item?.properties.type ?? null) === type;
   }
 
   public static getLastDirectory(itemPath: Gallery.Item[]): Gallery.Directory {
