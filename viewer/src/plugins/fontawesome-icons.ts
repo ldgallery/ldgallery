@@ -17,15 +17,19 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import Vue from "vue";
-
-import { library, config } from "@fortawesome/fontawesome-svg-core";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import * as faIcons from "./fontawesome-icons";
-
-library.add(faIcons);
-
-config.autoAddCss = false;
-import "@fortawesome/fontawesome-svg-core/styles.css";
-
-Vue.component("fa-icon", FontAwesomeIcon);
+export {
+  faFolder,
+  faFolderOpen,
+  faEraser,
+  faSearch,
+  faPlus,
+  faMinus,
+  faImage,
+  faHome,
+  faArrowLeft,
+  faLevelUpAlt,
+  faAngleRight,
+  faAngleDoubleLeft,
+  faFile,
+  faFileDownload,
+} from "@fortawesome/free-solid-svg-icons";
