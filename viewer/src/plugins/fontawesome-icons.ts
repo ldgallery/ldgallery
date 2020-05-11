@@ -36,4 +36,6 @@ export {
   faFileVideo,
   faFileAudio,
   faFileDownload,
+  faCaretUp,
+  faCaretDown,
 } from "@fortawesome/free-solid-svg-icons";

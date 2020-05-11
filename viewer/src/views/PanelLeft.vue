@@ -26,7 +26,7 @@
     />
     <ld-command-search @clear="clear" @search="search" />
     <h1 class="title">{{ $t("panelLeft.propositions") }}</h1>
-    <div class="scrollbar no-scroll-x">
+    <div class="scrollbar no-scroll-x flex-grow-1">
       <ld-proposition
         v-for="category in $galleryStore.tagsCategories"
         :key="category.tag"
@@ -37,6 +37,13 @@
         :current-tags="currentTags"
       />
     </div>
+    <b-collapse animation="slide" :open.sync="infoOpen">
+      <h1 slot="trigger" class="title flex">
+        Informations
+        <fa-icon :icon="infoOpen ? 'caret-up' : 'caret-down'" />
+      </h1>
+      <ld-information :item="$galleryStore.currentItem" />
+    </b-collapse>
   </div>
 </template>
 
@@ -49,6 +56,7 @@ import IndexFactory from "@/services/indexfactory";
 @Component
 export default class PanelLeft extends Vue {
   searchFilters: Tag.Search[] = [];
+  infoOpen: boolean = true;
 
   mounted() {
     this.restoreSearchFilters(this.$route);
@@ -93,6 +101,11 @@ export default class PanelLeft extends Vue {
     padding: 0.2em 0.5em;
     margin: 0 0 1px 0;
     font-variant: small-caps;
+    justify-content: space-between;
+    user-select: none;
+    > svg {
+      color: $link;
+  }
   }
 }
 </style>

@@ -1,4 +1,4 @@
-/* ldgallery - A static generator which turns a collection of tagged
+<!-- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
 -- Copyright (C) 2019-2020  Guillaume FOUET
@@ -15,34 +15,27 @@
 --
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+-->
 
-import Vue from "vue";
+<template>
+  <div class="flex-column">
+    <div>{{item.title}}</div>
+    <div>{{item.description}}</div>
+    <div>{{item.datetime}}</div>
+    <b-taglist>
+      <b-tag v-for="tag in item.tags" :key="tag">{{tag}}</b-tag>
+    </b-taglist>
+  </div>
+</template>
 
-// @ts-ignore
-import Taginput from "buefy/src/components/taginput";
-// @ts-ignore
-import Loading from "buefy/src/components/loading";
-// @ts-ignore
-import Button from "buefy/src/components/button";
-// @ts-ignore
-import SnackBar from "buefy/src/components/snackbar";
-// @ts-ignore
-import Collapse from "buefy/src/components/collapse";
-// @ts-ignore
-import Tag from "buefy/src/components/tag";
+<script lang="ts">
+import { Component, Vue, Prop } from "vue-property-decorator";
 
-import "@/assets/scss/buefy.scss";
-
-Vue.use(Taginput);
-Vue.use(Loading);
-Vue.use(Button);
-Vue.use(SnackBar);
-Vue.use(Collapse);
-Vue.use(Tag);
-
-declare module "vue/types/vue" {
-  interface Vue {
-    $buefy: any;
-  }
+@Component
+export default class LdInformation extends Vue {
+  @Prop({ required: true }) readonly item!: Gallery.Item;
 }
+</script>
+
+<style lang="scss">
+</style>
