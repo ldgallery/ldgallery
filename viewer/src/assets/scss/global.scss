@@ -59,6 +59,10 @@ button svg + span {
   height: 100%;
 }
 
+.flex-grow-1 {
+  flex-grow: 1;
+}
+
 /**
  * Class for containers that centers its content vertically and horizontally,
  * preferably sticking to the container start if the container is smaller than the content.
