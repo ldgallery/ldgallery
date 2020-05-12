@@ -47,8 +47,8 @@ data ProcessingException = ProcessingException FilePath String deriving Show
 instance Exception ProcessingException
 
 
--- TODO: handle video, music, text...
-data Format = PictureFormat | Unknown
+-- TODO: handle video, music, markdown, pdf...
+data Format = PictureFormat | PlainTextFormat | Unknown
 
 formatFromPath :: Path -> Format
 formatFromPath =
@@ -66,6 +66,8 @@ formatFromPath =
       ".tiff" -> PictureFormat
       ".hdr" -> PictureFormat
       ".gif" -> PictureFormat
+      ".txt" -> PlainTextFormat
+      ".md" -> PlainTextFormat -- TODO: handle markdown separately
       _ -> Unknown
 
 
@@ -170,6 +172,7 @@ itemFileProcessor maxResolution cached inputBase outputBase resClass inputRes =
     processorFor :: Format -> Maybe Resolution -> (FileProcessor, ItemDescriber)
     processorFor PictureFormat (Just maxRes) = (resizePictureUpTo maxRes, getPictureProps)
     processorFor PictureFormat Nothing = (copyFileProcessor, getPictureProps)
+    processorFor PlainTextFormat _ = (copyFileProcessor, const $ return . PlainText)
     -- TODO: handle video reencoding and others?
     processorFor Unknown _ = (copyFileProcessor, const $ return . Other)
 

@@ -75,6 +75,7 @@ data GalleryItemProps =
   | Picture
     { resource :: Resource
     , resolution :: Resolution }
+  | PlainText { resource :: Resource }
   | Other { resource :: Resource }
   deriving (Generic, Show)
 
