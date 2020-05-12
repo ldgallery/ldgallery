@@ -70,6 +70,8 @@ export default class Navigation {
     switch (item.properties.type) {
       case "picture":
         return "image";
+      case "plaintext":
+        return "file-alt";
       case "directory":
         return "folder";
       case "other":

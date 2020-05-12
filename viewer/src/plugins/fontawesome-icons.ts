@@ -31,5 +31,6 @@ export {
   faAngleRight,
   faAngleDoubleLeft,
   faFile,
+  faFileAlt,
   faFileDownload,
 } from "@fortawesome/free-solid-svg-icons";
