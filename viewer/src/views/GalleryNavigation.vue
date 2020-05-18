@@ -25,6 +25,7 @@
     <gallery-directory v-else-if="checkType('directory')" :directory="$galleryStore.currentItem" />
     <ld-picture v-else-if="checkType('picture')" :picture="$galleryStore.currentItem" />
     <ld-plain-text-viewer v-else-if="checkType('plaintext')" :plain-text-item="$galleryStore.currentItem" />
+    <ld-pdf-viewer v-else-if="checkType('pdf')" :pdf-item="$galleryStore.currentItem" />
     <ld-download v-else :item="$galleryStore.currentItem" />
   </div>
 </template>
