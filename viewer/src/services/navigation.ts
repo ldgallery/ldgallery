@@ -72,6 +72,8 @@ export default class Navigation {
         return "image";
       case "plaintext":
         return "file-alt";
+      case "pdf":
+        return "file-pdf";
       case "directory":
         return "folder";
       case "other":
