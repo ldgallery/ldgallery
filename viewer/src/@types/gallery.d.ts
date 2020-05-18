@@ -40,6 +40,9 @@ declare namespace Gallery {
   interface PlainText extends Item {
     properties: PlainTextProperties,
   }
+  interface PDF extends Item {
+    properties: PDFProperties,
+  }
   interface Directory extends Item {
     properties: DirectoryProperties,
   }
@@ -50,7 +53,7 @@ declare namespace Gallery {
     tags: RawTag[],
     path: string,
     thumbnail?: Thumbnail
-    properties: OtherProperties | PictureProperties | PlainTextProperties | DirectoryProperties,
+    properties: OtherProperties | PictureProperties | PlainTextProperties | PDFProperties | DirectoryProperties,
   }
   interface Resolution {
     width: number,
@@ -69,6 +72,10 @@ declare namespace Gallery {
     type: "plaintext",
     resource: string,
   }
+  interface PDFProperties {
+    type: "pdf",
+    resource: string,
+  }
   interface DirectoryProperties {
     type: "directory",
     items: Item[]
@@ -78,5 +85,5 @@ declare namespace Gallery {
     resolution: Resolution
   }
   type RawTag = string;
-  type ItemType = "other" | "picture" | "plaintext" | "directory";
+  type ItemType = "other" | "picture" | "plaintext" | "pdf" | "directory";
 }
