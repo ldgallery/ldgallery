@@ -20,9 +20,9 @@
 
 <template>
   <!-- Outer div necessary for the resize handle to appear on Firefox. -->
-  <div :class="$style.content">
+  <div :class="$style.content" class="fill">
     <!-- Using an iframe here to let the browser deal with content encoding detection. -->
-    <iframe :src="itemResourceUrl()" />
+    <iframe class="fill" :src="itemResourceUrl()" />
   </div>
 </template>
 
@@ -41,8 +41,6 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 <style lang="scss" module>
 .content {
   margin: auto; // Old-school horizontal centering.
-  width: 100%;
-  height: 100%;
 
   // Allow the user to adjust the width of the text view for easier column reading.
   resize: horizontal;
@@ -52,10 +50,5 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 
   // Re-normalise page colour.
   background-color: white;
-
-  & > iframe {
-    width: 100%;
-    height: 100%;
-  }
 }
 </style>

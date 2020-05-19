@@ -20,9 +20,9 @@
 
 <template>
   <!-- intermediate container necessary to eliminate the double scrollbar -->
-  <div :class="$style.container">
+  <div class="fill no-scroll">
     <!-- prefer native browser PDF viewer if available -->
-    <object :class="$style.content" :data="itemResourceUrl()" type="application/pdf">
+    <object class="fill" :data="itemResourceUrl()" type="application/pdf">
       <!-- TODO: fallback to PDF.js (https://github.com/pacien/ldgallery/issues/212) -->
       <ld-download :item="pdfItem" />
     </object>
@@ -42,9 +42,5 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 </script>
 
 <style lang="scss" module>
-.container, .content {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
+
 </style>
