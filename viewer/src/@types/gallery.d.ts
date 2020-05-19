@@ -43,6 +43,12 @@ declare namespace Gallery {
   interface PDF extends Item {
     properties: PDFProperties,
   }
+  interface Video extends Item {
+    properties: VideoProperties,
+  }
+  interface Audio extends Item {
+    properties: AudioProperties,
+  }
   interface Directory extends Item {
     properties: DirectoryProperties,
   }
@@ -53,7 +59,13 @@ declare namespace Gallery {
     tags: RawTag[],
     path: string,
     thumbnail?: Thumbnail
-    properties: OtherProperties | PictureProperties | PlainTextProperties | PDFProperties | DirectoryProperties,
+    properties: OtherProperties
+      | PictureProperties
+      | PlainTextProperties
+      | PDFProperties
+      | VideoProperties
+      | AudioProperties
+      | DirectoryProperties,
   }
   interface Resolution {
     width: number,
@@ -76,6 +88,14 @@ declare namespace Gallery {
     type: "pdf",
     resource: string,
   }
+  interface VideoProperties {
+    type: "video",
+    resource: string,
+  }
+  interface AudioProperties {
+    type: "audio",
+    resource: string,
+  }
   interface DirectoryProperties {
     type: "directory",
     items: Item[]
@@ -85,5 +105,5 @@ declare namespace Gallery {
     resolution: Resolution
   }
   type RawTag = string;
-  type ItemType = "other" | "picture" | "plaintext" | "pdf" | "directory";
+  type ItemType = "other" | "picture" | "plaintext" | "pdf" | "video" | "audio" | "directory";
 }
