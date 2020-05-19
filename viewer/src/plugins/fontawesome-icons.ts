@@ -33,5 +33,7 @@ export {
   faFile,
   faFileAlt,
   faFilePdf,
+  faFileVideo,
+  faFileAudio,
   faFileDownload,
 } from "@fortawesome/free-solid-svg-icons";
