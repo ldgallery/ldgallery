@@ -81,4 +81,11 @@ export default class Navigation {
         return "file";
     }
   }
+
+  // Get the file name of an item, without its cache timestamp
+  public static getFileName(item: Gallery.Item): string {
+    if (item.properties.type === "directory") return item.title;
+    const timeStamped = item.properties.resource.split("/").pop() ?? "";
+    return timeStamped.split("?")[0];
+  }
 }
