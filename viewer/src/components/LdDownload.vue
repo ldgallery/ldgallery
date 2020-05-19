@@ -30,21 +30,17 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import Navigation from "@/services/navigation";
 
 @Component export default class LdDownload extends Vue {
   @Prop({ required: true }) readonly item!: Gallery.Other;
 
-  itemResource(): string {
-    return this.item.properties.resource;
-  }
-
   itemFileName(): string {
-    const timeStamped = this.itemResource().split("/").pop() ?? "";
-    return timeStamped.split("?")[0];
+    return Navigation.getFileName(this.item);
   }
 
   itemDownloadUrl(): string {
-    return this.$galleryStore.resourceRoot + this.itemResource();
+    return this.$galleryStore.resourceRoot + this.item.properties.resource;
   }
 }
 </script>
