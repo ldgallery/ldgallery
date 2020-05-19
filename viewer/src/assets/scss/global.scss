@@ -36,6 +36,9 @@ button svg + span {
 .nowrap {
   white-space: nowrap;
 }
+.no-scroll {
+  overflow: hidden;
+}
 .no-scroll-x {
   overflow-x: hidden;
 }
@@ -49,6 +52,11 @@ button svg + span {
 }
 .flex-center {
   align-items: center;
+}
+
+.fill {
+  width: 100%;
+  height: 100%;
 }
 
 /**
