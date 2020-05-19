@@ -77,6 +77,8 @@ data GalleryItemProps =
     , resolution :: Resolution }
   | PlainText { resource :: Resource }
   | PDF { resource :: Resource }
+  | Video { resource :: Resource }
+  | Audio { resource :: Resource }
   | Other { resource :: Resource }
   deriving (Generic, Show)
 

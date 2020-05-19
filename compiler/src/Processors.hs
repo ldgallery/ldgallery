@@ -47,8 +47,13 @@ data ProcessingException = ProcessingException FilePath String deriving Show
 instance Exception ProcessingException
 
 
--- TODO: handle video, music, markdown...
-data Format = PictureFormat | PlainTextFormat | PortableDocumentFormat | Unknown
+data Format =
+    PictureFormat
+  | PlainTextFormat
+  | PortableDocumentFormat
+  | VideoFormat
+  | AudioFormat
+  | Unknown
 
 formatFromPath :: Path -> Format
 formatFromPath =
@@ -69,6 +74,19 @@ formatFromPath =
       ".txt" -> PlainTextFormat
       ".md" -> PlainTextFormat -- TODO: handle markdown separately
       ".pdf" -> PortableDocumentFormat
+      ".wav" -> AudioFormat
+      ".oga" -> AudioFormat
+      ".ogg" -> AudioFormat
+      ".spx" -> AudioFormat
+      ".opus" -> AudioFormat
+      ".flac" -> AudioFormat
+      ".m4a" -> AudioFormat
+      ".mp3" -> AudioFormat
+      ".ogv" -> VideoFormat
+      ".ogx" -> VideoFormat
+      ".webm" -> VideoFormat
+      ".mkv" -> VideoFormat
+      ".mp4" -> VideoFormat
       _ -> Unknown
 
 
@@ -175,6 +193,8 @@ itemFileProcessor maxResolution cached inputBase outputBase resClass inputRes =
     processorFor PictureFormat Nothing = (copyFileProcessor, getPictureProps)
     processorFor PlainTextFormat _ = (copyFileProcessor, const $ return . PlainText)
     processorFor PortableDocumentFormat _ = (copyFileProcessor, const $ return . PDF)
+    processorFor VideoFormat _ = (copyFileProcessor, const $ return . Video)
+    processorFor AudioFormat _ = (copyFileProcessor, const $ return . Audio)
     -- TODO: handle video reencoding and others?
     processorFor Unknown _ = (copyFileProcessor, const $ return . Other)
 
