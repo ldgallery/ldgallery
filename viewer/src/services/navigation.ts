@@ -74,6 +74,10 @@ export default class Navigation {
         return "file-alt";
       case "pdf":
         return "file-pdf";
+      case "video":
+        return "file-video";
+      case "audio":
+        return "file-audio";
       case "directory":
         return "folder";
       case "other":
