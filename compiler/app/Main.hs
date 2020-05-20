@@ -42,7 +42,7 @@ data Options = Options
   , outputDir :: FilePath
   , outputIndex :: FilePath
   , galleryConfig :: FilePath
-  , rebuilAll :: Bool
+  , rebuildAll :: Bool
   , cleanOutput :: Bool
   , withViewer :: Maybe FilePath
   } deriving (Show, Data, Typeable)
@@ -73,7 +73,7 @@ options = Options
       &= name "gallery-config"
       &= explicit
       &= help "Gallery configuration file (default=<input-dir>/gallery.yaml)"
-  , rebuilAll = False
+  , rebuildAll = False
       &= name "r"
       &= name "rebuild-all"
       &= explicit
@@ -130,7 +130,7 @@ main =
             (galleryOutputDir opts)
             (outputIndex opts)
             [outputDir opts]
-            (rebuilAll opts)
+            (rebuildAll opts)
             (cleanOutput opts)
       where
         checkDistinctPaths :: FilePath -> FilePath -> IO ()
