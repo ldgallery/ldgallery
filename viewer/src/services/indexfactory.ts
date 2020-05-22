@@ -18,6 +18,7 @@
 */
 
 import { Operation } from "@/@types/Operation";
+import { ItemType } from "@/@types/ItemType";
 import Navigation from "@/services/navigation";
 
 export default class IndexFactory {
@@ -30,7 +31,7 @@ export default class IndexFactory {
 
   // Pushes all tags for a root item (and its children) to the index
   private static pushTagsForItem(tagsIndex: Tag.Index, item: Gallery.Item): void {
-    if (item.properties.type === "directory") {
+    if (item.properties.type === ItemType.DIRECTORY) {
       item.properties.items.forEach(item => this.pushTagsForItem(tagsIndex, item));
       return; // Directories are not indexed
     }

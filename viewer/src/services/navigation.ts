@@ -17,12 +17,14 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import { ItemType } from "@/@types/ItemType";
+
 export default class Navigation {
 
   // Searches for an item by path from a root item (navigation)
   public static searchCurrentItemPath(root: Gallery.Item, path: string): Gallery.Item[] {
     if (path === root.path) return [root];
-    if (root.properties.type === "directory" && path.startsWith(root.path)) {
+    if (root.properties.type === ItemType.DIRECTORY && path.startsWith(root.path)) {
       const itemChain = root.properties.items
         .map(item => this.searchCurrentItemPath(item, path))
         .find(itemChain => itemChain.length > 0);
@@ -40,14 +42,14 @@ export default class Navigation {
   }
 
   // Checks if the type of an item matches
-  public static checkType(item: Gallery.Item | null, type: Gallery.ItemType | null): boolean {
+  public static checkType(item: Gallery.Item | null, type: ItemType | null): boolean {
     return (item?.properties.type ?? null) === type;
   }
 
   public static getLastDirectory(itemPath: Gallery.Item[]): Gallery.Directory {
     for (let idx = itemPath.length - 1; idx >= 0; idx--) {
       const item = itemPath[idx];
-      if (Navigation.checkType(item, "directory")) return item as Gallery.Directory;
+      if (Navigation.checkType(item, ItemType.DIRECTORY)) return item as Gallery.Directory;
     }
     throw new Error("No directory found");
   }
@@ -56,11 +58,11 @@ export default class Navigation {
   public static directoriesFirst(items: Gallery.Item[]) {
     return [
       ...items
-        .filter(child => Navigation.checkType(child, "directory"))
+        .filter(child => Navigation.checkType(child, ItemType.DIRECTORY))
         .sort((a, b) => a.title.localeCompare(b.title)),
 
       ...items
-        .filter(child => !Navigation.checkType(child, "directory")),
+        .filter(child => !Navigation.checkType(child, ItemType.DIRECTORY)),
     ];
   }
 
@@ -68,19 +70,13 @@ export default class Navigation {
   public static getIcon(item: Gallery.Item): string {
     if (item.path.length <= 1) return "home";
     switch (item.properties.type) {
-      case "picture":
-        return "image";
-      case "plaintext":
-        return "file-alt";
-      case "pdf":
-        return "file-pdf";
-      case "video":
-        return "file-video";
-      case "audio":
-        return "file-audio";
-      case "directory":
-        return "folder";
-      case "other":
+      case ItemType.PICTURE: return "image";
+      case ItemType.PLAINTEXT: return "file-alt";
+      case ItemType.PDF: return "file-pdf";
+      case ItemType.VIDEO: return "file-video";
+      case ItemType.AUDIO: return "file-audio";
+      case ItemType.DIRECTORY: return "folder";
+      case ItemType.OTHER:
       default:
         return "file";
     }
@@ -88,7 +84,7 @@ export default class Navigation {
 
   // Get the file name of an item, without its cache timestamp
   public static getFileName(item: Gallery.Item): string {
-    if (item.properties.type === "directory") return item.title;
+    if (item.properties.type === ItemType.DIRECTORY) return item.title;
     const timeStamped = item.properties.resource.split("/").pop() ?? "";
     return timeStamped.split("?")[0];
   }
