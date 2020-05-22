@@ -60,44 +60,44 @@ declare namespace Gallery {
     path: string,
     thumbnail?: Thumbnail
     properties: OtherProperties
-      | PictureProperties
-      | PlainTextProperties
-      | PDFProperties
-      | VideoProperties
-      | AudioProperties
-      | DirectoryProperties,
+    | PictureProperties
+    | PlainTextProperties
+    | PDFProperties
+    | VideoProperties
+    | AudioProperties
+    | DirectoryProperties,
   }
   interface Resolution {
     width: number,
     height: number,
   }
   interface OtherProperties {
-    type: "other",
+    type: import("./ItemType").ItemType.OTHER,
     resource: string
   }
   interface PictureProperties {
-    type: "picture",
+    type: import("./ItemType").ItemType.PICTURE,
     resource: string,
     resolution: Resolution
   }
   interface PlainTextProperties {
-    type: "plaintext",
+    type: import("./ItemType").ItemType.PLAINTEXT,
     resource: string,
   }
   interface PDFProperties {
-    type: "pdf",
+    type: import("./ItemType").ItemType.PDF,
     resource: string,
   }
   interface VideoProperties {
-    type: "video",
+    type: import("./ItemType").ItemType.VIDEO,
     resource: string,
   }
   interface AudioProperties {
-    type: "audio",
+    type: import("./ItemType").ItemType.AUDIO,
     resource: string,
   }
   interface DirectoryProperties {
-    type: "directory",
+    type: import("./ItemType").ItemType.DIRECTORY,
     items: Item[]
   }
   interface Thumbnail {
@@ -105,5 +105,4 @@ declare namespace Gallery {
     resolution: Resolution
   }
   type RawTag = string;
-  type ItemType = "other" | "picture" | "plaintext" | "pdf" | "video" | "audio" | "directory";
 }

@@ -21,19 +21,26 @@
   <!-- TODO: eliminate intermediate div -->
   <div>
     <ld-error v-if="checkType(null)" icon="folder-open" :message="$t('gallery.unknown-resource')" />
-    <gallery-search v-else-if="checkType('directory') && query.length > 0" :path="path" />
-    <gallery-directory v-else-if="checkType('directory')" :directory="$galleryStore.currentItem" />
-    <ld-picture v-else-if="checkType('picture')" :picture="$galleryStore.currentItem" />
-    <ld-plain-text-viewer v-else-if="checkType('plaintext')" :plain-text-item="$galleryStore.currentItem" />
-    <ld-pdf-viewer v-else-if="checkType('pdf')" :pdf-item="$galleryStore.currentItem" />
-    <ld-video-viewer v-else-if="checkType('video')" :video-item="$galleryStore.currentItem" />
-    <ld-audio-viewer v-else-if="checkType('audio')" :audio-item="$galleryStore.currentItem" />
+    <gallery-search v-else-if="checkType(ItemType.DIRECTORY) && query.length > 0" :path="path" />
+    <gallery-directory
+      v-else-if="checkType(ItemType.DIRECTORY)"
+      :directory="$galleryStore.currentItem"
+    />
+    <ld-picture v-else-if="checkType(ItemType.PICTURE)" :picture="$galleryStore.currentItem" />
+    <ld-plain-text-viewer
+      v-else-if="checkType(ItemType.PLAINTEXT)"
+      :plain-text-item="$galleryStore.currentItem"
+    />
+    <ld-pdf-viewer v-else-if="checkType(ItemType.PDF)" :pdf-item="$galleryStore.currentItem" />
+    <ld-video-viewer v-else-if="checkType(ItemType.VIDEO)" :video-item="$galleryStore.currentItem" />
+    <ld-audio-viewer v-else-if="checkType(ItemType.AUDIO)" :audio-item="$galleryStore.currentItem" />
     <ld-download v-else :item="$galleryStore.currentItem" />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
+import { ItemType } from "@/@types/ItemType";
 import Navigation from "@/services/navigation";
 import GalleryDirectory from "./GalleryDirectory.vue";
 import GallerySearch from "@/views/GallerySearch.vue";
@@ -48,6 +55,9 @@ export default class GalleryNavigation extends Vue {
   @Prop(String) readonly path!: string;
   @Prop(Array) readonly query!: string[];
 
+  // For the template
+  readonly ItemType = Object.freeze(ItemType);
+
   mounted() {
     this.pathChanged();
   }
@@ -57,7 +67,7 @@ export default class GalleryNavigation extends Vue {
     this.$galleryStore.setCurrentPath(this.path);
   }
 
-  checkType(type: Gallery.ItemType | null): boolean {
+  checkType(type: ItemType | null): boolean {
     return Navigation.checkType(this.$galleryStore.currentItem, type);
   }
 }
