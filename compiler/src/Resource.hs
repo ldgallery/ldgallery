@@ -29,6 +29,7 @@ import Data.List.Ordered (minusBy)
 import Data.Char (toLower)
 import Data.Maybe (mapMaybe, fromMaybe)
 import Data.Function ((&))
+import Data.Functor ((<&>))
 import qualified Data.Set as Set
 import Data.Text (pack)
 import Data.Time.Clock (UTCTime)
@@ -119,8 +120,8 @@ type ThumbnailProcessor = Path -> IO (Maybe Thumbnail)
 buildGalleryTree ::
      ItemProcessor -> ThumbnailProcessor -> TagsFromDirectoriesConfig
   -> InputTree -> IO GalleryItem
-buildGalleryTree processItem processThumbnail tagsFromDirsConfig inputTree =
-  mkGalleryItem [] inputTree
+buildGalleryTree processItem processThumbnail tagsFromDirsConfig =
+  mkGalleryItem []
   where
     mkGalleryItem :: [Tag] -> InputTree -> IO GalleryItem
     mkGalleryItem inheritedTags InputFile{path, modTime, sidecar} =
@@ -190,7 +191,7 @@ flattenGalleryTree simple = [simple]
 
 galleryOutputDiff :: GalleryItem -> FSNode -> [Path]
 galleryOutputDiff resources ref =
-  (filesystemPaths ref) \\ (compiledPaths $ flattenGalleryTree resources)
+  filesystemPaths ref \\ compiledPaths (flattenGalleryTree resources)
   where
     filesystemPaths :: FSNode -> [Path]
     filesystemPaths = map Files.path . tail . flattenDir
@@ -212,8 +213,7 @@ galleryOutputDiff resources ref =
 
     thumbnailPaths :: [GalleryItem] -> [Path]
     thumbnailPaths =
-        map resourcePath
-      . map (resource :: (Thumbnail -> Resource))
+        map (resourcePath . (resource :: (Thumbnail -> Resource)))
       . mapMaybe thumbnail
 
     (\\) :: [Path] -> [Path] -> [Path]
@@ -235,7 +235,7 @@ galleryOutputDiff resources ref =
 galleryCleanupResourceDir :: GalleryItem -> FileName -> IO ()
 galleryCleanupResourceDir resourceTree outputDir =
   readDirectory outputDir
-  >>= return . galleryOutputDiff resourceTree . root
-  >>= return . sortOn ((0 -) . pathLength) -- nested files before their parent dirs
-  >>= return . map (localPath . (/>) outputDir)
+  <&> galleryOutputDiff resourceTree . root
+  <&> sortOn ((0 -) . pathLength) -- nested files before their parent dirs
+  <&> map (localPath . (/>) outputDir)
   >>= mapM_ remove

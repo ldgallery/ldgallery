@@ -27,6 +27,7 @@ import GHC.Generics (Generic)
 import Control.Exception (Exception, AssertionFailed(..), throw, throwIO)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Function ((&))
+import Data.Functor ((<&>))
 import Data.Maybe (catMaybes)
 import Data.Bool (bool)
 import Data.List (find)
@@ -90,7 +91,7 @@ readSidecarFile :: FilePath -> IO Sidecar
 readSidecarFile filepath =
   doesFileExist filepath
   >>= bool (return Nothing) (decodeYamlFile filepath)
-  >>= return . maybe emptySidecar id
+  <&> maybe emptySidecar id
 
 
 readInputTree :: AnchoredFSNode -> IO InputTree
@@ -100,13 +101,13 @@ readInputTree (AnchoredFSNode anchor root@Dir{}) = mkDirNode root
   where
     mkInputNode :: FSNode -> IO (Maybe InputTree)
     mkInputNode file@File{path}
-      | (not $ isSidecar file) && (not $ isThumbnail file) =
+      | not (isSidecar file) && not (isThumbnail file) =
         do
           sidecar <- readSidecarFile $ localPath (anchor /> path <.> sidecarExt)
           modTime <- getModificationTime $ localPath (anchor /> path)
           return $ Just $ InputFile path modTime sidecar
     mkInputNode File{} = return Nothing
-    mkInputNode dir@Dir{} = mkDirNode dir >>= return . Just
+    mkInputNode dir@Dir{} = Just <$> mkDirNode dir
 
     mkDirNode :: FSNode -> IO InputTree
     mkDirNode File{} = throw $ AssertionFailed "Input directory is a file"
@@ -121,17 +122,17 @@ readInputTree (AnchoredFSNode anchor root@Dir{}) = mkDirNode root
     isSidecar Dir{} = False
     isSidecar File{path} =
       fileName path
-      & (maybe False $ isExtensionOf sidecarExt)
+      & maybe False (isExtensionOf sidecarExt)
 
     isThumbnail :: FSNode -> Bool
     isThumbnail Dir{} = False
     isThumbnail File{path} =
       fileName path
       & fmap dropExtension
-      & (maybe False (dirPropFile ==))
+      & maybe False (dirPropFile ==)
 
     findThumbnail :: [FSNode] -> Maybe Path
-    findThumbnail = (fmap Files.path) . (find isThumbnail)
+    findThumbnail = fmap Files.path . find isThumbnail
 
 -- | Filters an InputTree. The root is always returned.
 filterInputTree :: (InputTree -> Bool) -> InputTree -> InputTree

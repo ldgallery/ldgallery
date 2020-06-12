@@ -81,16 +81,16 @@ writeJSON outputPath object =
 (|||) = liftM2 (||)
 
 anyPattern :: [String] -> String -> Bool
-anyPattern patterns string = any (flip Glob.match string) (map Glob.compile patterns)
+anyPattern patterns string = any (flip Glob.match string . Glob.compile) patterns
 
 galleryDirFilter :: GalleryConfig -> [FilePath] -> FSNode -> Bool
 galleryDirFilter config excludedCanonicalDirs =
       (not . isHidden)
   &&& (not . isExcludedDir)
-  &&& ((matchesDir $ anyPattern $ includedDirectories config) |||
-       (matchesFile $ anyPattern $ includedFiles config))
-  &&& (not . ((matchesDir $ anyPattern $ excludedDirectories config) |||
-              (matchesFile $ anyPattern $ excludedFiles config)))
+  &&& (matchesDir (anyPattern $ includedDirectories config) |||
+       matchesFile (anyPattern $ includedFiles config))
+  &&& (not . (matchesDir (anyPattern $ excludedDirectories config) |||
+              matchesFile (anyPattern $ excludedFiles config)))
 
   where
     matchesDir :: (FileName -> Bool) -> FSNode -> Bool
@@ -102,17 +102,17 @@ galleryDirFilter config excludedCanonicalDirs =
     matchesFile _ Dir{} = False
 
     isExcludedDir :: FSNode -> Bool
-    isExcludedDir Dir{canonicalPath} = any (canonicalPath ==) excludedCanonicalDirs
+    isExcludedDir Dir{canonicalPath} = canonicalPath `elem` excludedCanonicalDirs
     isExcludedDir File{} = False
 
 inputTreeFilter :: GalleryConfig -> InputTree -> Bool
 inputTreeFilter GalleryConfig{includedTags, excludedTags} =
-      (hasTagMatching $ anyPattern includedTags)
-  &&& (not . (hasTagMatching $ anyPattern excludedTags))
+      hasTagMatching (anyPattern includedTags)
+  &&& (not . hasTagMatching (anyPattern excludedTags))
 
   where
     hasTagMatching :: (String -> Bool) -> InputTree -> Bool
-    hasTagMatching cond = (any cond) . (fromMaybe [""] . tags) . sidecar
+    hasTagMatching cond = any cond . (fromMaybe [""] . tags) . sidecar
 
 
 compileGallery :: FilePath -> FilePath -> FilePath -> FilePath -> [FilePath] -> Bool -> Bool -> IO ()

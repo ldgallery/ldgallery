@@ -57,10 +57,7 @@ data Format =
 
 formatFromPath :: Path -> Format
 formatFromPath =
-  maybe Unknown fromExt
-  . fmap (map toLower)
-  . fmap takeExtension
-  . fileName
+  maybe Unknown ((fromExt . map toLower) . takeExtension) . fileName
   where
     fromExt :: String -> Format
     fromExt ext = case ext of
@@ -97,12 +94,12 @@ type FileProcessor =
 
 copyFileProcessor :: FileProcessor
 copyFileProcessor inputPath outputPath =
-  (putStrLn $ "Copying:\t" ++ outputPath)
+  putStrLn ("Copying:\t" ++ outputPath)
   >> ensureParentDir (flip System.Directory.copyFile) outputPath inputPath
 
 resizePictureUpTo :: Resolution -> FileProcessor
 resizePictureUpTo maxResolution inputPath outputPath =
-  (putStrLn $ "Generating:\t" ++ outputPath)
+  putStrLn ("Generating:\t" ++ outputPath)
   >> ensureParentDir (flip resize) outputPath inputPath
   where
     maxSize :: Resolution -> String
@@ -143,7 +140,7 @@ withCached processor inputPath outputPath =
 
 
 resourceAt :: FilePath -> Path -> IO Resource
-resourceAt fsPath resPath = getModificationTime fsPath >>= return . Resource resPath
+resourceAt fsPath resPath = Resource resPath <$> getModificationTime fsPath
 
 getImageResolution :: FilePath -> IO Resolution
 getImageResolution fsPath =
@@ -160,9 +157,7 @@ getImageResolution fsPath =
         _ -> throwIO $ ProcessingException fsPath "Unable to read image resolution."
 
 getPictureProps :: ItemDescriber
-getPictureProps fsPath resource =
-      getImageResolution fsPath
-  >>= return . Picture resource
+getPictureProps fsPath resource = Picture resource <$> getImageResolution fsPath
 
 
 type ItemDescriber =

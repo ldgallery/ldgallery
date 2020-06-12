@@ -30,6 +30,7 @@ module Files
 
 import Data.List (isPrefixOf, length, subsequences, sortOn)
 import Data.Function ((&))
+import Data.Functor ((<&>))
 import Data.Text (pack)
 import Data.Aeson (ToJSON)
 import qualified Data.Aeson as JSON
@@ -53,7 +54,7 @@ type LocalPath = String
 type WebPath = String
 
 -- | Reversed path component list
-data Path = Path [FileName] deriving Show
+newtype Path = Path [FileName] deriving Show
 
 instance ToJSON Path where
   toJSON = JSON.String . pack . webPath
@@ -120,7 +121,7 @@ isHidden = hiddenName . nodeName
 -- | DFS with intermediate dirs first.
 flattenDir :: FSNode -> [FSNode]
 flattenDir file@File{} = [file]
-flattenDir dir@Dir{items} = dir:(concatMap flattenDir items)
+flattenDir dir@Dir{items} = dir:concatMap flattenDir items
 
 -- | Filters a dir tree. The root is always returned.
 filterDir :: (FSNode -> Bool) -> AnchoredFSNode -> AnchoredFSNode
@@ -133,7 +134,7 @@ filterDir cond (AnchoredFSNode anchor root) =
     filter cond items & map filterNode & Dir path canonicalPath
 
 readDirectory :: LocalPath -> IO AnchoredFSNode
-readDirectory root = mkNode (Path []) >>= return . AnchoredFSNode root
+readDirectory root = AnchoredFSNode root <$> mkNode (Path [])
   where
     mkNode :: Path -> IO FSNode
     mkNode path =
@@ -151,10 +152,10 @@ readDirectory root = mkNode (Path []) >>= return . AnchoredFSNode root
 
     mkDirNode :: Path -> FilePath -> IO FSNode
     mkDirNode path canonicalPath =
-      (listDirectory $ localPath (root /> path))
-      >>= mapM (mkNode . ((</) path))
-      >>= return . sortOn nodeName
-      >>= return . Dir path canonicalPath
+      listDirectory (localPath (root /> path))
+      >>= mapM (mkNode . (path </))
+      <&> sortOn nodeName
+      <&> Dir path canonicalPath
 
 copyTo :: FilePath -> AnchoredFSNode -> IO ()
 copyTo target AnchoredFSNode{anchor, root} = copyNode root

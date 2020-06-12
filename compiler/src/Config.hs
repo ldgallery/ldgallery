@@ -73,8 +73,8 @@ instance FromJSON GalleryConfig where
     <*> v .:? "includedTags" .!= ["*"]
     <*> v .:? "excludedTags" .!= []
     <*> v .:? "tagCategories" .!= []
-    <*> v .:? "tagsFromDirectories" .!= (TagsFromDirectoriesConfig 0 "")
-    <*> v .:? "thumbnailMaxResolution" .!= (Resolution 400 300)
+    <*> v .:? "tagsFromDirectories" .!= TagsFromDirectoriesConfig 0 ""
+    <*> v .:? "thumbnailMaxResolution" .!= Resolution 400 300
     <*> v .:? "pictureMaxResolution"
 
 readConfig :: FileName -> IO GalleryConfig
