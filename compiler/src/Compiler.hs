@@ -29,7 +29,7 @@ import System.FilePath ((</>))
 import qualified System.FilePath.Glob as Glob
 import System.Directory (canonicalizePath)
 
-import Data.Aeson (ToJSON)
+import Data.Aeson (ToJSON, FromJSON)
 import qualified Data.Aeson as JSON
 
 import Config
@@ -64,7 +64,7 @@ thumbnailsDir = "thumbnails"
 data GalleryIndex = GalleryIndex
   { properties :: ViewerConfig
   , tree :: GalleryItem
-  } deriving (Generic, Show, ToJSON)
+  } deriving (Generic, Show, ToJSON, FromJSON)
 
 
 writeJSON :: ToJSON a => FileName -> a -> IO ()

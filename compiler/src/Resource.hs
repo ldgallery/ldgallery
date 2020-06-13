@@ -31,14 +31,14 @@ import Data.Maybe (mapMaybe, fromMaybe)
 import Data.Function ((&))
 import Data.Functor ((<&>))
 import qualified Data.Set as Set
-import Data.Text (pack)
+import Data.Text (pack, unpack, breakOn)
 import Data.Time.Clock (UTCTime)
 import Data.Time.LocalTime (ZonedTime, utc, utcToZonedTime, zonedTimeToUTC)
-import Data.Time.Format (formatTime, defaultTimeLocale)
+import Data.Time.Format (formatTime, parseTimeM, defaultTimeLocale)
 import Safe.Foldable (maximumByMay)
 
 import GHC.Generics (Generic)
-import Data.Aeson (ToJSON, genericToJSON, genericToEncoding)
+import Data.Aeson (ToJSON, FromJSON, genericToJSON, genericToEncoding, genericParseJSON)
 import qualified Data.Aeson as JSON
 
 import Files
@@ -70,6 +70,13 @@ instance ToJSON Resource where
     where
       timestamp = formatTime defaultTimeLocale "%s" modTime
 
+instance FromJSON Resource where
+  parseJSON = JSON.withText "Resource" (unpackRes . breakOn "?")
+    where
+      unpackRes (resPathStr, modTimeStr) =
+        Resource (fromWebPath $ unpack resPathStr)
+        <$> parseTimeM True defaultTimeLocale "?%s" (unpack modTimeStr)
+
 
 data GalleryItemProps =
     Directory { items :: [GalleryItem] }
@@ -87,15 +94,14 @@ instance ToJSON GalleryItemProps where
   toJSON = genericToJSON encodingOptions
   toEncoding = genericToEncoding encodingOptions
 
+instance FromJSON GalleryItemProps where
+  parseJSON = genericParseJSON encodingOptions
+
 
 data Thumbnail = Thumbnail
   { resource :: Resource
   , resolution :: Resolution
-  } deriving (Generic, Show)
-
-instance ToJSON Thumbnail where
-  toJSON = genericToJSON encodingOptions
-  toEncoding = genericToEncoding encodingOptions
+  } deriving (Generic, Show, ToJSON, FromJSON)
 
 
 data GalleryItem = GalleryItem
@@ -106,11 +112,7 @@ data GalleryItem = GalleryItem
   , path :: Path
   , thumbnail :: Maybe Thumbnail
   , properties :: GalleryItemProps
-  } deriving (Generic, Show)
-
-instance ToJSON GalleryItem where
-  toJSON = genericToJSON encodingOptions
-  toEncoding = genericToEncoding encodingOptions
+  } deriving (Generic, Show, ToJSON, FromJSON)
 
 
 type ItemProcessor = Path -> IO GalleryItemProps

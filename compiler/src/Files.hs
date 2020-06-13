@@ -20,7 +20,7 @@ module Files
   ( FileName, LocalPath, WebPath, Path(..)
   , (</>), (</), (/>), (<.>)
   , fileName, subPaths, pathLength
-  , localPath, webPath
+  , localPath, webPath, fromWebPath
   , FSNode(..), AnchoredFSNode(..)
   , nodeName, isHidden, flattenDir, filterDir
   , readDirectory, copyTo
@@ -31,8 +31,8 @@ module Files
 import Data.List (isPrefixOf, length, sortOn)
 import Data.Function ((&))
 import Data.Functor ((<&>))
-import Data.Text (pack)
-import Data.Aeson (ToJSON)
+import Data.Text (pack, unpack)
+import Data.Aeson (ToJSON, FromJSON)
 import qualified Data.Aeson as JSON
 
 import System.Directory
@@ -59,8 +59,11 @@ newtype Path = Path [FileName] deriving Show
 instance ToJSON Path where
   toJSON = JSON.String . pack . webPath
 
+instance FromJSON Path where
+  parseJSON = JSON.withText "Path" (return . fromWebPath . unpack)
+
 instance Eq Path where
-  (Path left) == (Path right) = left == right
+  left == right = webPath left == webPath right
 
 (</>) :: Path -> Path -> Path
 (Path l) </> (Path r) = Path (r ++ l)
@@ -94,6 +97,9 @@ localPath (Path path) = System.FilePath.joinPath $ reverse path
 
 webPath :: Path -> WebPath
 webPath (Path path) = System.FilePath.Posix.joinPath $ reverse path
+
+fromWebPath :: WebPath -> Path
+fromWebPath = Path . reverse . System.FilePath.Posix.splitDirectories
 
 
 data FSNode =
