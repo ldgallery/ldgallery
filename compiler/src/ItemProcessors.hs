@@ -16,35 +16,23 @@
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module Processors
-  ( Resolution(..)
-  , ItemFileProcessor, itemFileProcessor
-  , ThumbnailFileProcessor, thumbnailFileProcessor
-  , skipCached, withCached
+module ItemProcessors
+  ( ItemProcessor
+  , itemFileProcessor
+  , ThumbnailProcessor
+  , thumbnailFileProcessor
   ) where
 
 
-import Control.Exception (Exception, throwIO)
-import Control.Monad (when)
 import Data.Function ((&))
 import Data.Char (toLower)
-import Text.Read (readMaybe)
+import System.FilePath (takeExtension)
 
-import System.Directory hiding (copyFile)
-import qualified System.Directory
-import System.FilePath
-
-import System.Process (callProcess, readProcess)
-
-import Resource
-  ( ItemProcessor, ThumbnailProcessor
-  , GalleryItemProps(..), Resolution(..), Resource(..), Thumbnail(..) )
-
+import Config (Resolution(..))
+import Resource (ItemProcessor, ThumbnailProcessor, Thumbnail(..), GalleryItemProps(..))
+import Caching (Cache)
+import FileProcessors
 import Files
-
-
-data ProcessingException = ProcessingException FilePath String deriving Show
-instance Exception ProcessingException
 
 
 data Format =
@@ -85,85 +73,6 @@ formatFromPath =
       ".mkv" -> VideoFormat
       ".mp4" -> VideoFormat
       _ -> Unknown
-
-
-type FileProcessor =
-     FileName        -- ^ Input path
-  -> FileName        -- ^ Output path
-  -> IO ()
-
-copyFileProcessor :: FileProcessor
-copyFileProcessor inputPath outputPath =
-  putStrLn ("Copying:\t" ++ outputPath)
-  >> ensureParentDir (flip System.Directory.copyFile) outputPath inputPath
-
-resizePictureUpTo :: Resolution -> FileProcessor
-resizePictureUpTo maxResolution inputPath outputPath =
-  putStrLn ("Generating:\t" ++ outputPath)
-  >> ensureParentDir (flip resize) outputPath inputPath
-  where
-    maxSize :: Resolution -> String
-    maxSize Resolution{width, height} = show width ++ "x" ++ show height ++ ">"
-
-    resize :: FileName -> FileName -> IO ()
-    resize input output = callProcess "magick"
-      [ input
-      , "-auto-orient"
-      , "-resize", maxSize maxResolution
-      , output ]
-
-
-type Cache = FileProcessor -> FileProcessor
-
-skipCached :: Cache
-skipCached processor inputPath outputPath =
-  removePathForcibly outputPath
-  >> processor inputPath outputPath
-
-withCached :: Cache
-withCached processor inputPath outputPath =
-  do
-    isDir <- doesDirectoryExist outputPath
-    when isDir $ removePathForcibly outputPath
-
-    fileExists <- doesFileExist outputPath
-    if fileExists then
-      do
-        needUpdate <- isOutdated True inputPath outputPath
-        if needUpdate then update else skip
-    else
-      update
-
-  where
-    update = processor inputPath outputPath
-    skip = putStrLn $ "Skipping:\t" ++ outputPath
-
-
-resourceAt :: FilePath -> Path -> IO Resource
-resourceAt fsPath resPath = Resource resPath <$> getModificationTime fsPath
-
-getImageResolution :: FilePath -> IO Resolution
-getImageResolution fsPath =
-  readProcess "magick" ["identify", "-format", "%w %h", firstFrame] []
-  >>= parseResolution . break (== ' ')
-  where
-    firstFrame :: FilePath
-    firstFrame = fsPath ++ "[0]"
-
-    parseResolution :: (String, String) -> IO Resolution
-    parseResolution (widthString, heightString) =
-      case (readMaybe widthString, readMaybe heightString) of
-        (Just w, Just h) -> return $ Resolution w h
-        _ -> throwIO $ ProcessingException fsPath "Unable to read image resolution."
-
-getPictureProps :: ItemDescriber
-getPictureProps fsPath resource = Picture resource <$> getImageResolution fsPath
-
-
-type ItemDescriber =
-     FilePath
-  -> Resource
-  -> IO GalleryItemProps
 
 
 type ItemFileProcessor =

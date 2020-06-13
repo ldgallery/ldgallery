@@ -43,9 +43,8 @@ import Files
   , nodeName
   , filterDir
   , ensureParentDir )
-import Processors
-  ( itemFileProcessor, thumbnailFileProcessor
-  , skipCached, withCached )
+import ItemProcessors (itemFileProcessor, thumbnailFileProcessor)
+import Caching (skipCache, withCache)
 
 
 defaultGalleryConf :: String
@@ -127,7 +126,7 @@ compileGallery configPath inputDirPath outputDirPath outputIndexPath excludedDir
     inputTree <- readInputTree sourceTree
     let curatedInputTree = filterInputTree (inputTreeFilter config) inputTree
 
-    let cache = if rebuildAll then skipCached else withCached
+    let cache = if rebuildAll then skipCache else withCache
     let itemProc = itemProcessor config cache
     let thumbnailProc = thumbnailProcessor config cache
     let galleryBuilder = buildGalleryTree itemProc thumbnailProc (tagsFromDirectories config)
