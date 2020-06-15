@@ -28,7 +28,7 @@ module Files
   ) where
 
 
-import Data.List (isPrefixOf, length, subsequences, sortOn)
+import Data.List (isPrefixOf, length, sortOn)
 import Data.Function ((&))
 import Data.Functor ((<&>))
 import Data.Text (pack)
@@ -81,7 +81,10 @@ fileName (Path (name:_)) = Just name
 fileName _ = Nothing
 
 subPaths :: Path -> [Path]
-subPaths (Path path) = map Path $ subsequences path
+subPaths (Path path) = map Path $ subpaths path
+  where
+    subpaths [] = []
+    subpaths full@(_:r) = full : subpaths r
 
 pathLength :: Path -> Int
 pathLength (Path path) = Data.List.length path
