@@ -18,39 +18,59 @@
 
 module Caching
   ( Cache
-  , skipCache
-  , withCache
+  , noCache
+  , ItemCache
+  , buildItemCache
+  , useCached
   ) where
 
 
 import Control.Monad (when)
+import qualified Data.Map.Strict as Map
 import System.Directory (removePathForcibly, doesDirectoryExist, doesFileExist)
 
 import FileProcessors (FileProcessor)
+import Resource (GalleryItem(..), flattenGalleryTree)
 import Files
 
 
-type Cache = FileProcessor -> FileProcessor
+type Cache a = FileProcessor a -> FileProcessor a
 
-skipCache :: Cache
-skipCache processor inputPath outputPath =
-  removePathForcibly outputPath
-  >> processor inputPath outputPath
 
-withCache :: Cache
-withCache processor inputPath outputPath =
+noCache :: Cache a
+noCache processor itemPath resPath inputFsPath outputFsPath =
+  removePathForcibly outputFsPath
+  >> processor itemPath resPath inputFsPath outputFsPath
+
+
+type ItemCache = Path -> Maybe GalleryItem
+
+buildItemCache :: Maybe GalleryItem -> ItemCache
+buildItemCache cachedItems = lookupCache
+  where
+    withKey item = (webPath $ Resource.path item, item)
+    cachedItemList = maybe [] flattenGalleryTree cachedItems
+    cachedMap = Map.fromList (map withKey cachedItemList)
+    lookupCache path = Map.lookup (webPath path) cachedMap
+
+useCached :: ItemCache -> (GalleryItem -> a) -> Cache a
+useCached cache propGetter processor itemPath resPath inputFsPath outputFsPath =
   do
-    isDir <- doesDirectoryExist outputPath
-    when isDir $ removePathForcibly outputPath
+    isDir <- doesDirectoryExist outputFsPath
+    when isDir $ removePathForcibly outputFsPath
 
-    fileExists <- doesFileExist outputPath
+    fileExists <- doesFileExist outputFsPath
     if fileExists then
       do
-        needUpdate <- isOutdated True inputPath outputPath
-        if needUpdate then update else skip
+        needUpdate <- isOutdated True inputFsPath outputFsPath
+        case (needUpdate, cache itemPath) of
+          (False, Just props) -> fromCache props
+          _ -> update
     else
       update
 
   where
-    update = processor inputPath outputPath
-    skip = putStrLn $ "Skipping:\t" ++ outputPath
+    update = processor itemPath resPath inputFsPath outputFsPath
+    fromCache props =
+      putStrLn ("From cache:\t" ++ outputFsPath)
+      >> return (propGetter props)

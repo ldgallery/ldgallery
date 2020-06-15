@@ -18,12 +18,18 @@
 
 module FileProcessors
   ( FileProcessor
+  , transformThenDescribe
+  , copyResource
+  , noopProcessor
+  , FileTransformer
   , copyFileProcessor
   , resizePictureUpTo
   , resourceAt
   , getImageResolution
-  , ItemDescriber
+  , FileDescriber
+  , getResProps
   , getPictureProps
+  , getThumbnailProps
   ) where
 
 
@@ -35,24 +41,43 @@ import System.Directory (getModificationTime)
 import qualified System.Directory
 
 import Config (Resolution(..))
-import Resource (Resource(..), GalleryItemProps(..))
+import Resource (Resource(..), GalleryItemProps(..), Thumbnail(..))
 import Files
 
 
 data ProcessingException = ProcessingException FilePath String deriving Show
 instance Exception ProcessingException
 
-type FileProcessor =
+type FileProcessor a =
+     Path     -- ^ Item path
+  -> Path     -- ^ Target resource path
+  -> FilePath -- ^ Filesystem input path
+  -> FilePath -- ^ Filesystem output path
+  -> IO a
+
+transformThenDescribe :: FileTransformer -> FileDescriber a -> FileProcessor a
+transformThenDescribe transformer describer _itemPath resPath fsInPath fsOutPath =
+  transformer fsInPath fsOutPath >> describer resPath fsOutPath
+
+copyResource :: (Resource -> a) -> FileProcessor a
+copyResource resPropConstructor =
+  transformThenDescribe copyFileProcessor (getResProps resPropConstructor)
+
+noopProcessor :: FileProcessor (Maybe a)
+noopProcessor _ _ _ _ = return Nothing
+
+
+type FileTransformer =
      FileName -- ^ Input path
   -> FileName -- ^ Output path
   -> IO ()
 
-copyFileProcessor :: FileProcessor
+copyFileProcessor :: FileTransformer
 copyFileProcessor inputPath outputPath =
   putStrLn ("Copying:\t" ++ outputPath)
   >> ensureParentDir (flip System.Directory.copyFile) outputPath inputPath
 
-resizePictureUpTo :: Resolution -> FileProcessor
+resizePictureUpTo :: Resolution -> FileTransformer
 resizePictureUpTo maxResolution inputPath outputPath =
   putStrLn ("Generating:\t" ++ outputPath)
   >> ensureParentDir (flip resize) outputPath inputPath
@@ -68,8 +93,10 @@ resizePictureUpTo maxResolution inputPath outputPath =
       , output ]
 
 
-resourceAt :: FilePath -> Path -> IO Resource
-resourceAt fsPath resPath = Resource resPath <$> getModificationTime fsPath
+type FileDescriber a =
+      Path     -- ^ Target resource path
+   -> FilePath -- ^ Filesystem path
+   -> IO a
 
 getImageResolution :: FilePath -> IO Resolution
 getImageResolution fsPath =
@@ -85,11 +112,17 @@ getImageResolution fsPath =
         (Just w, Just h) -> return $ Resolution w h
         _ -> throwIO $ ProcessingException fsPath "Unable to read image resolution."
 
+resourceAt :: FileDescriber Resource
+resourceAt resPath fsPath = Resource resPath <$> getModificationTime fsPath
 
-type ItemDescriber =
-     FilePath
-  -> Resource
-  -> IO GalleryItemProps
+getResProps :: (Resource -> a) -> FileDescriber a
+getResProps resPropsConstructor resPath fsPath =
+  resPropsConstructor <$> resourceAt resPath fsPath
 
-getPictureProps :: ItemDescriber
-getPictureProps fsPath resource = Picture resource <$> getImageResolution fsPath
+getPictureProps :: FileDescriber GalleryItemProps
+getPictureProps resPath fsPath =
+  Picture <$> resourceAt resPath fsPath <*> getImageResolution fsPath
+
+getThumbnailProps :: FileDescriber (Maybe Thumbnail)
+getThumbnailProps resPath fsPath =
+  Just <$> (Thumbnail <$> resourceAt resPath fsPath <*> getImageResolution fsPath)

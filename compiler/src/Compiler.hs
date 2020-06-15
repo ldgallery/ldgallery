@@ -24,17 +24,25 @@ module Compiler
 
 import GHC.Generics (Generic)
 import Control.Monad (liftM2, when)
+import Data.Bool (bool)
 import Data.Maybe (fromMaybe)
 import System.FilePath ((</>))
 import qualified System.FilePath.Glob as Glob
-import System.Directory (canonicalizePath)
+import System.Directory (canonicalizePath, doesFileExist)
 
 import Data.Aeson (ToJSON, FromJSON)
 import qualified Data.Aeson as JSON
 
 import Config
 import Input (InputTree, readInputTree, filterInputTree, sidecar, tags)
-import Resource (GalleryItem, buildGalleryTree, galleryCleanupResourceDir)
+import Resource
+  ( GalleryItem
+  , GalleryItemProps
+  , Thumbnail
+  , buildGalleryTree
+  , galleryCleanupResourceDir
+  , properties
+  , thumbnail)
 import Files
   ( FileName
   , FSNode(..)
@@ -43,8 +51,8 @@ import Files
   , nodeName
   , filterDir
   , ensureParentDir )
-import ItemProcessors (itemFileProcessor, thumbnailFileProcessor)
-import Caching (skipCache, withCache)
+import ItemProcessors (ItemProcessor, itemFileProcessor, thumbnailFileProcessor)
+import Caching (Cache, noCache, buildItemCache, useCached)
 
 
 defaultGalleryConf :: String
@@ -71,6 +79,15 @@ writeJSON outputPath object =
   do
     putStrLn $ "Generating:\t" ++ outputPath
     ensureParentDir JSON.encodeFile outputPath object
+
+loadGalleryIndex :: FilePath -> IO (Maybe GalleryIndex)
+loadGalleryIndex path =
+  doesFileExist path >>= bool (return Nothing) decodeIndex
+  where
+    decodeIndex =
+      JSON.eitherDecodeFileStrict path
+      >>= either (\err -> warn err >> return Nothing) (return . Just)
+    warn = putStrLn . ("Warning:\tUnable to reuse existing index as cache: " ++)
 
 
 (&&&) :: (a -> Bool) -> (a -> Bool) -> a -> Bool
@@ -126,14 +143,17 @@ compileGallery configPath inputDirPath outputDirPath outputIndexPath excludedDir
     inputTree <- readInputTree sourceTree
     let curatedInputTree = filterInputTree (inputTreeFilter config) inputTree
 
-    let cache = if rebuildAll then skipCache else withCache
-    let itemProc = itemProcessor config cache
-    let thumbnailProc = thumbnailProcessor config cache
+    let galleryIndexPath = outputGalleryIndex outputIndexPath
+    cachedIndex <- loadCachedIndex galleryIndexPath
+    let cache = mkCache cachedIndex
+
+    let itemProc = itemProcessor config (cache Resource.properties)
+    let thumbnailProc = thumbnailProcessor config (cache Resource.thumbnail)
     let galleryBuilder = buildGalleryTree itemProc thumbnailProc (tagsFromDirectories config)
     resources <- galleryBuilder curatedInputTree
 
     when cleanOutput $ galleryCleanupResourceDir resources outputDirPath
-    writeJSON (outputGalleryIndex outputIndexPath) $ GalleryIndex (viewerConfig config) resources
+    writeJSON galleryIndexPath $ GalleryIndex (viewerConfig config) resources
 
   where
     inputGalleryConf :: FilePath -> FilePath
@@ -144,10 +164,25 @@ compileGallery configPath inputDirPath outputDirPath outputIndexPath excludedDir
     outputGalleryIndex "" = outputDirPath </> defaultIndexFile
     outputGalleryIndex file = file
 
+    loadCachedIndex :: FilePath -> IO (Maybe GalleryIndex)
+    loadCachedIndex galleryIndexPath =
+      if rebuildAll
+        then return Nothing
+        else loadGalleryIndex galleryIndexPath
+
+    mkCache :: Maybe GalleryIndex -> (GalleryItem -> a) -> Cache a
+    mkCache refGalleryIndex =
+      if rebuildAll
+        then const noCache
+        else useCached (buildItemCache $ fmap tree refGalleryIndex)
+
+    itemProcessor :: GalleryConfig -> Cache GalleryItemProps -> ItemProcessor GalleryItemProps
     itemProcessor config cache =
       itemFileProcessor
         (pictureMaxResolution config) cache
         inputDirPath outputDirPath itemsDir
+
+    thumbnailProcessor :: GalleryConfig -> Cache (Maybe Thumbnail) -> ItemProcessor (Maybe Thumbnail)
     thumbnailProcessor config cache =
       thumbnailFileProcessor
         (thumbnailMaxResolution config) cache

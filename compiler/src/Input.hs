@@ -28,7 +28,7 @@ import Control.Exception (Exception, AssertionFailed(..), throw, throwIO)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Function ((&))
 import Data.Functor ((<&>))
-import Data.Maybe (catMaybes)
+import Data.Maybe (catMaybes, fromMaybe)
 import Data.Bool (bool)
 import Data.List (find)
 import Data.Time.Clock (UTCTime)
@@ -91,7 +91,7 @@ readSidecarFile :: FilePath -> IO Sidecar
 readSidecarFile filepath =
   doesFileExist filepath
   >>= bool (return Nothing) (decodeYamlFile filepath)
-  <&> maybe emptySidecar id
+  <&> fromMaybe emptySidecar
 
 
 readInputTree :: AnchoredFSNode -> IO InputTree

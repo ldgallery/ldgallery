@@ -17,9 +17,15 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 module Resource
-  ( ItemProcessor, ThumbnailProcessor
-  , GalleryItem(..), GalleryItemProps(..), Resolution(..), Resource(..), Thumbnail(..)
-  , buildGalleryTree, galleryCleanupResourceDir
+  ( ItemProcessor
+  , GalleryItem(..)
+  , GalleryItemProps(..)
+  , Resolution(..)
+  , Resource(..)
+  , Thumbnail(..)
+  , buildGalleryTree
+  , galleryCleanupResourceDir
+  , flattenGalleryTree
   ) where
 
 
@@ -115,12 +121,14 @@ data GalleryItem = GalleryItem
   } deriving (Generic, Show, ToJSON, FromJSON)
 
 
-type ItemProcessor = Path -> IO GalleryItemProps
-type ThumbnailProcessor = Path -> IO (Maybe Thumbnail)
+type ItemProcessor a =
+     Path -- Item path
+  -> Path -- Resource Path
+  -> IO a
 
 
 buildGalleryTree ::
-     ItemProcessor -> ThumbnailProcessor -> TagsFromDirectoriesConfig
+     ItemProcessor GalleryItemProps -> ItemProcessor (Maybe Thumbnail) -> TagsFromDirectoriesConfig
   -> InputTree -> IO GalleryItem
 buildGalleryTree processItem processThumbnail tagsFromDirsConfig =
   mkGalleryItem []
@@ -128,29 +136,31 @@ buildGalleryTree processItem processThumbnail tagsFromDirsConfig =
     mkGalleryItem :: [Tag] -> InputTree -> IO GalleryItem
     mkGalleryItem inheritedTags InputFile{path, modTime, sidecar} =
       do
-        properties <- processItem path
-        processedThumbnail <- processThumbnail path
+        let itemPath = "/" /> path
+        properties <- processItem itemPath path
+        processedThumbnail <- processThumbnail itemPath path
         return GalleryItem
           { title = Input.title sidecar ?? fileName path ?? ""
           , datetime = Input.datetime sidecar ?? toZonedTime modTime
           , description = Input.description sidecar ?? ""
           , tags = unique ((Input.tags sidecar ?? []) ++ inheritedTags ++ parentDirTags path)
-          , path = "/" /> path
+          , path = itemPath
           , thumbnail = processedThumbnail
           , properties = properties }
 
     mkGalleryItem inheritedTags InputDir{path, modTime, sidecar, dirThumbnailPath, items} =
       do
+        let itemPath = "/" /> path
         let dirTags = (Input.tags sidecar ?? []) ++ inheritedTags
         processedItems <- parallel $ map (mkGalleryItem dirTags) items
-        processedThumbnail <- maybeThumbnail dirThumbnailPath
+        processedThumbnail <- maybeThumbnail itemPath dirThumbnailPath
         return GalleryItem
           { title = Input.title sidecar ?? fileName path ?? ""
           , datetime = Input.datetime sidecar ?? mostRecentModTime processedItems
                                               ?? toZonedTime modTime
           , description = Input.description sidecar ?? ""
           , tags = unique (aggregateTags processedItems ++ parentDirTags path)
-          , path = "/" /> path
+          , path = itemPath
           , thumbnail = processedThumbnail
           , properties = Directory processedItems }
 
@@ -170,9 +180,9 @@ buildGalleryTree processItem processThumbnail tagsFromDirsConfig =
     aggregateTags :: [GalleryItem] -> [Tag]
     aggregateTags = concatMap (\item -> tags (item::GalleryItem))
 
-    maybeThumbnail :: Maybe Path -> IO (Maybe Thumbnail)
-    maybeThumbnail Nothing = return Nothing
-    maybeThumbnail (Just thumbnailPath) = processThumbnail thumbnailPath
+    maybeThumbnail :: Path -> Maybe Path -> IO (Maybe Thumbnail)
+    maybeThumbnail _ Nothing = return Nothing
+    maybeThumbnail itemPath (Just thumbnailPath) = processThumbnail itemPath thumbnailPath
 
     mostRecentModTime :: [GalleryItem] -> Maybe ZonedTime
     mostRecentModTime =

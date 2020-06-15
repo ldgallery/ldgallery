@@ -19,17 +19,15 @@
 module ItemProcessors
   ( ItemProcessor
   , itemFileProcessor
-  , ThumbnailProcessor
   , thumbnailFileProcessor
   ) where
 
 
-import Data.Function ((&))
 import Data.Char (toLower)
 import System.FilePath (takeExtension)
 
 import Config (Resolution(..))
-import Resource (ItemProcessor, ThumbnailProcessor, Thumbnail(..), GalleryItemProps(..))
+import Resource (ItemProcessor, Thumbnail(..), GalleryItemProps(..))
 import Caching (Cache)
 import FileProcessors
 import Files
@@ -75,58 +73,43 @@ formatFromPath =
       _ -> Unknown
 
 
-type ItemFileProcessor =
-     FileName        -- ^ Input base path
-  -> FileName        -- ^ Output base path
-  -> FileName        -- ^ Output class (subdir)
-  -> ItemProcessor
+type ItemFileProcessor a =
+     FilePath -- ^ Filesystem input base path
+  -> FilePath -- ^ Filesystem output base path
+  -> FileName -- ^ Output class (subdir)
+  -> ItemProcessor a
 
-itemFileProcessor :: Maybe Resolution -> Cache -> ItemFileProcessor
-itemFileProcessor maxResolution cached inputBase outputBase resClass inputRes =
-      cached processor inPath outPath
-  >>  resourceAt outPath relOutPath
-  >>= descriptor outPath
+
+callFileProcessor :: (Path -> FileProcessor a) -> Cache a -> ItemFileProcessor a
+callFileProcessor processorProvider withCache inputBase outputBase resClass itemPath resPath =
+  withCache (processorProvider resPath)
+    itemPath
+    (resClass /> resPath)
+    (localPath $ inputBase /> resPath)
+    (localPath $ outputBase /> (resClass /> resPath))
+
+
+itemFileProcessor :: Maybe Resolution -> Cache GalleryItemProps -> ItemFileProcessor GalleryItemProps
+itemFileProcessor maxResolution =
+  callFileProcessor (flip processorFor maxResolution . formatFromPath)
   where
-    relOutPath = resClass /> inputRes
-    inPath = localPath $ inputBase /> inputRes
-    outPath = localPath $ outputBase /> relOutPath
-    (processor, descriptor) = processorFor (formatFromPath inputRes) maxResolution
-
-    processorFor :: Format -> Maybe Resolution -> (FileProcessor, ItemDescriber)
-    processorFor PictureFormat (Just maxRes) = (resizePictureUpTo maxRes, getPictureProps)
-    processorFor PictureFormat Nothing = (copyFileProcessor, getPictureProps)
-    processorFor PlainTextFormat _ = (copyFileProcessor, const $ return . PlainText)
-    processorFor PortableDocumentFormat _ = (copyFileProcessor, const $ return . PDF)
-    processorFor VideoFormat _ = (copyFileProcessor, const $ return . Video)
-    processorFor AudioFormat _ = (copyFileProcessor, const $ return . Audio)
+    processorFor :: Format -> Maybe Resolution -> FileProcessor GalleryItemProps
+    processorFor PictureFormat (Just maxRes) =
+      transformThenDescribe (resizePictureUpTo maxRes) getPictureProps
+    processorFor PictureFormat Nothing =
+      transformThenDescribe copyFileProcessor getPictureProps
+    processorFor PlainTextFormat _ = copyResource PlainText
+    processorFor PortableDocumentFormat _ = copyResource PDF
+    processorFor VideoFormat _ = copyResource Video
+    processorFor AudioFormat _ = copyResource Audio
+    processorFor Unknown _ = copyResource Other
     -- TODO: handle video reencoding and others?
-    processorFor Unknown _ = (copyFileProcessor, const $ return . Other)
 
 
-type ThumbnailFileProcessor =
-     FileName        -- ^ Input base path
-  -> FileName        -- ^ Output base path
-  -> FileName        -- ^ Output class (subdir)
-  -> ThumbnailProcessor
-
-thumbnailFileProcessor :: Resolution -> Cache -> ThumbnailFileProcessor
-thumbnailFileProcessor maxRes cached inputBase outputBase resClass inputRes =
-  cached <$> processorFor (formatFromPath inputRes)
-  & process
+thumbnailFileProcessor :: Resolution -> Cache (Maybe Thumbnail) -> ItemFileProcessor (Maybe Thumbnail)
+thumbnailFileProcessor maxRes =
+  callFileProcessor (processorFor . formatFromPath)
   where
-    relOutPath = resClass /> inputRes
-    inPath = localPath $ inputBase /> inputRes
-    outPath = localPath $ outputBase /> relOutPath
-
-    process :: Maybe FileProcessor -> IO (Maybe Thumbnail)
-    process Nothing = return Nothing
-    process (Just proc) =
-      do
-        proc inPath outPath
-        resource <- resourceAt outPath relOutPath
-        resolution <- getImageResolution outPath
-        return $ Just $ Thumbnail resource resolution
-
-    processorFor :: Format -> Maybe FileProcessor
-    processorFor PictureFormat = Just $ resizePictureUpTo maxRes
-    processorFor _ = Nothing
+    processorFor :: Format -> FileProcessor (Maybe Thumbnail)
+    processorFor PictureFormat = transformThenDescribe (resizePictureUpTo maxRes) getThumbnailProps
+    processorFor _ = noopProcessor
