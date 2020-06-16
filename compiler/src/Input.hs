@@ -30,11 +30,12 @@ import Data.Function ((&))
 import Data.Functor ((<&>))
 import Data.Maybe (catMaybes, fromMaybe)
 import Data.Bool (bool)
-import Data.List (find)
+import Data.List (find, isSuffixOf)
 import Data.Time.Clock (UTCTime)
 import Data.Time.LocalTime (ZonedTime)
 import Data.Yaml (ParseException, decodeFileEither)
 import Data.Aeson (FromJSON)
+import qualified Data.Map.Strict as Map
 import System.FilePath (isExtensionOf, dropExtension)
 import System.Directory (doesFileExist, getModificationTime)
 
@@ -55,12 +56,13 @@ data InputTree =
     InputFile
       { path :: Path
       , modTime :: UTCTime
-      , sidecar :: Sidecar }
+      , sidecar :: Sidecar
+      , thumbnailPath :: Maybe Path }
     | InputDir
       { path :: Path
       , modTime :: UTCTime
       , sidecar :: Sidecar
-      , dirThumbnailPath :: Maybe Path
+      , thumbnailPath :: Maybe Path
       , items :: [InputTree] }
   deriving Show
 
@@ -81,6 +83,9 @@ emptySidecar = Sidecar
 sidecarExt :: String
 sidecarExt = "yaml"
 
+thumbnailSuffix :: String
+thumbnailSuffix = "_thumbnail"
+
 dirPropFile :: String
 dirPropFile = "_directory"
 
@@ -99,40 +104,49 @@ readInputTree (AnchoredFSNode _ File{}) =
   throw $ AssertionFailed "Input directory is a file"
 readInputTree (AnchoredFSNode anchor root@Dir{}) = mkDirNode root
   where
-    mkInputNode :: FSNode -> IO (Maybe InputTree)
-    mkInputNode file@File{path}
-      | not (isSidecar file) && not (isThumbnail file) =
-        do
-          sidecar <- readSidecarFile $ localPath (anchor /> path <.> sidecarExt)
-          modTime <- getModificationTime $ localPath (anchor /> path)
-          return $ Just $ InputFile path modTime sidecar
-    mkInputNode File{} = return Nothing
-    mkInputNode dir@Dir{} = Just <$> mkDirNode dir
+    mkInputNode :: Map.Map FileName FSNode -> FSNode -> IO (Maybe InputTree)
+    mkInputNode dir file@File{path} | not (isSidecar file) && not (isThumbnail file) =
+      do
+        sidecar <- readSidecarFile $ localPath (anchor /> path <.> sidecarExt)
+        modTime <- getModificationTime $ localPath (anchor /> path)
+        let thumbnail = findFileThumbnail (fromMaybe "" $ fileName path) dir
+        return $ Just $ InputFile path modTime sidecar thumbnail
+    mkInputNode _ File{} = return Nothing
+    mkInputNode _ dir@Dir{} = Just <$> mkDirNode dir
 
     mkDirNode :: FSNode -> IO InputTree
     mkDirNode File{} = throw $ AssertionFailed "Input directory is a file"
     mkDirNode Dir{path, items} =
       do
-        dirItems <- mapM mkInputNode items
+        dirItems <- mapM (mkInputNode $ Map.fromList (map withBaseName items)) items
         modTime <- getModificationTime $ localPath (anchor /> path)
         sidecar <- readSidecarFile $ localPath (anchor /> path </> dirSidecar)
-        return $ InputDir path modTime sidecar (findThumbnail items) (catMaybes dirItems)
+        return $ InputDir path modTime sidecar (findDirThumbnail items) (catMaybes dirItems)
+
+    withBaseName :: FSNode -> (FileName, FSNode)
+    withBaseName node = (fromMaybe "" $ baseName $ Files.path node, node)
+
+    findFileThumbnail :: FileName -> Map.Map FileName FSNode -> Maybe Path
+    findFileThumbnail name dict = Files.path <$> Map.lookup (name ++ thumbnailSuffix) dict
 
     isSidecar :: FSNode -> Bool
     isSidecar Dir{} = False
-    isSidecar File{path} =
-      fileName path
-      & maybe False (isExtensionOf sidecarExt)
+    isSidecar File{path} = fileName path & maybe False (isExtensionOf sidecarExt)
+
+    baseName :: Path -> Maybe FileName
+    baseName = fmap dropExtension . fileName
 
     isThumbnail :: FSNode -> Bool
     isThumbnail Dir{} = False
-    isThumbnail File{path} =
-      fileName path
-      & fmap dropExtension
-      & maybe False (dirPropFile ==)
+    isThumbnail File{path} = baseName path & maybe False (thumbnailSuffix `isSuffixOf`)
 
-    findThumbnail :: [FSNode] -> Maybe Path
-    findThumbnail = fmap Files.path . find isThumbnail
+    isDirThumbnail :: FSNode -> Bool
+    isDirThumbnail Dir{} = False
+    isDirThumbnail File{path} = baseName path & (== Just thumbnailSuffix)
+
+    findDirThumbnail :: [FSNode] -> Maybe Path
+    findDirThumbnail = fmap Files.path . find isDirThumbnail
+
 
 -- | Filters an InputTree. The root is always returned.
 filterInputTree :: (InputTree -> Bool) -> InputTree -> InputTree

@@ -134,11 +134,11 @@ buildGalleryTree processItem processThumbnail tagsFromDirsConfig =
   mkGalleryItem []
   where
     mkGalleryItem :: [Tag] -> InputTree -> IO GalleryItem
-    mkGalleryItem inheritedTags InputFile{path, modTime, sidecar} =
+    mkGalleryItem inheritedTags InputFile{path, modTime, sidecar, thumbnailPath} =
       do
         let itemPath = "/" /> path
         properties <- processItem itemPath path
-        processedThumbnail <- processThumbnail itemPath path
+        processedThumbnail <- processThumbnail itemPath (thumbnailPath ?? path)
         return GalleryItem
           { title = Input.title sidecar ?? fileName path ?? ""
           , datetime = Input.datetime sidecar ?? toZonedTime modTime
@@ -148,12 +148,12 @@ buildGalleryTree processItem processThumbnail tagsFromDirsConfig =
           , thumbnail = processedThumbnail
           , properties = properties }
 
-    mkGalleryItem inheritedTags InputDir{path, modTime, sidecar, dirThumbnailPath, items} =
+    mkGalleryItem inheritedTags InputDir{path, modTime, sidecar, thumbnailPath, items} =
       do
         let itemPath = "/" /> path
         let dirTags = (Input.tags sidecar ?? []) ++ inheritedTags
         processedItems <- parallel $ map (mkGalleryItem dirTags) items
-        processedThumbnail <- maybeThumbnail itemPath dirThumbnailPath
+        processedThumbnail <- maybeThumbnail itemPath thumbnailPath
         return GalleryItem
           { title = Input.title sidecar ?? fileName path ?? ""
           , datetime = Input.datetime sidecar ?? mostRecentModTime processedItems

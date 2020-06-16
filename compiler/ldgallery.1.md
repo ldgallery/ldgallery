@@ -67,22 +67,24 @@ Available options are:
 
 A gallery source directory contains the gallery items and their sidecar metadata files, optionally grouped inside sub-directories.
 
-Directory thumbnails can be set by placing a picture file named "_directory", with any image file extension, inside of directories.
+Thumbnails can be associated to items by suffixing their name with "_thumbnail", followed by an image file extension.
+Directory thumbnails can be placed within their repsective directories themselves, without any prefix.
 
 An example input gallery directory structure could be as follows:
 
 ```
 ./example-gallery
-├── DSC0001.jpg --------- a picture
-├── DSC0001.jpg.yaml ---- its associated sidecar metadata file
-├── Some directory ------ a directory grouping gallery items
-│   ├── _directory.jpg -- a thumbnail for its parent directory
-│   ├── _directory.yaml - directory sidecar metadata file
+├── DSC0001.jpg ----------------- a picture
+├── DSC0001.jpg.yaml ------------ its associated sidecar metadata file
+├── Some directory -------------- a directory grouping gallery items
+│   ├── _directory.yaml --------- directory sidecar metadata file
+│   ├── _thumbnail.jpg ---------- a thumbnail for its parent directory
 │   ├── DSC0002.jpg
 │   ├── DSC0002.jpg.yaml
-│   ├── DSC0003.jpg
-│   └── DSC0003.jpg.yaml
-└── gallery.yaml -------- gallery settings file
+│   ├── song.ogg
+│   ├── song.ogg.yaml
+│   └── song.ogg_thumbnail.jpg -- a thumbnail for song.ogg
+└── gallery.yaml -888------------ gallery settings file
 ```
 
 
