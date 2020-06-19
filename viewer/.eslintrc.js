@@ -5,14 +5,14 @@ module.exports = {
     node: true,
   },
 
-  extends: [
-    "plugin:vue/essential",
-    "@vue/typescript"
-  ],
+  plugins: ["prettier"],
+
+  extends: ["plugin:vue/essential", "plugin:prettier/recommended", "@vue/typescript"],
 
   rules: {
     "no-console": "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
+    "prettier/prettier": "warn",
     "eol-last": ["warn", "always"],
     "object-curly-spacing": ["warn", "always"],
     "quote-props": ["warn", "as-needed"],
@@ -36,5 +36,4 @@ module.exports = {
     sourceType: "module",
     parser: "@typescript-eslint/parser",
   },
-
 };
