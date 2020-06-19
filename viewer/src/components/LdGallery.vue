@@ -18,7 +18,7 @@
 -->
 
 <template>
-  <ld-error v-if="hasNoResults()" icon="search" :message="noresult" />
+  <ld-error v-if="hasNoResults" icon="search" :message="noresult" />
   <div v-else class="thumbnail-tiles">
     <router-link v-for="item in items" :key="item.path" :to="item.path">
       <ld-thumbnail :item="item" />
@@ -35,7 +35,7 @@ export default class LdPicture extends Vue {
   @Prop({ type: Array, required: true }) readonly items!: Gallery.Item[];
   @Prop(String) readonly noresult?: string;
 
-  hasNoResults(): boolean {
+  get hasNoResults(): boolean {
     return Boolean(this.noresult) && this.items.length === 0;
   }
 }

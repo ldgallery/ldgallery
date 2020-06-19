@@ -22,17 +22,18 @@
   <!-- Outer div necessary for the resize handle to appear on Firefox. -->
   <div :class="$style.content" class="fill">
     <!-- Using an iframe here to let the browser deal with content encoding detection. -->
-    <iframe class="fill" :src="itemResourceUrl()" />
+    <iframe class="fill" :src="itemResourceUrl" />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 
-@Component export default class LdPlainTextViewer extends Vue {
+@Component
+export default class LdPlainTextViewer extends Vue {
   @Prop({ required: true }) readonly plainTextItem!: Gallery.PlainText;
 
-  itemResourceUrl(): string {
+  get itemResourceUrl(): string {
     return this.$galleryStore.resourceRoot + this.plainTextItem.properties.resource;
   }
 }
@@ -46,7 +47,7 @@ import { Component, Prop, Vue } from "vue-property-decorator";
   resize: horizontal;
   max-width: 100%; // Forbid overflow when resizing.
   overflow: hidden; // Necessary for the resize handle to be shown in Chromium.
-  padding: .5em; // Necessary for the resize handle to be selectable on qutebrowser.
+  padding: 0.5em; // Necessary for the resize handle to be selectable on qutebrowser.
 
   // Re-normalise page colour.
   background-color: white;

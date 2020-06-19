@@ -20,10 +20,10 @@
 
 <template>
   <div class="container-vh-centering">
-    <a :class="$style.content" :download="itemFileName()" :href="itemDownloadUrl()">
+    <a :class="$style.content" :download="itemFileName" :href="itemDownloadUrl">
       <!-- TODO: show thumbnail instead of this generic file download icon? -->
       <fa-icon :class="$style.icon" icon="file-download" size="6x" />
-      <div>{{ $t("download.download-file-fmt", [itemFileName()]) }}</div>
+      <div>{{ $t("download.download-file-fmt", [itemFileName]) }}</div>
     </a>
   </div>
 </template>
@@ -32,14 +32,15 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import Navigation from "@/services/navigation";
 
-@Component export default class LdDownload extends Vue {
+@Component
+export default class LdDownload extends Vue {
   @Prop({ required: true }) readonly item!: Gallery.Other;
 
-  itemFileName(): string {
+  get itemFileName(): string {
     return Navigation.getFileName(this.item);
   }
 
-  itemDownloadUrl(): string {
+  get itemDownloadUrl(): string {
     return this.$galleryStore.resourceRoot + this.item.properties.resource;
   }
 }

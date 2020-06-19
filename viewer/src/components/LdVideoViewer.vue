@@ -21,7 +21,13 @@
 <template>
   <!-- intermediate container necessary to eliminate the scrollbar -->
   <div class="fill no-scroll">
-    <video class="fill" :src="itemResourceUrl()" :poster="thumbnailResourceUrl()" preload="auto" controls>
+    <video
+      class="fill"
+      :src="itemResourceUrl"
+      :poster="thumbnailResourceUrl"
+      preload="auto"
+      controls
+    >
       <ld-download :item="videoItem" />
     </video>
   </div>
@@ -30,21 +36,19 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 
-@Component export default class LdVideoViewer extends Vue {
+@Component
+export default class LdVideoViewer extends Vue {
   @Prop({ required: true }) readonly videoItem!: Gallery.Video;
 
-  itemResourceUrl(): string {
+  get itemResourceUrl(): string {
     return this.$galleryStore.resourceRoot + this.videoItem.properties.resource;
   }
 
-  thumbnailResourceUrl(): string {
-    return this.videoItem.thumbnail
-      ? this.$galleryStore.resourceRoot + this.videoItem.thumbnail.resource
-      : "";
+  get thumbnailResourceUrl(): string {
+    return this.videoItem.thumbnail ? this.$galleryStore.resourceRoot + this.videoItem.thumbnail.resource : "";
   }
 }
 </script>
 
 <style lang="scss" module>
-
 </style>

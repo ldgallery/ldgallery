@@ -22,7 +22,7 @@
   <!-- intermediate container necessary to eliminate the double scrollbar -->
   <div class="fill no-scroll">
     <!-- prefer native browser PDF viewer if available -->
-    <object class="fill" :data="itemResourceUrl()" type="application/pdf">
+    <object class="fill" :data="itemResourceUrl" type="application/pdf">
       <!-- TODO: fallback to PDF.js (https://github.com/pacien/ldgallery/issues/212) -->
       <ld-download :item="pdfItem" />
     </object>
@@ -32,15 +32,15 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 
-@Component export default class LdPdfViewer extends Vue {
+@Component
+export default class LdPdfViewer extends Vue {
   @Prop({ required: true }) readonly pdfItem!: Gallery.PDF;
 
-  itemResourceUrl(): string {
+  get itemResourceUrl(): string {
     return this.$galleryStore.resourceRoot + this.pdfItem.properties.resource;
   }
 }
 </script>
 
 <style lang="scss" module>
-
 </style>

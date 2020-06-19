@@ -21,10 +21,11 @@
 <template>
   <div class="flex-column container-vh-centering">
     <ld-thumbnail :item="audioItem" />
-    <audio :class="$style.player" :src="itemResourceUrl()" preload="auto" controls>
-      <a :download="itemFileName()" :href="itemResourceUrl()">
-        {{ $t("download.download-file-fmt", [itemFileName()]) }}
-      </a>
+    <audio :class="$style.player" :src="itemResourceUrl" preload="auto" controls>
+      <a
+        :download="itemFileName"
+        :href="itemResourceUrl"
+      >{{ $t("download.download-file-fmt", [itemFileName]) }}</a>
     </audio>
   </div>
 </template>
@@ -33,14 +34,15 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import Navigation from "@/services/navigation";
 
-@Component export default class LdAudioViewer extends Vue {
+@Component
+export default class LdAudioViewer extends Vue {
   @Prop({ required: true }) readonly audioItem!: Gallery.Audio;
 
-  itemResourceUrl(): string {
+  get itemResourceUrl(): string {
     return this.$galleryStore.resourceRoot + this.audioItem.properties.resource;
   }
 
-  itemFileName(): string {
+  get itemFileName(): string {
     return Navigation.getFileName(this.audioItem);
   }
 }

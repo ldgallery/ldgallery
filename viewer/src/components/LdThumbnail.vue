@@ -22,14 +22,14 @@
     <v-lazy-image
       v-if="item.thumbnail"
       :src="pictureSrc(item.thumbnail.resource)"
-      :style="pictureStyle()"
+      :style="pictureStyle"
       :title="item.title"
       @intersect="loading=true"
       @load="loading=false"
     />
     <div v-else class="thumbnail-other flex-column flex-center">
       <div>
-        <fa-icon :icon="getIcon()" size="4x" />
+        <fa-icon :icon="icon" size="4x" />
       </div>
       {{item.title}}
     </div>
@@ -50,12 +50,12 @@ export default class LdThumbnail extends Vue {
     return this.$galleryStore.resourceRoot + resource;
   }
 
-  pictureStyle() {
+  get pictureStyle() {
     const resolution = this.item.thumbnail!.resolution;
     return { width: `${resolution.width}px`, height: `${resolution.height}px` };
   }
 
-  getIcon() {
+  get icon() {
     return Navigation.getIcon(this.item);
   }
 }

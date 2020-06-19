@@ -34,7 +34,7 @@
         :show-category="$galleryStore.tagsCategories.length > 1"
         :search-filters.sync="searchFilters"
         :tags-index="category.index"
-        :current-tags="currentTags()"
+        :current-tags="currentTags"
       />
     </div>
   </div>
@@ -72,7 +72,7 @@ export default class PanelLeft extends Vue {
     return query;
   }
 
-  currentTags() {
+  get currentTags() {
     return this.$galleryStore.currentItem?.tags ?? [];
   }
 

@@ -66,7 +66,7 @@ export default class LdProposition extends Vue {
   }
 
   get proposedTags() {
-    let propositions: { [index: string]: number } = {};
+    let propositions: Record<string, number> = {};
     if (this.model.length > 0) {
       // Tags count from current search
       this.extractDistinctItems(this.model)

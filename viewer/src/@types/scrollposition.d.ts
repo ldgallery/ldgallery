@@ -17,4 +17,4 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-type ScrollPosition = { [index: string]: number }
+type ScrollPosition = Record<string, number>

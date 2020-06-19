@@ -18,7 +18,7 @@
 -->
 
 <template>
-  <ld-gallery :items="orderedItems()" :noresult="$t('directory.no-results')" />
+  <ld-gallery :items="orderedItems" :noresult="$t('directory.no-results')" />
 </template>
 
 <script lang="ts">
@@ -33,7 +33,7 @@ export default class GalleryDirectory extends Vue {
     this.$uiStore.toggleFullscreen(false);
   }
 
-  orderedItems() {
+  get orderedItems() {
     return Navigation.directoriesFirst(this.directory.properties.items);
   }
 }

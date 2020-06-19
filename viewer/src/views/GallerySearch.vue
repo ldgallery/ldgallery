@@ -18,7 +18,7 @@
 -->
 
 <template>
-  <ld-gallery :items="items()" :noresult="noResult()" />
+  <ld-gallery :items="items" :noresult="noResult" />
 </template>
 
 <script lang="ts">
@@ -41,14 +41,14 @@ export default class GalleryPicture extends Vue {
     this.$galleryStore.setCurrentSearch([]);
   }
 
-  items() {
+  get items() {
     const searchResult = IndexSearch.search(this.$galleryStore.currentSearch);
     const filteredByPath = searchResult.filter(item => item.path.startsWith(this.path));
     this.otherCount = searchResult.length - filteredByPath.length;
     return filteredByPath;
   }
 
-  noResult() {
+  get noResult() {
     return this.$tc("search.no-result-fmt", this.otherCount, [this.otherCount]);
   }
 }
