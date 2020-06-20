@@ -8,7 +8,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --modern",
     "build:report": "vue-cli-service build --report",
-    "lint": "vue-cli-service lint --no-fix",
+    "lint": "vue-cli-service lint --no-fix --max-warnings 0",
     "lint-autoformat": "vue-cli-service lint --fix",
     "i18n:report": "vue-cli-service i18n:report --src './src/**/*.?(js|vue|ts)' --locales './src/locales/*.json'"
   },
