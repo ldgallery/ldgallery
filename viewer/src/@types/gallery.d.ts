@@ -19,90 +19,91 @@
 
 declare namespace Gallery {
   interface Config {
-    galleryRoot: string,
+    galleryRoot: string;
   }
 
   interface GalleryProperties {
-    galleryTitle: string,
-    tagCategories: RawTag[]
+    galleryTitle: string;
+    tagCategories: RawTag[];
   }
   interface Index {
-    properties: GalleryProperties,
-    tree: Directory
+    properties: GalleryProperties;
+    tree: Directory;
   }
 
   interface Other extends Item {
-    properties: OtherProperties,
+    properties: OtherProperties;
   }
   interface Picture extends Item {
-    properties: PictureProperties,
+    properties: PictureProperties;
   }
   interface PlainText extends Item {
-    properties: PlainTextProperties,
+    properties: PlainTextProperties;
   }
   interface PDF extends Item {
-    properties: PDFProperties,
+    properties: PDFProperties;
   }
   interface Video extends Item {
-    properties: VideoProperties,
+    properties: VideoProperties;
   }
   interface Audio extends Item {
-    properties: AudioProperties,
+    properties: AudioProperties;
   }
   interface Directory extends Item {
-    properties: DirectoryProperties,
+    properties: DirectoryProperties;
   }
   interface Item {
-    title: string,
-    datetime: string,
-    description: string,
-    tags: RawTag[],
-    path: string,
-    thumbnail?: Thumbnail
-    properties: OtherProperties
-    | PictureProperties
-    | PlainTextProperties
-    | PDFProperties
-    | VideoProperties
-    | AudioProperties
-    | DirectoryProperties,
+    title: string;
+    datetime: string;
+    description: string;
+    tags: RawTag[];
+    path: string;
+    thumbnail?: Thumbnail;
+    properties:
+      | OtherProperties
+      | PictureProperties
+      | PlainTextProperties
+      | PDFProperties
+      | VideoProperties
+      | AudioProperties
+      | DirectoryProperties;
   }
   interface Resolution {
-    width: number,
-    height: number,
+    width: number;
+    height: number;
   }
   interface OtherProperties {
-    type: import("./ItemType").ItemType.OTHER,
-    resource: string
+    type: import("./ItemType").ItemType.OTHER;
+    resource: string;
   }
   interface PictureProperties {
-    type: import("./ItemType").ItemType.PICTURE,
-    resource: string,
-    resolution: Resolution
+    type: import("./ItemType").ItemType.PICTURE;
+    resource: string;
+    resolution: Resolution;
   }
   interface PlainTextProperties {
-    type: import("./ItemType").ItemType.PLAINTEXT,
-    resource: string,
+    type: import("./ItemType").ItemType.PLAINTEXT;
+    resource: string;
   }
   interface PDFProperties {
-    type: import("./ItemType").ItemType.PDF,
-    resource: string,
+    type: import("./ItemType").ItemType.PDF;
+    resource: string;
   }
   interface VideoProperties {
-    type: import("./ItemType").ItemType.VIDEO,
-    resource: string,
+    type: import("./ItemType").ItemType.VIDEO;
+    resource: string;
   }
   interface AudioProperties {
-    type: import("./ItemType").ItemType.AUDIO,
-    resource: string,
+    type: import("./ItemType").ItemType.AUDIO;
+    resource: string;
   }
   interface DirectoryProperties {
-    type: import("./ItemType").ItemType.DIRECTORY,
-    items: Item[]
+    type: import("./ItemType").ItemType.DIRECTORY;
+    items: Item[];
   }
   interface Thumbnail {
-    resource: string,
-    resolution: Resolution
+    resource: string;
+    resolution: Resolution;
   }
   type RawTag = string;
 }

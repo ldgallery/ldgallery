@@ -18,20 +18,20 @@
 -->
 
 <template>
-  <div :class="{'preload': loading}">
+  <div :class="{ preload: loading }">
     <v-lazy-image
       v-if="item.thumbnail"
       :src="pictureSrc(item.thumbnail.resource)"
       :style="pictureStyle"
       :title="item.title"
-      @intersect="loading=true"
-      @load="loading=false"
+      @intersect="loading = true"
+      @load="loading = false"
     />
     <div v-else class="thumbnail-other flex-column flex-center">
       <div>
         <fa-icon :icon="icon" size="4x" />
       </div>
-      {{item.title}}
+      {{ item.title }}
     </div>
   </div>
 </template>

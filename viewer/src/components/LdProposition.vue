@@ -20,7 +20,7 @@
 
 <template>
   <div class="proposition">
-    <h2 v-if="showCategory && proposedTags.length" class="subtitle category">{{title}}</h2>
+    <h2 v-if="showCategory && proposedTags.length" class="subtitle category">{{ title }}</h2>
     <div v-for="proposed in proposedTags" :key="proposed.rawTag">
       <a
         class="operation-btns link"
@@ -42,9 +42,10 @@
         class="operation-tag link"
         :title="$t('tag-propositions.intersection')"
         @click="add(Operation.INTERSECTION, proposed.rawTag)"
-      >{{proposed.rawTag}}</a>
+        >{{ proposed.rawTag }}</a
+      >
 
-      <div class="disabled" :title="$t('tag-propositions.item-count')">{{proposed.count}}</div>
+      <div class="disabled" :title="$t('tag-propositions.item-count')">{{ proposed.count }}</div>
     </div>
   </div>
 </template>

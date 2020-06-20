@@ -22,7 +22,6 @@ import { ItemType } from "@/@types/ItemType";
 import Navigation from "@/services/navigation";
 
 export default class IndexFactory {
-
   public static generateTags(root: Gallery.Item | null): Tag.Index {
     let tagsIndex: Tag.Index = {};
     if (root) IndexFactory.pushTagsForItem(tagsIndex, root);
@@ -51,7 +50,15 @@ export default class IndexFactory {
   }
 
   private static pushPartToIndex(index: Tag.Node, part: string, item: Gallery.Item, rootPart: boolean): Tag.Node {
-    if (!index) index = { tag: part, tagfiltered: Navigation.normalize(part), rootPart, childPart: !rootPart, items: [], children: {} };
+    if (!index)
+      index = {
+        tag: part,
+        tagfiltered: Navigation.normalize(part),
+        rootPart,
+        childPart: !rootPart,
+        items: [],
+        children: {},
+      };
     else if (rootPart) index.rootPart = true;
     else index.childPart = true;
 
@@ -60,7 +67,6 @@ export default class IndexFactory {
   }
 
   // ---
-
 
   public static searchTags(tagsIndex: Tag.Index, filter: string, strict: boolean): Tag.Search[] {
     let search: Tag.Search[] = [];
@@ -106,7 +112,12 @@ export default class IndexFactory {
       );
   }
 
-  private static searchTagsFromFilter(tagsIndex: Tag.Index, operation: Operation, filter: string, strict: boolean): Tag.Search[] {
+  private static searchTagsFromFilter(
+    tagsIndex: Tag.Index,
+    operation: Operation,
+    filter: string,
+    strict: boolean
+  ): Tag.Search[] {
     filter = Navigation.normalize(filter);
     return Object.values(tagsIndex)
       .filter(node => IndexFactory.matches(node, filter, strict))
@@ -115,7 +126,7 @@ export default class IndexFactory {
 
   private static matches(node: Tag.Node, filter: string, strict: boolean): boolean {
     if (strict) return node.tagfiltered === filter;
-    return node.tagfiltered.includes(filter)
+    return node.tagfiltered.includes(filter);
   }
 
   // ---

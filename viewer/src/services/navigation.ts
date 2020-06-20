@@ -20,6 +20,15 @@
 import { ItemType } from "@/@types/ItemType";
 
 export default class Navigation {
+  static readonly ICON_BY_TYPE: Record<ItemType, string> = {
+    directory: "folder",
+    picture: "image",
+    plaintext: "file-alt",
+    pdf: "file-pdf",
+    video: "file-video",
+    audio: "file-audio",
+    other: "file",
+  };
 
   // Searches for an item by path from a root item (navigation)
   public static searchCurrentItemPath(root: Gallery.Item, path: string): Gallery.Item[] {
@@ -61,25 +70,14 @@ export default class Navigation {
         .filter(child => Navigation.checkType(child, ItemType.DIRECTORY))
         .sort((a, b) => a.title.localeCompare(b.title)),
 
-      ...items
-        .filter(child => !Navigation.checkType(child, ItemType.DIRECTORY)),
+      ...items.filter(child => !Navigation.checkType(child, ItemType.DIRECTORY)),
     ];
   }
 
   // Get the icon for an item
   public static getIcon(item: Gallery.Item): string {
     if (item.path.length <= 1) return "home";
-    switch (item.properties.type) {
-      case ItemType.PICTURE: return "image";
-      case ItemType.PLAINTEXT: return "file-alt";
-      case ItemType.PDF: return "file-pdf";
-      case ItemType.VIDEO: return "file-video";
-      case ItemType.AUDIO: return "file-audio";
-      case ItemType.DIRECTORY: return "folder";
-      case ItemType.OTHER:
-      default:
-        return "file";
-    }
+    return Navigation.ICON_BY_TYPE[item.properties.type];
   }
 
   // Get the file name of an item, without its cache timestamp
