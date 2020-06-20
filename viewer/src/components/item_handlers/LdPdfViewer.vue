@@ -19,10 +19,13 @@
 -->
 
 <template>
-  <!-- Outer div necessary for the resize handle to appear on Firefox. -->
-  <div :class="$style.content" class="fill">
-    <!-- Using an iframe here to let the browser deal with content encoding detection. -->
-    <iframe class="fill" :src="itemResourceUrl" />
+  <!-- intermediate container necessary to eliminate the double scrollbar -->
+  <div class="fill no-scroll">
+    <!-- prefer native browser PDF viewer if available -->
+    <object class="fill" :data="itemResourceUrl" type="application/pdf">
+      <!-- TODO: fallback to PDF.js (https://github.com/pacien/ldgallery/issues/212) -->
+      <ld-download :item="item" />
+    </object>
   </div>
 </template>
 
@@ -30,26 +33,14 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
-export default class LdPlainTextViewer extends Vue {
-  @Prop({ required: true }) readonly plainTextItem!: Gallery.PlainText;
+export default class LdPdfViewer extends Vue {
+  @Prop({ required: true }) readonly item!: Gallery.PDF;
 
   get itemResourceUrl(): string {
-    return this.$galleryStore.resourceRoot + this.plainTextItem.properties.resource;
+    return this.$galleryStore.resourceRoot + this.item.properties.resource;
   }
 }
 </script>
 
 <style lang="scss" module>
-.content {
-  margin: auto; // Old-school horizontal centering.
-
-  // Allow the user to adjust the width of the text view for easier column reading.
-  resize: horizontal;
-  max-width: 100%; // Forbid overflow when resizing.
-  overflow: hidden; // Necessary for the resize handle to be shown in Chromium.
-  padding: 0.5em; // Necessary for the resize handle to be selectable on qutebrowser.
-
-  // Re-normalise page colour.
-  background-color: white;
-}
 </style>

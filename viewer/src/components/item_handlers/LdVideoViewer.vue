@@ -19,40 +19,36 @@
 -->
 
 <template>
-  <div class="flex-column container-vh-centering">
-    <ld-thumbnail :item="audioItem" />
-    <audio :class="$style.player" :src="itemResourceUrl" preload="auto" controls>
-      <a
-        :download="itemFileName"
-        :href="itemResourceUrl"
-      >{{ $t("download.download-file-fmt", [itemFileName]) }}</a>
-    </audio>
+  <!-- intermediate container necessary to eliminate the scrollbar -->
+  <div class="fill no-scroll">
+    <video
+      class="fill"
+      :src="itemResourceUrl"
+      :poster="thumbnailResourceUrl"
+      preload="auto"
+      controls
+    >
+      <ld-download :item="item" />
+    </video>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import Navigation from "@/services/navigation";
 
 @Component
-export default class LdAudioViewer extends Vue {
-  @Prop({ required: true }) readonly audioItem!: Gallery.Audio;
+export default class LdVideoViewer extends Vue {
+  @Prop({ required: true }) readonly item!: Gallery.Video;
 
   get itemResourceUrl(): string {
-    return this.$galleryStore.resourceRoot + this.audioItem.properties.resource;
+    return this.$galleryStore.resourceRoot + this.item.properties.resource;
   }
 
-  get itemFileName(): string {
-    return Navigation.getFileName(this.audioItem);
+  get thumbnailResourceUrl(): string {
+    return this.item.thumbnail ? this.$galleryStore.resourceRoot + this.item.thumbnail.resource : "";
   }
 }
 </script>
 
 <style lang="scss" module>
-.player {
-  width: 100%;
-  max-width: 500px;
-  margin-top: 1em;
-  text-align: center; // for fallback download link
-}
 </style>

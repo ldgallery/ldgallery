@@ -18,23 +18,10 @@
 -->
 
 <template>
-  <!-- TODO: eliminate intermediate div -->
   <div>
-    <ld-error v-if="checkType(null)" icon="folder-open" :message="$t('gallery.unknown-resource')" />
-    <gallery-search v-else-if="checkType(ItemType.DIRECTORY) && query.length > 0" :path="path" />
-    <gallery-directory
-      v-else-if="checkType(ItemType.DIRECTORY)"
-      :directory="$galleryStore.currentItem"
-    />
-    <ld-picture v-else-if="checkType(ItemType.PICTURE)" :picture="$galleryStore.currentItem" />
-    <ld-plain-text-viewer
-      v-else-if="checkType(ItemType.PLAINTEXT)"
-      :plain-text-item="$galleryStore.currentItem"
-    />
-    <ld-pdf-viewer v-else-if="checkType(ItemType.PDF)" :pdf-item="$galleryStore.currentItem" />
-    <ld-video-viewer v-else-if="checkType(ItemType.VIDEO)" :video-item="$galleryStore.currentItem" />
-    <ld-audio-viewer v-else-if="checkType(ItemType.AUDIO)" :audio-item="$galleryStore.currentItem" />
-    <ld-download v-else :item="$galleryStore.currentItem" />
+    <ld-error v-if="isError" icon="folder-open" :message="$t('gallery.unknown-resource')" />
+    <gallery-search v-else-if="isSearch" :path="path" />
+    <component :is="componentName" v-else :item="$galleryStore.currentItem" />
   </div>
 </template>
 
@@ -42,12 +29,10 @@
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import { ItemType } from "@/@types/ItemType";
 import Navigation from "@/services/navigation";
-import GalleryDirectory from "./GalleryDirectory.vue";
 import GallerySearch from "@/views/GallerySearch.vue";
 
 @Component({
   components: {
-    GalleryDirectory,
     GallerySearch,
   },
 })
@@ -55,11 +40,30 @@ export default class GalleryNavigation extends Vue {
   @Prop(String) readonly path!: string;
   @Prop(Array) readonly query!: string[];
 
-  // For the template
-  readonly ItemType = Object.freeze(ItemType);
+  readonly COMPONENT_BY_TYPE: Record<ItemType, string> = {
+    directory: "ld-directory",
+    picture: "ld-picture",
+    plaintext: "ld-plain-text-viewer",
+    pdf: "ld-pdf-viewer",
+    video: "ld-video-viewer",
+    audio: "ld-audio-viewer",
+    other: "ld-download",
+  };
 
   mounted() {
     this.pathChanged();
+  }
+
+  get isError() {
+    return this.checkType(null);
+  }
+
+  get isSearch() {
+    return this.checkType(ItemType.DIRECTORY) && this.query.length > 0;
+  }
+
+  get componentName() {
+    return this.COMPONENT_BY_TYPE[this.$galleryStore.currentItem?.properties.type ?? ItemType.OTHER];
   }
 
   @Watch("path")

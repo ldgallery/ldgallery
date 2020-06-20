@@ -19,28 +19,40 @@
 -->
 
 <template>
-  <!-- intermediate container necessary to eliminate the double scrollbar -->
-  <div class="fill no-scroll">
-    <!-- prefer native browser PDF viewer if available -->
-    <object class="fill" :data="itemResourceUrl" type="application/pdf">
-      <!-- TODO: fallback to PDF.js (https://github.com/pacien/ldgallery/issues/212) -->
-      <ld-download :item="pdfItem" />
-    </object>
+  <div class="flex-column container-vh-centering">
+    <ld-thumbnail :item="item" />
+    <audio :class="$style.player" :src="itemResourceUrl" preload="auto" controls>
+      <a
+        :download="itemFileName"
+        :href="itemResourceUrl"
+      >{{ $t("download.download-file-fmt", [itemFileName]) }}</a>
+    </audio>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import Navigation from "@/services/navigation";
 
 @Component
-export default class LdPdfViewer extends Vue {
-  @Prop({ required: true }) readonly pdfItem!: Gallery.PDF;
+export default class LdAudioViewer extends Vue {
+  @Prop({ required: true }) readonly item!: Gallery.Audio;
 
   get itemResourceUrl(): string {
-    return this.$galleryStore.resourceRoot + this.pdfItem.properties.resource;
+    return this.$galleryStore.resourceRoot + this.item.properties.resource;
+  }
+
+  get itemFileName(): string {
+    return Navigation.getFileName(this.item);
   }
 }
 </script>
 
 <style lang="scss" module>
+.player {
+  width: 100%;
+  max-width: 500px;
+  margin-top: 1em;
+  text-align: center; // for fallback download link
+}
 </style>
