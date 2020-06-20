@@ -19,17 +19,10 @@
 -->
 
 <template>
-  <!-- intermediate container necessary to eliminate the scrollbar -->
-  <div class="fill no-scroll">
-    <video
-      class="fill"
-      :src="itemResourceUrl"
-      :poster="thumbnailResourceUrl"
-      preload="auto"
-      controls
-    >
-      <ld-download :item="videoItem" />
-    </video>
+  <!-- Outer div necessary for the resize handle to appear on Firefox. -->
+  <div :class="$style.content" class="fill">
+    <!-- Using an iframe here to let the browser deal with content encoding detection. -->
+    <iframe class="fill" :src="itemResourceUrl" />
   </div>
 </template>
 
@@ -37,18 +30,26 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
-export default class LdVideoViewer extends Vue {
-  @Prop({ required: true }) readonly videoItem!: Gallery.Video;
+export default class LdPlainTextViewer extends Vue {
+  @Prop({ required: true }) readonly item!: Gallery.PlainText;
 
   get itemResourceUrl(): string {
-    return this.$galleryStore.resourceRoot + this.videoItem.properties.resource;
-  }
-
-  get thumbnailResourceUrl(): string {
-    return this.videoItem.thumbnail ? this.$galleryStore.resourceRoot + this.videoItem.thumbnail.resource : "";
+    return this.$galleryStore.resourceRoot + this.item.properties.resource;
   }
 }
 </script>
 
 <style lang="scss" module>
+.content {
+  margin: auto; // Old-school horizontal centering.
+
+  // Allow the user to adjust the width of the text view for easier column reading.
+  resize: horizontal;
+  max-width: 100%; // Forbid overflow when resizing.
+  overflow: hidden; // Necessary for the resize handle to be shown in Chromium.
+  padding: 0.5em; // Necessary for the resize handle to be selectable on qutebrowser.
+
+  // Re-normalise page colour.
+  background-color: white;
+}
 </style>

@@ -21,7 +21,7 @@ import Vue from "vue"
 
 const requireComponent = require.context(
   "@/components",
-  false, // Whether or not to look in subfolders
+  true, // Whether or not to look in subfolders
   // The regular expression used to match base component filenames
   /Ld[A-Z]\w+\.vue$/
 )

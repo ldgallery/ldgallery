@@ -26,15 +26,15 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import Navigation from "@/services/navigation";
 
 @Component
-export default class GalleryDirectory extends Vue {
-  @Prop({ required: true }) readonly directory!: Gallery.Directory;
+export default class LdDirectory extends Vue {
+  @Prop({ required: true }) readonly item!: Gallery.Directory;
 
   mounted() {
     this.$uiStore.toggleFullscreen(false);
   }
 
   get orderedItems() {
-    return Navigation.directoriesFirst(this.directory.properties.items);
+    return Navigation.directoriesFirst(this.item.properties.items);
   }
 }
 </script>

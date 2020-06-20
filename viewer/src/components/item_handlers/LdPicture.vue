@@ -31,7 +31,7 @@
   >
     <v-lazy-image
       ref="imageElement"
-      :src="pictureSrc(picture.properties.resource)"
+      :src="pictureSrc(item.properties.resource)"
       class="ld-picture-element"
       :class="{'slow-loading': Boolean(slowLoadingStyle)}"
       :style="slowLoadingStyle"
@@ -48,7 +48,7 @@ import DragScrollClickFix from "@/services/dragscrollclickfix";
 
 @Component
 export default class LdPicture extends Vue {
-  @Prop({ required: true }) readonly picture!: Gallery.Picture;
+  @Prop({ required: true }) readonly item!: Gallery.Picture;
   @Ref() readonly containerElement!: HTMLDivElement;
   @Ref() readonly imageElement!: Vue;
 
@@ -61,7 +61,13 @@ export default class LdPicture extends Vue {
 
   mounted() {
     this.timer = setTimeout(this.generateSlowLoadingStyle, this.SLOW_LOADING_TIMEOUT_MS);
-    new LdZoom(this.containerElement, this.imageElement.$el as HTMLImageElement, this.picture.properties, 10, 1 / 5).install();
+    new LdZoom(
+      this.containerElement,
+      this.imageElement.$el as HTMLImageElement,
+      this.item.properties,
+      10,
+      1 / 5
+    ).install();
   }
 
   destroyed() {
@@ -82,8 +88,8 @@ export default class LdPicture extends Vue {
   generateSlowLoadingStyle() {
     this.clearSlowLoading();
     this.loader = true;
-    if (this.picture.thumbnail) {
-      const url = this.pictureSrc(this.picture.thumbnail.resource);
+    if (this.item.thumbnail) {
+      const url = this.pictureSrc(this.item.thumbnail.resource);
       this.slowLoadingStyle = `background-image: url('${url}');`;
     }
   }
