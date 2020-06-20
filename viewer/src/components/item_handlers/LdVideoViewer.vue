@@ -21,13 +21,7 @@
 <template>
   <!-- intermediate container necessary to eliminate the scrollbar -->
   <div class="fill no-scroll">
-    <video
-      class="fill"
-      :src="itemResourceUrl"
-      :poster="thumbnailResourceUrl"
-      preload="auto"
-      controls
-    >
+    <video class="fill" :src="itemResourceUrl" :poster="thumbnailResourceUrl" preload="auto" controls>
       <ld-download :item="item" />
     </video>
   </div>
@@ -50,5 +44,4 @@ export default class LdVideoViewer extends Vue {
 }
 </script>
 
-<style lang="scss" module>
-</style>
+<style lang="scss" module></style>

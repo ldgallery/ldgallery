@@ -22,10 +22,7 @@
   <div class="flex-column container-vh-centering">
     <ld-thumbnail :item="item" />
     <audio :class="$style.player" :src="itemResourceUrl" preload="auto" controls>
-      <a
-        :download="itemFileName"
-        :href="itemResourceUrl"
-      >{{ $t("download.download-file-fmt", [itemFileName]) }}</a>
+      <a :download="itemFileName" :href="itemResourceUrl">{{ $t("download.download-file-fmt", [itemFileName]) }}</a>
     </audio>
   </div>
 </template>

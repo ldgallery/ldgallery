@@ -24,14 +24,14 @@
       <fa-icon :icon="commandToggleSearchPanelIcon" size="lg" />
     </a>
     <a
-      :class="{'disabled': isEntryPoint}"
+      :class="{ disabled: isEntryPoint }"
       class="link command-secondary"
       :title="$t('command.back')"
       @click="isEntryPoint || $router.back()"
     >
       <fa-icon icon="arrow-left" size="lg" />
     </a>
-    <router-link :class="{'disabled': isRoot}" :title="$t('command.parent')" :to="parent">
+    <router-link :class="{ disabled: isRoot }" :title="$t('command.parent')" :to="parent">
       <fa-icon icon="folder" size="xs" />
       <fa-icon icon="level-up-alt" size="lg" />
     </router-link>

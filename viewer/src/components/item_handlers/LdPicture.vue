@@ -33,7 +33,7 @@
       ref="imageElement"
       :src="pictureSrc(item.properties.resource)"
       class="ld-picture-element"
-      :class="{'slow-loading': Boolean(slowLoadingStyle)}"
+      :class="{ 'slow-loading': Boolean(slowLoadingStyle) }"
       :style="slowLoadingStyle"
       @load="clearSlowLoading"
     />

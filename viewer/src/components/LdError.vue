@@ -30,7 +30,8 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 
-@Component export default class LdError extends Vue {
+@Component
+export default class LdError extends Vue {
   @Prop({ required: true, type: String }) readonly icon!: string;
   @Prop({ required: true, type: String }) readonly message!: string;
 }

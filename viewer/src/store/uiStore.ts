@@ -21,11 +21,10 @@ import { createModule, mutation, action } from "vuex-class-component";
 
 const VuexModule = createModule({
   namespaced: "uiStore",
-  strict: true
-})
+  strict: true,
+});
 
 export default class UIStore extends VuexModule {
-
   fullscreen: boolean = false;
   fullWidth: boolean = window.innerWidth < Number(process.env.VUE_APP_FULLWIDTH_LIMIT);
   searchMode: boolean = false;

@@ -27,11 +27,11 @@ module.exports = {
       enableInSFC: false,
     },
   },
-  chainWebpack: (config) => {
+  chainWebpack: config => {
     config.plugins.delete("prefetch");
   },
   configureWebpack: {
-    devtool: "source-map"
+    devtool: "source-map",
   },
   productionSourceMap: false,
   devServer: {
@@ -47,6 +47,6 @@ module.exports = {
         const file = fs.readFileSync(fullpath);
         res.end(file);
       });
-    }
-  }
+    },
+  },
 };

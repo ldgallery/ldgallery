@@ -25,10 +25,10 @@
       @onkeyenter-empty="search"
     />
     <ld-command-search @clear="clear" @search="search" />
-    <h1 class="title">{{$t('panelLeft.propositions')}}</h1>
+    <h1 class="title">{{ $t("panelLeft.propositions") }}</h1>
     <div class="scrollbar no-scroll-x">
       <ld-proposition
-        v-for="(category) in $galleryStore.tagsCategories"
+        v-for="category in $galleryStore.tagsCategories"
         :key="category.tag"
         :category="$galleryStore.tagsIndex[category.tag]"
         :show-category="$galleryStore.tagsCategories.length > 1"

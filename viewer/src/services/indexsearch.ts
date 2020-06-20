@@ -20,7 +20,6 @@
 import { Operation } from "@/@types/Operation";
 
 export default class IndexSearch {
-
   // Results of the search (by tags)
   public static search(searchTags: Tag.Search[]): Gallery.Item[] {
     const byOperation = this.extractTagsByOperation(searchTags);

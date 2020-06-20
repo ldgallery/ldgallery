@@ -23,11 +23,10 @@ import Navigation from "@/services/navigation";
 
 const VuexModule = createModule({
   namespaced: "galleryStore",
-  strict: true
-})
+  strict: true,
+});
 
 export default class GalleryStore extends VuexModule {
-
   config: Gallery.Config | null = null;
   galleryIndex: Gallery.Index | null = null;
   tagsIndex: Tag.Index = {};
@@ -65,8 +64,7 @@ export default class GalleryStore extends VuexModule {
 
   get currentItemPath(): Gallery.Item[] {
     const root = this.galleryIndex?.tree;
-    if (root)
-      return Navigation.searchCurrentItemPath(root, this.currentPath);
+    if (root) return Navigation.searchCurrentItemPath(root, this.currentPath);
     return [];
   }
 

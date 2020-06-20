@@ -18,11 +18,8 @@
 -->
 
 <template>
-  <div :class="{'fullscreen': $uiStore.fullscreen, 'fullwidth': $uiStore.fullWidth}">
-    <ld-title
-      :gallery-title="$galleryStore.galleryTitle"
-      :current-item="$galleryStore.currentItem"
-    />
+  <div :class="{ fullscreen: $uiStore.fullscreen, fullwidth: $uiStore.fullWidth }">
+    <ld-title :gallery-title="$galleryStore.galleryTitle" :current-item="$galleryStore.currentItem" />
     <panel-top v-if="!isLoading" class="layout layout-top" />
     <panel-left v-if="!isLoading" class="layout layout-left" />
     <router-view v-if="!isLoading" ref="content" class="layout layout-content scrollbar" />
