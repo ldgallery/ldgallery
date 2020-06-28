@@ -23,7 +23,7 @@ import Navigation from "@/services/navigation";
 
 export default class IndexFactory {
   public static generateTags(root: Gallery.Item | null): Tag.Index {
-    let tagsIndex: Tag.Index = {};
+    const tagsIndex: Tag.Index = {};
     if (root) IndexFactory.pushTagsForItem(tagsIndex, root);
     return tagsIndex;
   }
