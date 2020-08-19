@@ -31,6 +31,12 @@ import(/* webpackChunkName: "ui" */ "@/plugins/dragscroll");
 import(/* webpackChunkName: "ui" */ "@/plugins/fontawesome");
 const MainLayout = () => import(/* webpackChunkName: "ui" */ "@/views/MainLayout.vue");
 
+declare module "vue/types/vue" {
+  interface Vue {
+    $style: any; // SCSS modules
+  }
+}
+
 new Vue({
   router,
   i18n,
