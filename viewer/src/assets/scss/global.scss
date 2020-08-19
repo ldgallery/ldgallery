@@ -102,26 +102,6 @@ button svg + span {
   }
 }
 
-// === Scrollbar styling
-
-.scrollbar {
-  overflow: auto;
-  scrollbar-color: $scrollbar-color transparent;
-  scrollbar-width: thin;
-  &::-webkit-scrollbar {
-    width: $scrollbar-width;
-    height: $scrollbar-width;
-  }
-  &::-webkit-scrollbar-corner {
-    background-color: transparent;
-  }
-  &::-webkit-scrollbar-thumb {
-    box-shadow: inset 0 0 1px black;
-    background-color: $scrollbar-color;
-  }
-}
-
-
 // === Effect to apply on lazy-image loading
 
 img {
