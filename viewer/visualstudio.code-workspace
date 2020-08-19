@@ -13,6 +13,7 @@
     "javascript.format.semicolons": "insert",
     "typescript.disableAutomaticTypeAcquisition": true,
     "i18n-ally.localesPaths": "src/locales",
+    "i18n-ally.keystyle": "flat",
     // ---
     // Autoformating is done with eslint-prettier
     "eslint.enable": true,
