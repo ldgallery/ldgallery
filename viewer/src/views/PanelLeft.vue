@@ -38,9 +38,9 @@
       />
     </div>
     <b-collapse animation="slide" :open.sync="infoOpen">
-      <h1 slot="trigger" class="title flex">
-        Informations
-        <fa-icon :icon="infoOpen ? 'caret-up' : 'caret-down'" />
+      <h1 slot="trigger" class="flex title">
+        {{ $t("panelLeft.information.title") }}
+        <fa-icon :icon="infoOpen ? 'caret-down' : 'caret-up'" />
       </h1>
       <ld-information :item="$galleryStore.currentItem" />
     </b-collapse>
@@ -105,7 +105,8 @@ export default class PanelLeft extends Vue {
     user-select: none;
     > svg {
       color: $link;
-  }
+      margin-top: 2px; // Fixes a vertical centering issue with the carret
+    }
   }
 }
 </style>
