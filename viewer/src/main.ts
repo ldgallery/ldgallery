@@ -19,6 +19,7 @@
 
 import Vue from "vue";
 import "@/assets/scss/global.scss";
+import "@/assets/scss/scrollbar.scss";
 import store from "@/store";
 import i18n from "@/plugins/i18n";
 import router from "@/plugins/router";
