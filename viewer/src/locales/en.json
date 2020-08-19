@@ -15,5 +15,6 @@
   "command.back": "Go back",
   "command.parent": "Go to parent directory",
   "directory.no-results": "Empty directory",
-  "panelLeft.propositions.other": "other filters"
+  "panelLeft.propositions.other": "other filters",
+  "panelLeft.information.title": "Information"
 }
