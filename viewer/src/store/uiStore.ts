@@ -18,16 +18,20 @@
 */
 
 import { createModule, mutation, action } from "vuex-class-component";
+import ItemSortFn from "@/services/itemSortFn";
 
 const VuexModule = createModule({
   namespaced: "uiStore",
   strict: true,
 });
 
+type TItemSortFn = (left: Gallery.Item, right: Gallery.Item) => number;
+
 export default class UIStore extends VuexModule {
   fullscreen: boolean = false;
   fullWidth: boolean = window.innerWidth < Number(process.env.VUE_APP_FULLWIDTH_LIMIT);
   searchMode: boolean = false;
+  sortFn: TItemSortFn = ItemSortFn.sortByName;
 
   // ---
 
@@ -41,5 +45,9 @@ export default class UIStore extends VuexModule {
 
   @mutation toggleSearchMode(value?: boolean) {
     this.searchMode = value ?? !this.searchMode;
+  }
+
+  @mutation setSortFn(sortFn: TItemSortFn) {
+    this.sortFn = sortFn;
   }
 }

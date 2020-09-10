@@ -17,5 +17,7 @@
   "directory.no-results": "Empty directory",
   "panelLeft.propositions.other": "other filters",
   "panelLeft.information.title": "Information",
-  "tag-propositions.showmore": "show more ({0})"
+  "tag-propositions.showmore": "show more ({0})",
+  "command.sort.byName": "By name",
+  "command.sort.byDateDesc": "By most recent"
 }
