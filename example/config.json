@@ -1,3 +1,4 @@
 {
-    "galleryRoot": "out/"
+    "galleryRoot": "out/",
+	"initialTagDisplayLimit": 10,
 }

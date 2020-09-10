@@ -38,4 +38,5 @@ export {
   faFileDownload,
   faCaretUp,
   faCaretDown,
+  faAngleDoubleDown,
 } from "@fortawesome/free-solid-svg-icons";
