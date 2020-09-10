@@ -23,6 +23,7 @@
     <a class="link" :title="$t('command.search')" @click="$uiStore.toggleFullWidth()">
       <fa-icon :icon="commandToggleSearchPanelIcon" size="lg" />
     </a>
+    <ld-command-sort />
     <a
       :class="{ disabled: isEntryPoint }"
       class="link command-secondary"

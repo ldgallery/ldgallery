@@ -20,8 +20,8 @@
 <template>
   <div :class="{ fullscreen: $uiStore.fullscreen, fullwidth: $uiStore.fullWidth }">
     <ld-title :gallery-title="$galleryStore.galleryTitle" :current-item="$galleryStore.currentItem" />
-    <panel-top v-if="!isLoading" class="layout layout-top" />
-    <panel-left v-if="!isLoading" class="layout layout-left" />
+    <panel-top v-if="isReady" class="layout layout-top" />
+    <panel-left v-if="isReady" class="layout layout-left" />
     <router-view v-if="!isLoading" ref="content" class="layout layout-content scrollbar" />
     <b-loading :active="isLoading" is-full-page />
     <ld-key-press :keycode="27" @action="$uiStore.toggleFullscreen(false)" />
@@ -67,6 +67,10 @@ export default class MainLayout extends Vue {
       .then(this.$galleryStore.fetchGalleryItems)
       .finally(() => (this.isLoading = false))
       .catch(this.displayError);
+  }
+
+  get isReady() {
+    return !this.isLoading && this.$galleryStore.currentPath !== null;
   }
 
   displayError(reason: any) {

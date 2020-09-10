@@ -39,4 +39,7 @@ export {
   faCaretUp,
   faCaretDown,
   faAngleDoubleDown,
+  faSortAmountDown,
 } from "@fortawesome/free-solid-svg-icons";
+
+export { faCircle, faDotCircle } from "@fortawesome/free-regular-svg-icons";

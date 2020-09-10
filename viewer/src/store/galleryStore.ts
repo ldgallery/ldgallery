@@ -31,7 +31,7 @@ export default class GalleryStore extends VuexModule {
   galleryIndex: Gallery.Index | null = null;
   tagsIndex: Tag.Index = {};
   tagsCategories: Tag.Category[] = [];
-  currentPath: string = "/";
+  currentPath: string | null = null;
   currentSearch: Tag.Search[] = [];
 
   // ---
@@ -64,7 +64,7 @@ export default class GalleryStore extends VuexModule {
 
   get currentItemPath(): Gallery.Item[] {
     const root = this.galleryIndex?.tree;
-    if (root) return Navigation.searchCurrentItemPath(root, this.currentPath);
+    if (root && this.currentPath) return Navigation.searchCurrentItemPath(root, this.currentPath);
     return [];
   }
 

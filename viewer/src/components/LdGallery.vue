@@ -20,7 +20,7 @@
 <template>
   <ld-error v-if="hasNoResults" icon="search" :message="noresult" />
   <div v-else class="thumbnail-tiles">
-    <router-link v-for="item in items" :key="item.path" :to="item.path">
+    <router-link v-for="item in sortedItems" :key="item.path" :to="item.path">
       <ld-thumbnail :item="item" />
     </router-link>
   </div>
@@ -34,6 +34,10 @@ import DragScrollClickFix from "@/services/dragscrollclickfix";
 export default class LdPicture extends Vue {
   @Prop({ type: Array, required: true }) readonly items!: Gallery.Item[];
   @Prop(String) readonly noresult?: string;
+
+  get sortedItems() {
+    return this.items.sort(this.$uiStore.sortFn);
+  }
 
   get hasNoResults(): boolean {
     return Boolean(this.noresult) && this.items.length === 0;
