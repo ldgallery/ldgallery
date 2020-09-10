@@ -28,8 +28,6 @@ import Button from "buefy/src/components/button";
 // @ts-ignore
 import SnackBar from "buefy/src/components/snackbar";
 // @ts-ignore
-import Collapse from "buefy/src/components/collapse";
-// @ts-ignore
 import Tag from "buefy/src/components/tag";
 
 import "@/assets/scss/buefy.scss";
@@ -38,7 +36,6 @@ Vue.use(Taginput);
 Vue.use(Loading);
 Vue.use(Button);
 Vue.use(SnackBar);
-Vue.use(Collapse);
 Vue.use(Tag);
 
 declare module "vue/types/vue" {
