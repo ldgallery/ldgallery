@@ -106,7 +106,7 @@ html {
 }
 .layout {
   position: fixed;
-  transition: all 0.1s linear;
+  transition: all $transition-flex-expand linear;
   top: 0;
   bottom: 0;
   left: 0;

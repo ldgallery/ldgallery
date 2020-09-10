@@ -1,0 +1,13 @@
+@import "~@/assets/scss/theme.scss";
+
+// === Transitions for Vue
+
+.flex-expand-enter-active, .flex-expand-leave-active {
+  transition: max-height $transition-flex-expand linear;
+}
+.flex-expand-enter, .flex-expand-leave-to {
+  max-height: 0%;
+}
+.flex-expand-enter-to, .flex-expand-leave {
+  max-height: 100%;
+}

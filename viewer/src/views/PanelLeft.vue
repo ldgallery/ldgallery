@@ -18,7 +18,7 @@
 -->
 
 <template>
-  <div class="flex-column sidebar">
+  <div class="flex-column" :class="$style.sidebar">
     <ld-tag-input
       :search-filters.sync="searchFilters"
       :tags-index="$galleryStore.tagsIndex"
@@ -26,7 +26,7 @@
     />
     <ld-command-search @clear="clear" @search="search" />
     <h1 class="title">{{ $t("panelLeft.propositions") }}</h1>
-    <div class="scrollbar no-scroll-x flex-grow-1">
+    <div class="scrollbar no-scroll-x flex-grow-1" :class="$style.flexShrink1000">
       <ld-proposition
         v-for="category in $galleryStore.tagsCategories"
         :key="category.tag"
@@ -37,13 +37,13 @@
         :current-tags="currentTags"
       />
     </div>
-    <b-collapse animation="slide" :open.sync="infoOpen">
-      <h1 slot="trigger" class="flex title">
-        {{ $t("panelLeft.information.title") }}
-        <fa-icon :icon="infoOpen ? 'caret-down' : 'caret-up'" />
-      </h1>
-      <ld-information :item="$galleryStore.currentItem" />
-    </b-collapse>
+    <h1 class="flex title" @click="infoOpen = !infoOpen">
+      {{ $t("panelLeft.information.title") }}
+      <fa-icon :icon="infoOpen ? 'caret-down' : 'caret-up'" />
+    </h1>
+    <transition name="flex-expand">
+      <ld-information v-show="infoOpen" :item="$galleryStore.currentItem" class="scrollbar no-scroll-x" />
+    </transition>
   </div>
 </template>
 
@@ -92,11 +92,11 @@ export default class PanelLeft extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" module>
 @import "~@/assets/scss/theme.scss";
 
 .sidebar {
-  .title {
+  :global(.title) {
     background-color: $proposed-category-bgcolor;
     padding: 0.2em 0.5em;
     margin: 0 0 1px 0;
@@ -108,5 +108,9 @@ export default class PanelLeft extends Vue {
       margin-top: 2px; // Fixes a vertical centering issue with the carret
     }
   }
+}
+
+.flexShrink1000 {
+  flex-shrink: 1000;
 }
 </style>
