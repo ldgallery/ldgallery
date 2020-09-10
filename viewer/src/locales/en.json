@@ -16,5 +16,6 @@
   "command.parent": "Go to parent directory",
   "directory.no-results": "Empty directory",
   "panelLeft.propositions.other": "other filters",
-  "panelLeft.information.title": "Information"
+  "panelLeft.information.title": "Information",
+  "tag-propositions.showmore": "show more ({0})"
 }
