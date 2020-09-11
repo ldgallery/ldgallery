@@ -85,7 +85,7 @@ export default class GalleryStore extends VuexModule {
 
   // Fetches the gallery's JSON config
   @action async fetchConfig() {
-    return fetch(`${process.env.VUE_APP_DATA_URL}config.json`, { cache: "no-cache" })
+    return fetch(`${process.env.VUE_APP_DATA_URL}${GalleryStore.getUrlConfig()}`, { cache: "no-cache" })
       .then(response => response.json())
       .then(this.setConfig);
   }
@@ -93,7 +93,8 @@ export default class GalleryStore extends VuexModule {
   // Fetches the gallery's JSON metadata
   @action async fetchGalleryItems() {
     const root = this.config?.galleryRoot ?? "";
-    return fetch(`${process.env.VUE_APP_DATA_URL}${root}index.json`, { cache: "no-cache" })
+    const index = this.config?.galleryIndex ?? "index.json";
+    return fetch(`${process.env.VUE_APP_DATA_URL}${root}${index}`, { cache: "no-cache" })
       .then(response => response.json())
       .then(this.setGalleryIndex)
       .then(this.indexTags)
@@ -120,5 +121,11 @@ export default class GalleryStore extends VuexModule {
     const results = filters.flatMap(filter => IndexFactory.searchTags(this.tagsIndex, filter, true));
     this.setCurrentSearch(results);
     return results;
+  }
+
+  private static getUrlConfig() {
+    let search = window.location.search;
+    if (search.length > 1) return search.substr(1) + ".json";
+    return "config.json";
   }
 }
