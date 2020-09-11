@@ -20,7 +20,7 @@
 
 <template>
   <div class="proposition">
-    <h2 v-if="showCategory && proposedTags.length" class="subtitle category">{{ title }}</h2>
+    <h2 v-if="showCategory && Object.keys(propositions).length" class="subtitle category">{{ title }}</h2>
     <div v-for="proposed in proposedTags" :key="proposed.rawTag">
       <a
         class="operation-btns link"

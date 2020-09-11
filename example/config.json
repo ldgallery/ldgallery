@@ -1,5 +1,5 @@
 {
     "galleryRoot": "out/",
-	"galleryIndex": "index.json",
+    "galleryIndex": "index.json",
     "initialTagDisplayLimit": 10
 }
