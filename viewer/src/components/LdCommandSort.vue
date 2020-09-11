@@ -25,7 +25,7 @@
     </a>
     <b-dropdown-item v-for="(sort, idx) in SORTS" :key="idx" :value="idx">
       <fa-icon :icon="['far', idx === selectedSort ? 'dot-circle' : 'circle']" />
-      <span :class="$style.ml1">{{ sort.name }}</span>
+      <span :class="$style.dropdownLabel">{{ sort.name }}</span>
     </b-dropdown-item>
   </b-dropdown>
 </template>
@@ -38,7 +38,7 @@ import ItemSortFn from "@/services/itemSortFn";
 @Component
 export default class LdCommandSort extends Vue {
   readonly SORTS = [
-    { name: this.$t("command.sort.byName"), fn: ItemSortFn.sortByName },
+    { name: this.$t("command.sort.byNameAsc"), fn: ItemSortFn.sortByNameAsc },
     { name: this.$t("command.sort.byDateDesc"), fn: ItemSortFn.sortByDateDesc },
   ];
 
@@ -51,7 +51,7 @@ export default class LdCommandSort extends Vue {
 </script>
 
 <style lang="scss" module>
-.ml1 {
+.dropdownLabel {
   margin-left: 0.5em;
 }
 </style>

@@ -18,7 +18,7 @@
 */
 
 export default class ItemSortFn {
-  static sortByName(left: Gallery.Item, right: Gallery.Item): number {
+  static sortByNameAsc(left: Gallery.Item, right: Gallery.Item): number {
     return left.title.localeCompare(right.title);
   }
 

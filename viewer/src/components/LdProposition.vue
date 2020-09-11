@@ -47,8 +47,8 @@
 
       <div class="disabled" :title="$t('tag-propositions.item-count')">{{ proposed.count }}</div>
     </div>
-    <div v-if="showMore > 0" class="showmore" @click="limit += showMore">
-      {{ $t("tag-propositions.showmore", [showMore]) }}<fa-icon icon="angle-double-down" />
+    <div v-if="showMoreCount > 0" class="showmore" @click="limit += showMoreCount">
+      {{ $t("tag-propositions.showmore", [showMoreCount]) }}<fa-icon icon="angle-double-down" />
     </div>
   </div>
 </template>
@@ -65,9 +65,14 @@ export default class LdProposition extends Vue {
   @Prop({ required: true }) readonly tagsIndex!: Tag.Index;
   @PropSync("searchFilters", { type: Array, required: true }) model!: Tag.Search[];
 
-  readonly INITIAL_TAG_DISPLAY_LIMIT = this.$galleryStore.config?.initialTagDisplayLimit ?? 10;
+  readonly INITIAL_TAG_DISPLAY_LIMIT = this.getInitialTagDisplayLimit();
 
   limit: number = this.INITIAL_TAG_DISPLAY_LIMIT;
+
+  getInitialTagDisplayLimit() {
+    const limit = this.$galleryStore.config?.initialTagDisplayLimit ?? 10;
+    return limit > 0 ? limit : 1000;
+  }
 
   @Watch("$route")
   onRouteChange() {
@@ -105,7 +110,7 @@ export default class LdProposition extends Vue {
       .map(entry => ({ rawTag: entry[0], count: entry[1] }));
   }
 
-  get showMore(): number {
+  get showMoreCount(): number {
     return Object.keys(this.propositions).length - Object.keys(this.proposedTags).length;
   }
 
