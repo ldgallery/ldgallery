@@ -14,6 +14,8 @@
     "typescript.disableAutomaticTypeAcquisition": true,
     "i18n-ally.localesPaths": "src/locales",
     "i18n-ally.keystyle": "flat",
+    "i18n-ally.enabledFrameworks": ["vue"],
+    "i18n-ally.sortKeys": true,
     // ---
     // Autoformating is done with eslint-prettier
     "eslint.enable": true,
