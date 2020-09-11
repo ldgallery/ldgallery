@@ -71,7 +71,7 @@ export default class LdProposition extends Vue {
 
   getInitialTagDisplayLimit() {
     const limit = this.$galleryStore.config?.initialTagDisplayLimit ?? 10;
-    return limit > 0 ? limit : 1000;
+    return limit >= 0 ? limit : 1000;
   }
 
   @Watch("$route")
