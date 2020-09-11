@@ -26,7 +26,7 @@
     />
     <ld-command-search @clear="clear" @search="search" />
     <h1 class="title">{{ $t("panelLeft.propositions") }}</h1>
-    <div class="scrollbar no-scroll-x flex-grow-1" :class="$style.flexShrink1000">
+    <div class="scrollbar no-scroll-x flex-grow-1" :class="$style.flexShrinkFully">
       <ld-proposition
         v-for="category in $galleryStore.tagsCategories"
         :key="category.tag"
@@ -110,7 +110,7 @@ export default class PanelLeft extends Vue {
   }
 }
 
-.flexShrink1000 {
+.flexShrinkFully {
   flex-shrink: 1000;
 }
 </style>

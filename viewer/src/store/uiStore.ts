@@ -31,7 +31,7 @@ export default class UIStore extends VuexModule {
   fullscreen: boolean = false;
   fullWidth: boolean = window.innerWidth < Number(process.env.VUE_APP_FULLWIDTH_LIMIT);
   searchMode: boolean = false;
-  sortFn: TItemSortFn = ItemSortFn.sortByName;
+  sortFn: TItemSortFn = ItemSortFn.sortByNameAsc;
 
   // ---
 
