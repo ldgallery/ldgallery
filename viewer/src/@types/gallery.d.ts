@@ -20,7 +20,8 @@
 declare namespace Gallery {
   interface Config {
     galleryRoot: string;
-    initialTagDisplayLimit: number;
+    galleryIndex?: string;
+    initialTagDisplayLimit?: number;
   }
 
   interface GalleryProperties {
