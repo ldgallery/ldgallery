@@ -64,6 +64,7 @@ export default class MainLayout extends Vue {
     this.isLoading = true;
     this.$galleryStore
       .fetchConfig()
+      .then(this.$uiStore.initFromConfig)
       .then(this.$galleryStore.fetchGalleryItems)
       .finally(() => (this.isLoading = false))
       .catch(this.displayError);

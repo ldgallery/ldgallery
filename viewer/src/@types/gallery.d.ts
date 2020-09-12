@@ -18,9 +18,12 @@
 */
 
 declare namespace Gallery {
+  type ItemSortStr = "name_asc" | "date_desc";
+
   interface Config {
     galleryRoot: string;
     galleryIndex?: string;
+    initialSort?: ItemSortStr;
     initialTagDisplayLimit?: number;
   }
 

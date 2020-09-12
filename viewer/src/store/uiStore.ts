@@ -18,20 +18,18 @@
 */
 
 import { createModule, mutation, action } from "vuex-class-component";
-import ItemSortFn from "@/services/itemSortFn";
+import ItemComparators, { ItemComparator } from "@/services/itemComparators";
 
 const VuexModule = createModule({
   namespaced: "uiStore",
   strict: true,
 });
 
-type TItemSortFn = (left: Gallery.Item, right: Gallery.Item) => number;
-
 export default class UIStore extends VuexModule {
   fullscreen: boolean = false;
   fullWidth: boolean = window.innerWidth < Number(process.env.VUE_APP_FULLWIDTH_LIMIT);
   searchMode: boolean = false;
-  sortFn: TItemSortFn = ItemSortFn.sortByNameAsc;
+  sortFn: ItemComparator = ItemComparators.sortByNameAsc;
 
   // ---
 
@@ -47,7 +45,20 @@ export default class UIStore extends VuexModule {
     this.searchMode = value ?? !this.searchMode;
   }
 
-  @mutation setSortFn(sortFn: TItemSortFn) {
+  @mutation setSortFn(sortFn: ItemComparator) {
     this.sortFn = sortFn;
+  }
+
+  @action async initFromConfig(config: Gallery.Config) {
+    switch (config.initialSort ?? "") {
+      case "date_desc":
+        this.setSortFn(ItemComparators.sortByDateDesc);
+        break;
+      case "name_asc":
+      case "":
+        break;
+      default:
+        throw new Error("Unknown sort type: " + config.initialSort);
+    }
   }
 }
