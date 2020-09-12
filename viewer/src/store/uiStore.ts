@@ -29,7 +29,7 @@ export default class UIStore extends VuexModule {
   fullscreen: boolean = false;
   fullWidth: boolean = window.innerWidth < Number(process.env.VUE_APP_FULLWIDTH_LIMIT);
   searchMode: boolean = false;
-  sortFn: ItemComparator = ItemComparators.sortByNameAsc;
+  sortFn: ItemComparator = ItemComparators.DEFAULT;
 
   // ---
 
@@ -50,15 +50,10 @@ export default class UIStore extends VuexModule {
   }
 
   @action async initFromConfig(config: Gallery.Config) {
-    switch (config.initialSort ?? "") {
-      case "date_desc":
-        this.setSortFn(ItemComparators.sortByDateDesc);
-        break;
-      case "name_asc":
-      case "":
-        break;
-      default:
-        throw new Error("Unknown sort type: " + config.initialSort);
+    if (config.initialItemSort) {
+      const itemSort = ItemComparators.ITEM_SORTS.find(s => s.name == config.initialItemSort);
+      if (itemSort) this.setSortFn(itemSort.fn);
+      else throw new Error("Unknown sort type: " + config.initialItemSort);
     }
   }
 }

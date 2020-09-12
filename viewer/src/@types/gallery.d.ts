@@ -23,7 +23,7 @@ declare namespace Gallery {
   interface Config {
     galleryRoot: string;
     galleryIndex?: string;
-    initialSort?: ItemSortStr;
+    initialItemSort?: ItemSortStr;
     initialTagDisplayLimit?: number;
   }
 

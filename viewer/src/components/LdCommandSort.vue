@@ -19,42 +19,32 @@
 -->
 
 <template>
-  <b-dropdown v-model="selectedSort" :mobile-modal="false" append-to-body @change="onChangeSort">
+  <b-dropdown v-model="selectedSort" :mobile-modal="false" append-to-body>
     <a slot="trigger" class="link">
       <fa-icon icon="sort-amount-down" size="lg" />
     </a>
-    <b-dropdown-item v-for="(sort, idx) in SORTS" :key="idx" :value="idx">
+    <b-dropdown-item v-for="(sort, idx) in ITEM_SORTS" :key="idx" :value="idx">
       <fa-icon :icon="['far', idx === selectedSort ? 'dot-circle' : 'circle']" />
-      <span :class="$style.dropdownLabel">{{ sort.name }}</span>
+      <span :class="$style.dropdownLabel">{{ sort.text }}</span>
     </b-dropdown-item>
   </b-dropdown>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from "vue-property-decorator";
+import { Component, Vue, Prop } from "vue-property-decorator";
 import { RawLocation } from "vue-router";
 import ItemComparators, { ItemComparator } from "@/services/itemComparators";
 
 @Component
 export default class LdCommandSort extends Vue {
-  readonly SORTS = [
-    { name: this.$t("command.sort.byNameAsc"), fn: ItemComparators.sortByNameAsc },
-    { name: this.$t("command.sort.byDateDesc"), fn: ItemComparators.sortByDateDesc },
-  ];
+  readonly ITEM_SORTS = ItemComparators.ITEM_SORTS;
 
-  selectedSort = 0;
-
-  created() {
-    this.onChangeStore(this.$uiStore.sortFn);
+  get selectedSort() {
+    return this.ITEM_SORTS.map(s => s.fn).indexOf(this.$uiStore.sortFn);
   }
 
-  @Watch("$uiStore.sortFn")
-  onChangeStore(newFn: ItemComparator) {
-    this.selectedSort = this.SORTS.map(s => s.fn).indexOf(newFn);
-  }
-
-  onChangeSort(newValue: number) {
-    this.$uiStore.setSortFn(this.SORTS[newValue].fn);
+  set selectedSort(newValue: number) {
+    this.$uiStore.setSortFn(this.ITEM_SORTS[newValue].fn);
   }
 }
 </script>
