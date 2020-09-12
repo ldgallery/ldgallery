@@ -31,18 +31,27 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import { RawLocation } from "vue-router";
-import ItemSortFn from "@/services/itemSortFn";
+import ItemComparators, { ItemComparator } from "@/services/itemComparators";
 
 @Component
 export default class LdCommandSort extends Vue {
   readonly SORTS = [
-    { name: this.$t("command.sort.byNameAsc"), fn: ItemSortFn.sortByNameAsc },
-    { name: this.$t("command.sort.byDateDesc"), fn: ItemSortFn.sortByDateDesc },
+    { name: this.$t("command.sort.byNameAsc"), fn: ItemComparators.sortByNameAsc },
+    { name: this.$t("command.sort.byDateDesc"), fn: ItemComparators.sortByDateDesc },
   ];
 
   selectedSort = 0;
+
+  created() {
+    this.onChangeStore(this.$uiStore.sortFn);
+  }
+
+  @Watch("$uiStore.sortFn")
+  onChangeStore(newFn: ItemComparator) {
+    this.selectedSort = this.SORTS.map(s => s.fn).indexOf(newFn);
+  }
 
   onChangeSort(newValue: number) {
     this.$uiStore.setSortFn(this.SORTS[newValue].fn);

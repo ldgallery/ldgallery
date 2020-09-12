@@ -1,5 +1,6 @@
 {
     "galleryRoot": "out/",
     "galleryIndex": "index.json",
+    "initialSort": "date_desc",
     "initialTagDisplayLimit": 10
 }

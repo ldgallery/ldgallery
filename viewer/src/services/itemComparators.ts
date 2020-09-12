@@ -17,7 +17,9 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-export default class ItemSortFn {
+export type ItemComparator = (left: Gallery.Item, right: Gallery.Item) => number;
+
+export default class ItemComparators {
   static sortByNameAsc(left: Gallery.Item, right: Gallery.Item): number {
     return left.title.localeCompare(right.title);
   }
