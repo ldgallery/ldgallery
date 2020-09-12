@@ -85,20 +85,22 @@ export default class GalleryStore extends VuexModule {
 
   // Fetches the gallery's JSON config
   @action async fetchConfig() {
-    return fetch(`${process.env.VUE_APP_DATA_URL}${GalleryStore.getUrlConfig()}`, { cache: "no-cache" })
-      .then(response => response.json())
+    await fetch(`${process.env.VUE_APP_DATA_URL}${GalleryStore.getUrlConfig()}`, { cache: "no-cache" })
+      .then(GalleryStore.responseToJson)
       .then(this.setConfig);
+    return this.config!;
   }
 
   // Fetches the gallery's JSON metadata
   @action async fetchGalleryItems() {
     const root = this.config?.galleryRoot ?? "";
     const index = this.config?.galleryIndex ?? "index.json";
-    return fetch(`${process.env.VUE_APP_DATA_URL}${root}${index}`, { cache: "no-cache" })
-      .then(response => response.json())
+    await fetch(`${process.env.VUE_APP_DATA_URL}${root}${index}`, { cache: "no-cache" })
+      .then(GalleryStore.responseToJson)
       .then(this.setGalleryIndex)
       .then(this.indexTags)
       .then(this.indexTagCategories);
+    return this.galleryIndex!;
   }
 
   // Indexes the gallery
@@ -127,5 +129,10 @@ export default class GalleryStore extends VuexModule {
     let search = window.location.search;
     if (search.length > 1) return search.substr(1) + ".json";
     return "config.json";
+  }
+
+  private static responseToJson(response: Response) {
+    if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`);
+    return response.json();
   }
 }

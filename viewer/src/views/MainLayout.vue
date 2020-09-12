@@ -70,12 +70,12 @@ export default class MainLayout extends Vue {
   }
 
   get isReady() {
-    return !this.isLoading && this.$galleryStore.currentPath !== null;
+    return !this.isLoading && this.$galleryStore.config && this.$galleryStore.currentPath !== null;
   }
 
   displayError(reason: any) {
     this.$buefy.snackbar.open({
-      message: `Error ${reason}`,
+      message: `${reason}`,
       actionText: "Retry",
       position: "is-top",
       type: "is-danger",
