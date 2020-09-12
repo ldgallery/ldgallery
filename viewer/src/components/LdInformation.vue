@@ -18,7 +18,7 @@
 -->
 
 <template>
-  <div class="flex-column" :class="$style.infopanel">
+  <div v-if="item" class="flex-column" :class="$style.infopanel">
     <div v-if="item.title" :class="$style.title">{{ item.title }}</div>
     <time v-if="item.datetime" :datetime="item.datetime" :class="$style.datetime">{{ formatDate }}</time>
     <div v-if="item.description" :class="$style.description" v-html="formatDescription" />
