@@ -31,7 +31,11 @@ export default class ItemComparators {
   ];
 
   static sortByNameAsc(left: Gallery.Item, right: Gallery.Item): number {
-    return left.title.localeCompare(right.title);
+    return left.title.localeCompare(right.title, undefined, {
+      sensitivity: "base",
+      ignorePunctuation: true,
+      numeric: true,
+    });
   }
 
   static sortByDateDesc(left: Gallery.Item, right: Gallery.Item): number {
