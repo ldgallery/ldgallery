@@ -18,7 +18,7 @@
 */
 
 declare namespace Gallery {
-  type ItemSortStr = "name_asc" | "date_desc";
+  type ItemSortStr = "name_asc" | "date_asc" | "date_desc";
 
   interface Config {
     galleryRoot: string;
