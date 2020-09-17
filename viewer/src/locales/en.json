@@ -4,7 +4,7 @@
   "command.search": "Open/close search panel",
   "command.search.clear": "Clear",
   "command.search.search": "Search",
-  "command.sort.byDateAsc": "By date (most ancient first)",
+  "command.sort.byDateAsc": "By date (oldest first)",
   "command.sort.byDateDesc": "By date (most recent first)",
   "command.sort.byNameAsc": "By name (A to Z)",
   "directory.no-results": "Empty directory",
