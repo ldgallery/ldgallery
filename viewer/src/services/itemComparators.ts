@@ -27,7 +27,12 @@ export default class ItemComparators {
 
   static readonly ITEM_SORTS: ItemSort[] = [
     { name: "name_asc", text: i18n.t("command.sort.byNameAsc"), fn: ItemComparators.sortByNameAsc },
-    { name: "date_desc", text: i18n.t("command.sort.byDateDesc"), fn: ItemComparators.sortByDateDesc },
+    { name: "date_asc", text: i18n.t("command.sort.byDateAsc"), fn: ItemComparators.sortByDateAsc },
+    {
+      name: "date_desc",
+      text: i18n.t("command.sort.byDateDesc"),
+      fn: ItemComparators.reverse(ItemComparators.sortByDateAsc),
+    },
   ];
 
   static sortByNameAsc(left: Gallery.Item, right: Gallery.Item): number {
@@ -38,7 +43,11 @@ export default class ItemComparators {
     });
   }
 
-  static sortByDateDesc(left: Gallery.Item, right: Gallery.Item): number {
-    return -left.datetime.localeCompare(right.datetime); // TODO: handle timezones
+  static sortByDateAsc(left: Gallery.Item, right: Gallery.Item): number {
+    return left.datetime.localeCompare(right.datetime); // TODO: handle timezones
+  }
+
+  static reverse(fn: ItemComparator): ItemComparator {
+    return (l, r) => -fn(l, r);
   }
 }
