@@ -52,11 +52,13 @@ Builds of this software embed and make use of the following libraries:
 * Viewer (npm packages)
   * fortawesome/fontawesome-svg-core, licensed under the MIT License
   * fortawesome/free-solid-svg-icons, licensed under the CC-BY-4.0 and MIT Licenses
+  * fortawesome/free-regular-svg-icons, licensed under the CC-BY-4.0 and MIT Licenses
   * fortawesome/vue-fontawesome, licensed under the MIT License
   * buefy, licensed under the MIT License
   * core-js, licensed under the MIT License
-  * resize-observer-polyfill, licensed under the MIT License
   * hammerjs, licensed under the MIT License
+  * marked, licensed under the MIT License
+  * resize-observer-polyfill, licensed under the MIT License
   * v-lazy-image, licensed under the MIT License
   * vue, licensed under the MIT License
   * vue-class-component, licensed under the MIT License
