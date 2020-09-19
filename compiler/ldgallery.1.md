@@ -2,7 +2,7 @@
 pagetitle: Compiler user manual - ldgallery
 title: LDGALLERY(1) ldgallery
 author: Pacien TRAN-GIRARD, Guillaume FOUET
-date: 2020-04-30 (v1.0)
+date: 2020-09-19 (v2.0)
 ---
 
 
@@ -13,7 +13,7 @@ ldgallery - a static web gallery generator with tags
 
 # DESCRIPTION
 
-ldgallery is a static gallery generator which turns a collection of tagged pictures into a searchable web gallery.
+ldgallery is a static gallery generator which turns a collection of tagged media files into a searchable web gallery.
 
 The ldgallery compiler program processes pictures and aggregates metadata from plain text sidecar files to generate an indexed version of the gallery.
 It can optionally output a static web viewer along, which allows the content to be presented and searched through from a JavaScript-enabled web browser.
@@ -45,6 +45,7 @@ Available options are:
 
 -r, \--rebuild-all
 : Invalidate cache and recompile everything.
+  By default, the compiler skips items which haven't changed based on their modification time.
 
 -c, \--clean-output
 : Remove unnecessary files from the output directory.
@@ -67,8 +68,8 @@ Available options are:
 
 A gallery source directory contains the gallery items and their sidecar metadata files, optionally grouped inside sub-directories.
 
-Thumbnails can be associated to items by suffixing their name with "_thumbnail", followed by an image file extension.
-Directory thumbnails can be placed within their repsective directories themselves, without any prefix.
+Thumbnails can be associated to items by suffixing their name with "\_thumbnail", followed by an image file extension.
+Directory thumbnails can be placed within their respective directories themselves, without any prefix.
 
 An example input gallery directory structure could be as follows:
 
@@ -84,7 +85,7 @@ An example input gallery directory structure could be as follows:
 │   ├── song.ogg
 │   ├── song.ogg.yaml
 │   └── song.ogg_thumbnail.jpg -- a thumbnail for song.ogg
-└── gallery.yaml -888------------ gallery settings file
+└── gallery.yaml ---------------- gallery settings file
 ```
 
 
@@ -93,7 +94,7 @@ An example input gallery directory structure could be as follows:
 File metadata are read from sidecar files of the same name, with the ".yaml" extension appended.
 Metadata contained within item files themselves (e.g. Exif fields for pictures) are ignored.
 
-Directory metadata are read from sidecar files named "_directory.yaml" located within the directory.
+Directory metadata are read from sidecar files named "\_directory.yaml" located within the directory.
 
 When a sidecar file is absent or a particular key omitted, values are set as empty or to their fallback value specified below.
 
@@ -101,17 +102,16 @@ title
 : Title of the item.
   Defaults to the name of the file or directory.
 
-<!-- not used in the viewer yet --
 datetime
 : ISO 8601 zoned date and time.
   Defaults to the last modification time of the file itself,
   or the most recent modification date of a directory's items.
--->
 
-<!-- not used in the viewer yet --
 description
-: Description for the item.
--->
+: Optional description for the item.
+  Rich text formatting is possible through the use of the [GitHub Flavoured Markdown syntax][GFM].
+
+  [GFM]: https://github.github.com/gfm/
 
 tags
 : List of tags for the item.
@@ -121,7 +121,9 @@ tags
 
 # GALLERY CONFIGURATION
 
-The gallery settings reside in a file named "gallery.yaml" located at the root of the gallery's source directory.
+The gallery settings reside in a file named __gallery.yaml__ located at the root of the gallery's source directory.
+
+Gallery configurations options are:
 
 galleryTitle
 : Title of the gallery.
@@ -129,7 +131,7 @@ galleryTitle
 
 includedDirectories[]
 : Glob patterns of directory names to include in the gallery.
-  Defaults to ["*"] (matches all directory names).
+  Defaults to ["\*"] (matches all directory names).
 
 excludedDirectories[]
 : Glob patterns of directory names to exclude from the gallery.
@@ -137,7 +139,7 @@ excludedDirectories[]
 
 includedFiles[]
 : Glob patterns of file names to include in the gallery.
-  Defaults to ["*"] (matches all file names).
+  Defaults to ["\*"] (matches all file names).
 
 excludedFiles[]
 : Glob patterns of file names to exclude from the gallery.
@@ -146,7 +148,7 @@ excludedFiles[]
 includedTags[]
 : Glob patterns of tags to include in the gallery.
   Items with no tags can be matched with the empty pattern.
-  Defaults to ["*"] (matches all tags, includes untagged items).
+  Defaults to ["\*"] (matches all tags, includes untagged items).
 
 excludedTags[]
 : Glob patterns of tags to exclude from the gallery.
@@ -178,7 +180,7 @@ pictureMaxResolution.height
 
 # SEE ALSO
 
-Related manual pages: __ldgallery-quickstart__(7), __ldgallery-viewer__(7)
+Related manual pages: __ldgallery-quickstart__(7), __ldgallery-viewer__(7).
 
 The ldgallery source code is available on <https://ldgallery.pacien.org>.
 
