@@ -23,10 +23,10 @@ export type ItemComparator = (left: Gallery.Item, right: Gallery.Item) => number
 export type ItemSort = { name: Gallery.ItemSortStr; text: TranslateResult; fn: ItemComparator };
 
 export default class ItemComparators {
-  static readonly DEFAULT = ItemComparators.sortByNameAsc;
+  static readonly DEFAULT = ItemComparators.sortByTitleAsc;
 
   static readonly ITEM_SORTS: ItemSort[] = [
-    { name: "name_asc", text: i18n.t("command.sort.byNameAsc"), fn: ItemComparators.sortByNameAsc },
+    { name: "title_asc", text: i18n.t("command.sort.byTitleAsc"), fn: ItemComparators.sortByTitleAsc },
     { name: "date_asc", text: i18n.t("command.sort.byDateAsc"), fn: ItemComparators.sortByDateAsc },
     {
       name: "date_desc",
@@ -35,7 +35,7 @@ export default class ItemComparators {
     },
   ];
 
-  static sortByNameAsc(left: Gallery.Item, right: Gallery.Item): number {
+  static sortByTitleAsc(left: Gallery.Item, right: Gallery.Item): number {
     return left.title.localeCompare(right.title, undefined, {
       sensitivity: "base",
       ignorePunctuation: true,

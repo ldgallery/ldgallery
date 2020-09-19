@@ -6,7 +6,7 @@
   "command.search.search": "Search",
   "command.sort.byDateAsc": "By date (oldest first)",
   "command.sort.byDateDesc": "By date (most recent first)",
-  "command.sort.byNameAsc": "By name (A to Z)",
+  "command.sort.byTitleAsc": "By title (A to Z)",
   "directory.no-results": "Empty directory",
   "download.download-file-fmt": "Download {0}",
   "gallery.unknown-resource": "Resource not found",
