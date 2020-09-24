@@ -23,17 +23,33 @@ export type ItemComparator = (left: Gallery.Item, right: Gallery.Item) => number
 export type ItemSort = { name: Gallery.ItemSortStr; text: TranslateResult; fn: ItemComparator };
 
 export default class ItemComparators {
-  static readonly DEFAULT = ItemComparators.sortByTitleAsc;
-
   static readonly ITEM_SORTS: ItemSort[] = [
-    { name: "title_asc", text: i18n.t("command.sort.byTitleAsc"), fn: ItemComparators.sortByTitleAsc },
-    { name: "date_asc", text: i18n.t("command.sort.byDateAsc"), fn: ItemComparators.sortByDateAsc },
+    {
+      name: "title_asc",
+      text: i18n.t("command.sort.byTitleAsc"),
+      fn: ItemComparators.chain(ItemComparators.sortByTitleAsc, ItemComparators.sortByPathAsc),
+    },
+    {
+      name: "date_asc",
+      text: i18n.t("command.sort.byDateAsc"),
+      fn: ItemComparators.chain(ItemComparators.sortByDateAsc, ItemComparators.sortByPathAsc),
+    },
     {
       name: "date_desc",
       text: i18n.t("command.sort.byDateDesc"),
-      fn: ItemComparators.reverse(ItemComparators.sortByDateAsc),
+      fn: ItemComparators.reverse(ItemComparators.chain(ItemComparators.sortByDateAsc, ItemComparators.sortByPathAsc)),
     },
   ];
+
+  static readonly DEFAULT = ItemComparators.ITEM_SORTS[0].fn;
+
+  static sortByPathAsc(left: Gallery.Item, right: Gallery.Item): number {
+    return left.path.localeCompare(right.path, undefined, {
+      sensitivity: "base",
+      ignorePunctuation: true,
+      numeric: true,
+    });
+  }
 
   static sortByTitleAsc(left: Gallery.Item, right: Gallery.Item): number {
     return left.title.localeCompare(right.title, undefined, {
@@ -49,5 +65,12 @@ export default class ItemComparators {
 
   static reverse(fn: ItemComparator): ItemComparator {
     return (l, r) => -fn(l, r);
+  }
+
+  static chain(primary: ItemComparator, tieBreaker: ItemComparator): ItemComparator {
+    return (l, r) => {
+      const primaryComparison = primary(l, r);
+      return primaryComparison !== 0 ? primaryComparison : tieBreaker(l, r);
+    };
   }
 }

@@ -2,7 +2,7 @@
 pagetitle: Viewer user manual - ldgallery
 title: LDGALLERY-VIEWER(7) ldgallery
 author: Pacien TRAN-GIRARD, Guillaume FOUET
-date: 2020-09-19 (v2.0)
+date: 2020-09-24 (v2.0)
 ---
 
 
@@ -79,6 +79,7 @@ initialItemSort
   Possible values are "title_asc", "date_asc", "date_desc".
   Defaults to "title_asc".
   Titles are sorted using a human-friendly _natural sort order_ which treats multi-digit numbers atomically.
+  The item path is used as a tie-breaker for all the defined orders.
 
 <!-- https://github.com/pacien/ldgallery/issues/27
 initialSearchQuery
