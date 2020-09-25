@@ -77,7 +77,7 @@ galleryIndex
 initialItemSort
 : Order in which gallery items are originally to be displayed.
   Possible values are "title_asc", "date_asc", "date_desc".
-  Defaults to "title_asc".
+  Defaults to "date_asc".
   Titles are sorted using a human-friendly _natural sort order_ which treats multi-digit numbers atomically.
   The item path is used as a tie-breaker for all the defined orders.
 

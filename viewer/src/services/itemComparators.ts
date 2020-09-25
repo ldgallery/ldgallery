@@ -41,7 +41,7 @@ export default class ItemComparators {
     },
   ];
 
-  static readonly DEFAULT = ItemComparators.ITEM_SORTS[0].fn;
+  static readonly DEFAULT = ItemComparators.ITEM_SORTS[1].fn;
 
   static sortByPathAsc(left: Gallery.Item, right: Gallery.Item): number {
     return left.path.localeCompare(right.path, undefined, {
