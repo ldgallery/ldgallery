@@ -23,8 +23,8 @@
     <a slot="trigger" class="link">
       <fa-icon icon="sort-amount-down" size="lg" />
     </a>
-    <b-dropdown-item v-for="(sort, idx) in ITEM_SORTS" :key="idx" :value="idx">
-      <fa-icon :icon="['far', idx === selectedSort ? 'dot-circle' : 'circle']" />
+    <b-dropdown-item v-for="(sort, idx) in ITEM_SORTS" :key="idx" :value="sort">
+      <fa-icon :icon="['far', sort === selectedSort ? 'dot-circle' : 'circle']" />
       <span :class="$style.dropdownLabel">{{ sort.text }}</span>
     </b-dropdown-item>
   </b-dropdown>
@@ -32,19 +32,18 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import { RawLocation } from "vue-router";
-import ItemComparators, { ItemComparator } from "@/services/itemComparators";
+import ItemComparators, { ItemSort } from "@/services/itemComparators";
 
 @Component
 export default class LdCommandSort extends Vue {
   readonly ITEM_SORTS = ItemComparators.ITEM_SORTS;
 
   get selectedSort() {
-    return this.ITEM_SORTS.map(s => s.fn).indexOf(this.$uiStore.sortFn);
+    return this.$uiStore.sort;
   }
 
-  set selectedSort(newValue: number) {
-    this.$uiStore.setSortFn(this.ITEM_SORTS[newValue].fn);
+  set selectedSort(newValue: ItemSort) {
+    this.$uiStore.setSort(newValue);
   }
 }
 </script>

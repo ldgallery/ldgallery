@@ -18,7 +18,7 @@
 */
 
 import { createModule, mutation, action } from "vuex-class-component";
-import ItemComparators, { ItemComparator } from "@/services/itemComparators";
+import ItemComparators, { ItemSort } from "@/services/itemComparators";
 
 const VuexModule = createModule({
   namespaced: "uiStore",
@@ -29,7 +29,7 @@ export default class UIStore extends VuexModule {
   fullscreen: boolean = false;
   fullWidth: boolean = window.innerWidth < Number(process.env.VUE_APP_FULLWIDTH_LIMIT);
   searchMode: boolean = false;
-  sortFn: ItemComparator = ItemComparators.DEFAULT;
+  sort: ItemSort = ItemComparators.DEFAULT;
 
   // ---
 
@@ -45,14 +45,14 @@ export default class UIStore extends VuexModule {
     this.searchMode = value ?? !this.searchMode;
   }
 
-  @mutation setSortFn(sortFn: ItemComparator) {
-    this.sortFn = sortFn;
+  @mutation setSort(sort: ItemSort) {
+    this.sort = sort;
   }
 
   @action async initFromConfig(config: Gallery.Config) {
     if (config.initialItemSort) {
-      const itemSort = ItemComparators.ITEM_SORTS.find(s => s.name == config.initialItemSort);
-      if (itemSort) this.setSortFn(itemSort.fn);
+      const itemSort = ItemComparators.ITEM_SORTS[config.initialItemSort];
+      if (itemSort) this.setSort(itemSort);
       else throw new Error("Unknown sort type: " + config.initialItemSort);
     }
   }

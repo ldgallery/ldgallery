@@ -20,28 +20,25 @@ import { TranslateResult } from "vue-i18n";
 import i18n from "@/plugins/i18n";
 
 export type ItemComparator = (left: Gallery.Item, right: Gallery.Item) => number;
-export type ItemSort = { name: Gallery.ItemSortStr; text: TranslateResult; fn: ItemComparator };
+export type ItemSort = { text: TranslateResult; fn: ItemComparator };
 
 export default class ItemComparators {
-  static readonly ITEM_SORTS: ItemSort[] = [
-    {
-      name: "title_asc",
+  static readonly ITEM_SORTS: Record<Gallery.ItemSortStr, ItemSort> = {
+    title_asc: {
       text: i18n.t("command.sort.byTitleAsc"),
       fn: ItemComparators.chain(ItemComparators.sortByTitleAsc, ItemComparators.sortByPathAsc),
     },
-    {
-      name: "date_asc",
+    date_asc: {
       text: i18n.t("command.sort.byDateAsc"),
       fn: ItemComparators.chain(ItemComparators.sortByDateAsc, ItemComparators.sortByPathAsc),
     },
-    {
-      name: "date_desc",
+    date_desc: {
       text: i18n.t("command.sort.byDateDesc"),
       fn: ItemComparators.reverse(ItemComparators.chain(ItemComparators.sortByDateAsc, ItemComparators.sortByPathAsc)),
     },
-  ];
+  };
 
-  static readonly DEFAULT = ItemComparators.ITEM_SORTS[1].fn;
+  static readonly DEFAULT = ItemComparators.ITEM_SORTS.date_asc;
 
   static sortByPathAsc(left: Gallery.Item, right: Gallery.Item): number {
     return left.path.localeCompare(right.path, undefined, {

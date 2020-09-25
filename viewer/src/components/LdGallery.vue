@@ -36,7 +36,7 @@ export default class LdPicture extends Vue {
   @Prop(String) readonly noresult?: string;
 
   get sortedItems() {
-    return this.items.sort(this.$uiStore.sortFn);
+    return this.items.sort(this.$uiStore.sort.fn);
   }
 
   get hasNoResults(): boolean {
