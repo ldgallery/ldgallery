@@ -33,9 +33,11 @@ export default class LdZoom {
   scaleFactor: number = 0.0;
 
   constructor(
-    containerElement: HTMLDivElement, imageElement: HTMLImageElement,
+    containerElement: HTMLDivElement,
+    imageElement: HTMLImageElement,
     pictureProperties: Gallery.PictureProperties,
-    maxScaleFactor: number, scrollZoomSpeed: number
+    maxScaleFactor: number,
+    scrollZoomSpeed: number
   ) {
     this.containerElement = containerElement;
     this.imageElement = imageElement;

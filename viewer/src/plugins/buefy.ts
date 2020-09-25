@@ -27,6 +27,10 @@ import Loading from "buefy/src/components/loading";
 import Button from "buefy/src/components/button";
 // @ts-ignore
 import SnackBar from "buefy/src/components/snackbar";
+// @ts-ignore
+import Tag from "buefy/src/components/tag";
+// @ts-ignore
+import DropDown from "buefy/src/components/dropdown";
 
 import "@/assets/scss/buefy.scss";
 
@@ -34,6 +38,8 @@ Vue.use(Taginput);
 Vue.use(Loading);
 Vue.use(Button);
 Vue.use(SnackBar);
+Vue.use(Tag);
+Vue.use(DropDown);
 
 declare module "vue/types/vue" {
   interface Vue {

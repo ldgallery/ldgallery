@@ -20,7 +20,7 @@ module Files
   ( FileName, LocalPath, WebPath, Path(..)
   , (</>), (</), (/>), (<.>)
   , fileName, subPaths, pathLength
-  , localPath, webPath
+  , localPath, webPath, fromWebPath
   , FSNode(..), AnchoredFSNode(..)
   , nodeName, isHidden, flattenDir, filterDir
   , readDirectory, copyTo
@@ -28,10 +28,11 @@ module Files
   ) where
 
 
-import Data.List (isPrefixOf, length, subsequences, sortOn)
+import Data.List (isPrefixOf, length, sortOn)
 import Data.Function ((&))
-import Data.Text (pack)
-import Data.Aeson (ToJSON)
+import Data.Functor ((<&>))
+import Data.Text (pack, unpack)
+import Data.Aeson (ToJSON, FromJSON)
 import qualified Data.Aeson as JSON
 
 import System.Directory
@@ -53,13 +54,16 @@ type LocalPath = String
 type WebPath = String
 
 -- | Reversed path component list
-data Path = Path [FileName] deriving Show
+newtype Path = Path [FileName] deriving Show
 
 instance ToJSON Path where
   toJSON = JSON.String . pack . webPath
 
+instance FromJSON Path where
+  parseJSON = JSON.withText "Path" (return . fromWebPath . unpack)
+
 instance Eq Path where
-  (Path left) == (Path right) = left == right
+  left == right = webPath left == webPath right
 
 (</>) :: Path -> Path -> Path
 (Path l) </> (Path r) = Path (r ++ l)
@@ -80,7 +84,10 @@ fileName (Path (name:_)) = Just name
 fileName _ = Nothing
 
 subPaths :: Path -> [Path]
-subPaths (Path path) = map Path $ subsequences path
+subPaths (Path path) = map Path $ subpaths path
+  where
+    subpaths [] = []
+    subpaths full@(_:r) = full : subpaths r
 
 pathLength :: Path -> Int
 pathLength (Path path) = Data.List.length path
@@ -90,6 +97,9 @@ localPath (Path path) = System.FilePath.joinPath $ reverse path
 
 webPath :: Path -> WebPath
 webPath (Path path) = System.FilePath.Posix.joinPath $ reverse path
+
+fromWebPath :: WebPath -> Path
+fromWebPath = Path . reverse . System.FilePath.Posix.splitDirectories
 
 
 data FSNode =
@@ -120,7 +130,7 @@ isHidden = hiddenName . nodeName
 -- | DFS with intermediate dirs first.
 flattenDir :: FSNode -> [FSNode]
 flattenDir file@File{} = [file]
-flattenDir dir@Dir{items} = dir:(concatMap flattenDir items)
+flattenDir dir@Dir{items} = dir:concatMap flattenDir items
 
 -- | Filters a dir tree. The root is always returned.
 filterDir :: (FSNode -> Bool) -> AnchoredFSNode -> AnchoredFSNode
@@ -133,7 +143,7 @@ filterDir cond (AnchoredFSNode anchor root) =
     filter cond items & map filterNode & Dir path canonicalPath
 
 readDirectory :: LocalPath -> IO AnchoredFSNode
-readDirectory root = mkNode (Path []) >>= return . AnchoredFSNode root
+readDirectory root = AnchoredFSNode root <$> mkNode (Path [])
   where
     mkNode :: Path -> IO FSNode
     mkNode path =
@@ -151,10 +161,10 @@ readDirectory root = mkNode (Path []) >>= return . AnchoredFSNode root
 
     mkDirNode :: Path -> FilePath -> IO FSNode
     mkDirNode path canonicalPath =
-      (listDirectory $ localPath (root /> path))
-      >>= mapM (mkNode . ((</) path))
-      >>= return . sortOn nodeName
-      >>= return . Dir path canonicalPath
+      listDirectory (localPath (root /> path))
+      >>= mapM (mkNode . (path </))
+      <&> sortOn nodeName
+      <&> Dir path canonicalPath
 
 copyTo :: FilePath -> AnchoredFSNode -> IO ()
 copyTo target AnchoredFSNode{anchor, root} = copyNode root

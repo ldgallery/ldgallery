@@ -19,7 +19,9 @@
 
 import Vue from "vue";
 import "@/assets/scss/global.scss";
-import store from "@/store"
+import "@/assets/scss/scrollbar.scss";
+import "@/assets/scss/transition.scss";
+import store from "@/store";
 import i18n from "@/plugins/i18n";
 import router from "@/plugins/router";
 Vue.config.productionTip = false;
@@ -31,9 +33,15 @@ import(/* webpackChunkName: "ui" */ "@/plugins/dragscroll");
 import(/* webpackChunkName: "ui" */ "@/plugins/fontawesome");
 const MainLayout = () => import(/* webpackChunkName: "ui" */ "@/views/MainLayout.vue");
 
+declare module "vue/types/vue" {
+  interface Vue {
+    $style: any; // SCSS modules
+  }
+}
+
 new Vue({
   router,
   i18n,
   store,
-  render: h => h(MainLayout)
-}).$mount("#ldgallery")
+  render: h => h(MainLayout),
+}).$mount("#ldgallery");

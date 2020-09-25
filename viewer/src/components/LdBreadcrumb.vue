@@ -29,11 +29,11 @@
   >
     <div v-show="overflowMask" class="ld-breadcrumb-overflow-mask"></div>
     <ul class="ld-breadcrumb">
-      <li v-for="(item,idx) in currentItemPath" :key="item.path">
+      <li v-for="(item, idx) in currentItemPath" :key="item.path">
         <fa-icon v-if="idx > 0" icon="angle-right" class="disabled" />
         <router-link :to="item.path" class="link">
           <fa-icon :icon="getIcon(item)" size="lg" />
-          {{item.title}}
+          {{ item.title }}
         </router-link>
       </li>
       <li v-if="searchMode">

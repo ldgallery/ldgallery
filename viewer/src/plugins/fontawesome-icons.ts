@@ -1,4 +1,4 @@
-<!-- ldgallery - A static generator which turns a collection of tagged
+/* ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
 -- Copyright (C) 2019-2020  Guillaume FOUET
@@ -15,29 +15,31 @@
 --
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
--->
+*/
 
-<template>
-  <ld-gallery :items="orderedItems()" :noresult="$t('directory.no-results')" />
-</template>
+export {
+  faFolder,
+  faFolderOpen,
+  faEraser,
+  faSearch,
+  faPlus,
+  faMinus,
+  faImage,
+  faHome,
+  faArrowLeft,
+  faLevelUpAlt,
+  faAngleRight,
+  faAngleDoubleLeft,
+  faFile,
+  faFileAlt,
+  faFilePdf,
+  faFileVideo,
+  faFileAudio,
+  faFileDownload,
+  faCaretUp,
+  faCaretDown,
+  faAngleDoubleDown,
+  faSortAmountDown,
+} from "@fortawesome/free-solid-svg-icons";
 
-<script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
-import Navigation from "@/services/navigation";
-
-@Component
-export default class GalleryDirectory extends Vue {
-  @Prop({ required: true }) readonly directory!: Gallery.Directory;
-
-  mounted() {
-    this.$uiStore.toggleFullscreen(false);
-  }
-
-  orderedItems() {
-    return Navigation.directoriesFirst(this.directory.properties.items);
-  }
-}
-</script>
-
-<style lang="scss">
-</style>
+export { faCircle, faDotCircle } from "@fortawesome/free-regular-svg-icons";

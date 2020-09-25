@@ -18,25 +18,32 @@
 -->
 
 <template>
-  <div class="flex-column sidebar">
+  <div class="flex-column" :class="$style.sidebar">
     <ld-tag-input
       :search-filters.sync="searchFilters"
       :tags-index="$galleryStore.tagsIndex"
       @onkeyenter-empty="search"
     />
     <ld-command-search @clear="clear" @search="search" />
-    <h1 class="title">{{$t('panelLeft.propositions')}}</h1>
-    <div class="scrollbar no-scroll-x">
+    <h1 class="title">{{ $t("panelLeft.propositions") }}</h1>
+    <div class="scrollbar no-scroll-x flex-grow-1" :class="$style.flexShrinkFully">
       <ld-proposition
-        v-for="(category) in $galleryStore.tagsCategories"
+        v-for="category in $galleryStore.tagsCategories"
         :key="category.tag"
         :category="$galleryStore.tagsIndex[category.tag]"
         :show-category="$galleryStore.tagsCategories.length > 1"
         :search-filters.sync="searchFilters"
         :tags-index="category.index"
-        :current-tags="currentTags()"
+        :current-tags="currentTags"
       />
     </div>
+    <h1 class="flex title" @click="infoOpen = !infoOpen">
+      {{ $t("panelLeft.information.title") }}
+      <fa-icon :icon="infoOpen ? 'caret-down' : 'caret-up'" />
+    </h1>
+    <transition name="flex-expand">
+      <ld-information v-show="infoOpen" :item="$galleryStore.currentItem" class="scrollbar no-scroll-x" />
+    </transition>
   </div>
 </template>
 
@@ -49,6 +56,7 @@ import IndexFactory from "@/services/indexfactory";
 @Component
 export default class PanelLeft extends Vue {
   searchFilters: Tag.Search[] = [];
+  infoOpen: boolean = true;
 
   mounted() {
     this.restoreSearchFilters(this.$route);
@@ -72,7 +80,7 @@ export default class PanelLeft extends Vue {
     return query;
   }
 
-  currentTags() {
+  get currentTags() {
     return this.$galleryStore.currentItem?.tags ?? [];
   }
 
@@ -84,15 +92,25 @@ export default class PanelLeft extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" module>
 @import "~@/assets/scss/theme.scss";
 
 .sidebar {
-  .title {
+  :global(.title) {
     background-color: $proposed-category-bgcolor;
     padding: 0.2em 0.5em;
     margin: 0 0 1px 0;
     font-variant: small-caps;
+    justify-content: space-between;
+    user-select: none;
+    > svg {
+      color: $link;
+      margin-top: 2px; // Fixes a vertical centering issue with the carret
+    }
   }
+}
+
+.flexShrinkFully {
+  flex-shrink: 1000;
 }
 </style>

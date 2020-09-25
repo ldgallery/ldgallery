@@ -19,23 +19,20 @@
 
 <template>
   <div>
-    <gallery-search v-if="query.length" :path="path" />
-    <gallery-directory v-else-if="checkType('directory')" :directory="$galleryStore.currentItem" />
-    <ld-picture v-else-if="checkType('picture')" :picture="$galleryStore.currentItem" />
-    <div v-else>{{$t("gallery.unknowntype")}}</div>
+    <ld-error v-if="isError" icon="folder-open" :message="$t('gallery.unknown-resource')" />
+    <gallery-search v-else-if="isSearch" :path="path" />
+    <component :is="componentName" v-else :item="$galleryStore.currentItem" />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { Operation } from "@/@types/Operation";
+import { ItemType } from "@/@types/ItemType";
 import Navigation from "@/services/navigation";
-import GalleryDirectory from "./GalleryDirectory.vue";
 import GallerySearch from "@/views/GallerySearch.vue";
 
 @Component({
   components: {
-    GalleryDirectory,
     GallerySearch,
   },
 })
@@ -43,8 +40,30 @@ export default class GalleryNavigation extends Vue {
   @Prop(String) readonly path!: string;
   @Prop(Array) readonly query!: string[];
 
+  readonly COMPONENT_BY_TYPE: Record<ItemType, string> = {
+    directory: "ld-directory",
+    picture: "ld-picture",
+    plaintext: "ld-plain-text-viewer",
+    pdf: "ld-pdf-viewer",
+    video: "ld-video-viewer",
+    audio: "ld-audio-viewer",
+    other: "ld-download",
+  };
+
   mounted() {
     this.pathChanged();
+  }
+
+  get isError() {
+    return this.checkType(null);
+  }
+
+  get isSearch() {
+    return this.checkType(ItemType.DIRECTORY) && this.query.length > 0;
+  }
+
+  get componentName() {
+    return this.COMPONENT_BY_TYPE[this.$galleryStore.currentItem?.properties.type ?? ItemType.OTHER];
   }
 
   @Watch("path")
@@ -52,11 +71,10 @@ export default class GalleryNavigation extends Vue {
     this.$galleryStore.setCurrentPath(this.path);
   }
 
-  private checkType(type: Gallery.ItemType): boolean {
+  checkType(type: ItemType | null): boolean {
     return Navigation.checkType(this.$galleryStore.currentItem, type);
   }
 }
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

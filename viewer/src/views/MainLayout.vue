@@ -18,13 +18,10 @@
 -->
 
 <template>
-  <div :class="{'fullscreen': $uiStore.fullscreen, 'fullwidth': $uiStore.fullWidth}">
-    <ld-title
-      :gallery-title="$galleryStore.galleryTitle"
-      :current-item="$galleryStore.currentItem"
-    />
-    <panel-top v-if="!isLoading" class="layout layout-top" />
-    <panel-left v-if="!isLoading" class="layout layout-left" />
+  <div :class="{ fullscreen: $uiStore.fullscreen, fullwidth: $uiStore.fullWidth }">
+    <ld-title :gallery-title="$galleryStore.galleryTitle" :current-item="$galleryStore.currentItem" />
+    <panel-top v-if="isReady" class="layout layout-top" />
+    <panel-left v-if="isReady" class="layout layout-left" />
     <router-view v-if="!isLoading" ref="content" class="layout layout-content scrollbar" />
     <b-loading :active="isLoading" is-full-page />
     <ld-key-press :keycode="27" @action="$uiStore.toggleFullscreen(false)" />
@@ -67,14 +64,19 @@ export default class MainLayout extends Vue {
     this.isLoading = true;
     this.$galleryStore
       .fetchConfig()
+      .then(this.$uiStore.initFromConfig)
       .then(this.$galleryStore.fetchGalleryItems)
       .finally(() => (this.isLoading = false))
       .catch(this.displayError);
   }
 
+  get isReady() {
+    return !this.isLoading && this.$galleryStore.config && this.$galleryStore.currentPath !== null;
+  }
+
   displayError(reason: any) {
     this.$buefy.snackbar.open({
-      message: `Error ${reason}`,
+      message: `${reason}`,
       actionText: "Retry",
       position: "is-top",
       type: "is-danger",
@@ -109,7 +111,7 @@ html {
 }
 .layout {
   position: fixed;
-  transition: all 0.1s linear;
+  transition: all $transition-flex-expand linear;
   top: 0;
   bottom: 0;
   left: 0;
@@ -155,16 +157,6 @@ html {
   &.layout-content {
     background-color: $content-bgcolor;
   }
-}
-
-// TODO: Remove when #21 (remove explicit navigation/search modes) is resolved
-// Forced at the bottom right corner so we can continue working on the sidebar without interference
-.tmp-mode-selector {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  z-index: 100;
-  opacity: 0.75;
 }
 // =====
 </style>

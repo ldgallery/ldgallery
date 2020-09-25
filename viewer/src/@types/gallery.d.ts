@@ -18,57 +18,97 @@
 */
 
 declare namespace Gallery {
+  type ItemSortStr = "title_asc" | "date_asc" | "date_desc";
+
   interface Config {
-    galleryRoot: string,
+    galleryRoot: string;
+    galleryIndex?: string;
+    initialItemSort?: ItemSortStr;
+    initialTagDisplayLimit?: number;
   }
 
   interface GalleryProperties {
-    galleryTitle: string,
-    tagCategories: RawTag[]
+    galleryTitle: string;
+    tagCategories: RawTag[];
   }
   interface Index {
-    properties: GalleryProperties,
-    tree: Directory
+    properties: GalleryProperties;
+    tree: Directory;
   }
 
   interface Other extends Item {
-    properties: OtherProperties,
+    properties: OtherProperties;
   }
   interface Picture extends Item {
-    properties: PictureProperties,
+    properties: PictureProperties;
+  }
+  interface PlainText extends Item {
+    properties: PlainTextProperties;
+  }
+  interface PDF extends Item {
+    properties: PDFProperties;
+  }
+  interface Video extends Item {
+    properties: VideoProperties;
+  }
+  interface Audio extends Item {
+    properties: AudioProperties;
   }
   interface Directory extends Item {
-    properties: DirectoryProperties,
+    properties: DirectoryProperties;
   }
   interface Item {
-    title: string,
-    datetime: string,
-    description: string,
-    tags: RawTag[],
-    path: string,
-    thumbnail?: Thumbnail
-    properties: OtherProperties | PictureProperties | DirectoryProperties,
+    title: string;
+    datetime: string;
+    description: string;
+    tags: RawTag[];
+    path: string;
+    thumbnail?: Thumbnail;
+    properties:
+      | OtherProperties
+      | PictureProperties
+      | PlainTextProperties
+      | PDFProperties
+      | VideoProperties
+      | AudioProperties
+      | DirectoryProperties;
   }
   interface Resolution {
-    width: number,
-    height: number,
+    width: number;
+    height: number;
   }
   interface OtherProperties {
-    type: "other",
+    type: import("./ItemType").ItemType.OTHER;
+    resource: string;
   }
   interface PictureProperties {
-    type: "picture",
-    resource: string,
-    resolution: Resolution
+    type: import("./ItemType").ItemType.PICTURE;
+    resource: string;
+    resolution: Resolution;
+  }
+  interface PlainTextProperties {
+    type: import("./ItemType").ItemType.PLAINTEXT;
+    resource: string;
+  }
+  interface PDFProperties {
+    type: import("./ItemType").ItemType.PDF;
+    resource: string;
+  }
+  interface VideoProperties {
+    type: import("./ItemType").ItemType.VIDEO;
+    resource: string;
+  }
+  interface AudioProperties {
+    type: import("./ItemType").ItemType.AUDIO;
+    resource: string;
   }
   interface DirectoryProperties {
-    type: "directory",
-    items: Item[]
+    type: import("./ItemType").ItemType.DIRECTORY;
+    items: Item[];
   }
   interface Thumbnail {
-    resource: string,
-    resolution: Resolution
+    resource: string;
+    resolution: Resolution;
   }
   type RawTag = string;
-  type ItemType = "other" | "picture" | "directory";
 }

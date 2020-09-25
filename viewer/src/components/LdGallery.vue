@@ -18,11 +18,11 @@
 -->
 
 <template>
-  <div class="thumbnail-tiles">
-    <router-link v-for="item in items" :key="item.path" :to="item.path">
+  <ld-error v-if="hasNoResults" icon="search" :message="noresult" />
+  <div v-else class="thumbnail-tiles">
+    <router-link v-for="item in sortedItems" :key="item.path" :to="item.path">
       <ld-thumbnail :item="item" />
     </router-link>
-    <div v-if="hasNoResults()" class="noresult">{{noresult}}</div>
   </div>
 </template>
 
@@ -35,7 +35,11 @@ export default class LdPicture extends Vue {
   @Prop({ type: Array, required: true }) readonly items!: Gallery.Item[];
   @Prop(String) readonly noresult?: string;
 
-  hasNoResults(): boolean {
+  get sortedItems() {
+    return this.items.sort(this.$uiStore.sort.fn);
+  }
+
+  get hasNoResults(): boolean {
     return Boolean(this.noresult) && this.items.length === 0;
   }
 }
@@ -47,11 +51,9 @@ export default class LdPicture extends Vue {
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-evenly;
+
   & > a {
     margin: 2px;
-  }
-  & .noresult {
-    margin-top: 40px;
   }
 }
 </style>

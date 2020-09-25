@@ -20,7 +20,6 @@
 import { Operation } from "@/@types/Operation";
 
 export default class IndexSearch {
-
   // Results of the search (by tags)
   public static search(searchTags: Tag.Search[]): Gallery.Item[] {
     const byOperation = this.extractTagsByOperation(searchTags);
@@ -30,7 +29,7 @@ export default class IndexSearch {
   }
 
   private static extractTagsByOperation(searchTags: Tag.Search[]): Tag.SearchByOperation {
-    let byOperation: Tag.SearchByOperation = {};
+    const byOperation: Tag.SearchByOperation = {};
     Object.values(Operation).forEach(
       operation => (byOperation[operation] = searchTags.filter(tag => tag.operation === operation))
     );
@@ -38,7 +37,7 @@ export default class IndexSearch {
   }
 
   private static extractIntersection(byOperation: Tag.SearchByOperation): Set<Gallery.Item> {
-    let intersection = new Set<Gallery.Item>();
+    const intersection = new Set<Gallery.Item>();
     if (byOperation[Operation.INTERSECTION].length > 0) {
       byOperation[Operation.INTERSECTION]
         .map(tag => tag.items)
@@ -50,7 +49,7 @@ export default class IndexSearch {
   }
 
   private static extractSubstraction(byOperation: Tag.SearchByOperation): Set<Gallery.Item> {
-    let substraction = new Set<Gallery.Item>();
+    const substraction = new Set<Gallery.Item>();
     if (byOperation[Operation.SUBSTRACTION].length > 0) {
       byOperation[Operation.SUBSTRACTION].flatMap(tag => tag.items).forEach(item => substraction.add(item));
     }

@@ -18,7 +18,7 @@
 -->
 
 <template>
-  <ld-gallery :items="items()" :noresult="noResult()" />
+  <ld-gallery :items="items" :noresult="noResult" />
 </template>
 
 <script lang="ts">
@@ -29,8 +29,7 @@ import IndexSearch from "@/services/indexsearch";
 @Component
 export default class GalleryPicture extends Vue {
   @Prop(String) readonly path!: string;
-
-  otherCount: Number = 0;
+  otherCount: number = 0;
 
   mounted() {
     this.$uiStore.toggleFullscreen(false);
@@ -42,19 +41,17 @@ export default class GalleryPicture extends Vue {
     this.$galleryStore.setCurrentSearch([]);
   }
 
-  items() {
+  get items() {
     const searchResult = IndexSearch.search(this.$galleryStore.currentSearch);
     const filteredByPath = searchResult.filter(item => item.path.startsWith(this.path));
     this.otherCount = searchResult.length - filteredByPath.length;
     return filteredByPath;
   }
 
-  noResult() {
-    const params = [this.otherCount, this.otherCount > 1 ? "s" : ""];
-    return this.$t("search.no-results.otherfolders", params);
+  get noResult() {
+    return this.$tc("search.no-result-fmt", this.otherCount, [this.otherCount]);
   }
 }
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

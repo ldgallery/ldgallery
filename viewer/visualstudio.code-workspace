@@ -6,22 +6,36 @@
   ],
   "settings": {
     "editor.tabSize": 2,
-    "editor.formatOnSave": true,
     "editor.wordBasedSuggestions": false,
     "editor.detectIndentation": false,
     "files.insertFinalNewline": true,
     "files.trimFinalNewlines": true,
     "javascript.format.semicolons": "insert",
     "typescript.disableAutomaticTypeAcquisition": true,
-    "vue-i18n-ally.keystyle": "flat",
-    "vue-i18n-ally.localesPaths": "src/locales",
     "i18n-ally.localesPaths": "src/locales",
+    "i18n-ally.keystyle": "flat",
+    "i18n-ally.enabledFrameworks": ["vue"],
+    "i18n-ally.sortKeys": true,
+    // ---
+    // Autoformating is done with eslint-prettier
+    "eslint.enable": true,
+    "eslint.onIgnoredFiles": "warn",
+    "vetur.format.enable": false,
+    "javascript.format.enable": false,
+    "typescript.format.enable": false,
+    "html.format.enable": false,
+    "eslint.format.enable": false,
+    "editor.formatOnSave": false,
+      "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true,
+      },
+    // ---
   },
 }
 // Recommended Visual Studio Code extensions:
 // - Vetur
 // - ESLint
-// - Vue i18n Ally
+// - i18n Ally
 // - SCSS Everywhere
 // - SCSS Formatter
 // - Debugger for Chrome

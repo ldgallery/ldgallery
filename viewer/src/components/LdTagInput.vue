@@ -34,8 +34,8 @@
     @remove="clearCurrentFilter"
     @keydown.enter.native="onKeyEnter"
   >
-    <template slot-scope="props">{{displayOption(props.option)}}</template>
-    <template slot="empty">{{$t('tagInput.nomatch')}}</template>
+    <template slot-scope="props">{{ displayOption(props.option) }}</template>
+    <template slot="empty">{{ $t("tagInput.nomatch") }}</template>
   </b-taginput>
 </template>
 

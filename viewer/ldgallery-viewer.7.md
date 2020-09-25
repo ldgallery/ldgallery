@@ -2,7 +2,7 @@
 pagetitle: Viewer user manual - ldgallery
 title: LDGALLERY-VIEWER(7) ldgallery
 author: Pacien TRAN-GIRARD, Guillaume FOUET
-date: 2020-04-30 (v1.0)
+date: 2020-09-24 (v2.0)
 ---
 
 
@@ -24,12 +24,23 @@ Its responsiveness allows it to be used from either a desktop browser or some mo
 The viewer's user interface is split into a main item view and a side search panel, which can be opened by using the appropriate button in the toolbar at the top-left corner.
 
 The main view displays the gallery's directories and items as a thumbnail grid.
+The order in which items are displayed can be chosen from the sort menu at the top-left corner.
 
 The side panel allows the user to interactively enter filtering queries to search through the gallery's content.
 This panel features a list of relevant tags, grouped by categories, that can be used to build the search query.
 
-Picture items can be opened and visualised within the application.
-Other types of elements are either downloaded or displayed in the same window depending on the user's web browser supported media types.
+The information panel at the bottom of the sidebar displays various metadata about the currently viewed item.
+Those include the title, date and description of the file or directory.
+
+Items of the following formats can be opened and visualised within the web application:
+
+* Pictures (Bitmap, JPEG, PNG, TIFF, HDR, GIF)
+* Videos (OGV, WebM, Matroska, MPEG-4)
+* Audio files (WAV, Opus, FLAC, MP3, MPEG-4)
+* Plain text files (`.txt`)
+* PDFs
+
+Formats which are not listed above or which are not supported by the user's web browser are offered for download instead of being directly displayed in the same window.
 
 
 # SEARCH QUERIES
@@ -46,16 +57,44 @@ The following modifiers can be used in queries as prefixes of tags:
 `-`
 : Exclude all items having the associated tag, independently of simple tag restrictions and inclusions.
 
-Autocompletion suggestions are shown as filters are being typed in the query field.
+Auto-completion suggestions are shown as filters are being typed in the query field.
 In the case of disambiguated tags, both the category and the tag components are allowed to be partially entered, allowing "loc:fra" to expand into "location:france" for example.
 
 
 # VIEWER CONFIGURATION
 
-The viewer itself can be configured through a JSON file named "config.json" and placed in the web viewer's directory.
+The viewer itself can be configured through a JSON file named __config.json__ and placed in the web viewer's directory.
+
+Viewer configuration options are:
 
 galleryRoot
 : Absolute or relative path to the root of the gallery to display.
+
+galleryIndex
+: Optional index file to use under the value specified for "galleryRoot".
+  Defaults to "index.json".
+
+initialItemSort
+: Order in which gallery items are originally to be displayed.
+  Possible values are "title_asc", "date_asc", "date_desc".
+  Defaults to "date_asc".
+  Titles are sorted using a human-friendly _natural sort order_ which treats multi-digit numbers atomically.
+  The item path is used as a tie-breaker for all the defined orders.
+
+<!-- https://github.com/pacien/ldgallery/issues/27
+initialSearchQuery
+: Optional initial search query to set when opening the gallery.
+-->
+
+initialTagDisplayLimit
+: Limit on the number of tags to suggest in each tag category.
+  Causes only the specified amount of most used tags to be displayed until the user expands the list.
+  Set to -1 to disable the limit on suggestions.
+  Defaults to 10.
+
+An alternative viewer configuration file located in the viewer's directory can be loaded by specifying its name,
+without the ".json" extension, as a query parameter given before the page anchor;
+for example, some alternative configuration named "config_2.json" can be loaded with "http://gallery/?config_2#".
 
 
 # PROGRESSIVE WEB APPLICATION
@@ -68,7 +107,7 @@ An example of such manifest and an associated icon are available in the example 
 
 # SEE ALSO
 
-Related manual pages: __ldgallery__(1), __ldgallery-quickstart__(7)
+Related manual pages: __ldgallery__(1), __ldgallery-quickstart__(7).
 
 The ldgallery source code is available on <https://ldgallery.pacien.org>.
 

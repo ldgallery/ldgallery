@@ -21,17 +21,18 @@
 <template>
   <div class="flex command-btns">
     <a class="link" :title="$t('command.search')" @click="$uiStore.toggleFullWidth()">
-      <fa-icon :icon="commandToggleSearchPanelIcon()" size="lg" />
+      <fa-icon :icon="commandToggleSearchPanelIcon" size="lg" />
     </a>
+    <ld-command-sort />
     <a
-      :class="{'disabled': isEntryPoint()}"
+      :class="{ disabled: isEntryPoint }"
       class="link command-secondary"
       :title="$t('command.back')"
-      @click="isEntryPoint() || $router.back()"
+      @click="isEntryPoint || $router.back()"
     >
       <fa-icon icon="arrow-left" size="lg" />
     </a>
-    <router-link :class="{'disabled': isRoot()}" :title="$t('command.parent')" :to="parent()">
+    <router-link :class="{ disabled: isRoot }" :title="$t('command.parent')" :to="parent">
       <fa-icon icon="folder" size="xs" />
       <fa-icon icon="level-up-alt" size="lg" />
     </router-link>
@@ -46,19 +47,19 @@ import { RawLocation } from "vue-router";
 export default class LdCommand extends Vue {
   @Prop({ type: Array, required: true }) readonly currentItemPath!: Gallery.Item[];
 
-  commandToggleSearchPanelIcon(): string {
+  get commandToggleSearchPanelIcon(): string {
     return this.$uiStore.fullWidth ? "search" : "angle-double-left";
   }
 
-  isRoot(): boolean {
+  get isRoot(): boolean {
     return this.currentItemPath.length <= 1 && !this.$uiStore.searchMode;
   }
 
-  isEntryPoint(): boolean {
+  get isEntryPoint(): boolean {
     return history.state?.ldgallery === "ENTRYPOINT"; // Set by MainLayout.vue
   }
 
-  parent(): RawLocation {
+  get parent(): RawLocation {
     if (this.$uiStore.searchMode) return this.$route.path;
     if (this.currentItemPath.length > 1) return this.currentItemPath[this.currentItemPath.length - 2];
     return "";

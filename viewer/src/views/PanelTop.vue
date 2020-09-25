@@ -20,10 +20,7 @@
 <template>
   <div class="flex">
     <ld-command :current-item-path="$galleryStore.currentItemPath" />
-    <ld-breadcrumb
-      :current-item-path="$galleryStore.currentItemPath"
-      :search-mode="$uiStore.searchMode"
-    />
+    <ld-breadcrumb :current-item-path="$galleryStore.currentItemPath" :search-mode="$uiStore.searchMode" />
   </div>
 </template>
 
@@ -34,5 +31,4 @@ import { Component, Vue } from "vue-property-decorator";
 export default class PanelTop extends Vue {}
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

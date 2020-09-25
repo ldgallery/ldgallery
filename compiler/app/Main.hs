@@ -21,6 +21,7 @@ module Main where
 import GHC.Generics (Generic)
 import Paths_ldgallery_compiler (version, getDataFileName)
 import Control.Monad (when)
+import Data.Functor ((<&>))
 import Data.Maybe (isJust)
 import Data.Version (showVersion)
 import Data.Aeson (ToJSON)
@@ -32,7 +33,7 @@ import Compiler
 import Files (readDirectory, copyTo, remove)
 
 
-data ViewerConfig = ViewerConfig
+newtype ViewerConfig = ViewerConfig
   { galleryRoot :: String
   } deriving (Generic, Show, ToJSON)
 
@@ -42,7 +43,7 @@ data Options = Options
   , outputDir :: FilePath
   , outputIndex :: FilePath
   , galleryConfig :: FilePath
-  , rebuilAll :: Bool
+  , rebuildAll :: Bool
   , cleanOutput :: Bool
   , withViewer :: Maybe FilePath
   } deriving (Show, Data, Typeable)
@@ -73,7 +74,7 @@ options = Options
       &= name "gallery-config"
       &= explicit
       &= help "Gallery configuration file (default=<input-dir>/gallery.yaml)"
-  , rebuilAll = False
+  , rebuildAll = False
       &= name "r"
       &= name "rebuild-all"
       &= explicit
@@ -92,7 +93,7 @@ options = Options
       &= help "Deploy either the bundled or the given static web viewer to the output directory"
   }
 
-  &= summary ("ldgallery v" ++ (showVersion version) ++ " - a static web gallery generator with tags")
+  &= summary ("ldgallery v" ++ showVersion version ++ " - a static web gallery generator with tags")
   &= program "ldgallery"
   &= help "Compile a gallery"
   &= helpArg [explicit, name "h", name "help"]
@@ -130,7 +131,7 @@ main =
             (galleryOutputDir opts)
             (outputIndex opts)
             [outputDir opts]
-            (rebuilAll opts)
+            (rebuildAll opts)
             (cleanOutput opts)
       where
         checkDistinctPaths :: FilePath -> FilePath -> IO ()
@@ -146,7 +147,7 @@ main =
 
     deployViewer :: FilePath -> Options -> IO ()
     deployViewer distPath Options{outputDir, cleanOutput} =
-      (when cleanOutput $ cleanViewerDir outputDir)
+      when cleanOutput (cleanViewerDir outputDir)
       >> copyViewer distPath outputDir
       >> writeJSON (outputDir </> "config.json") viewerConfig
 
@@ -154,8 +155,8 @@ main =
         cleanViewerDir :: FilePath -> IO ()
         cleanViewerDir target =
           listDirectory target
-          >>= return . filter (/= gallerySubdir)
-          >>= mapM_ remove . map (target </>)
+          <&> filter (/= gallerySubdir)
+          >>= mapM_ (remove . (target </>))
 
         copyViewer :: FilePath -> FilePath -> IO ()
         copyViewer dist target =

@@ -31,8 +31,8 @@ declare namespace Tag {
     operation: string; // Enum Operation
     display: string;
   }
-  type SearchByOperation = { [index: string]: Tag.Search[] };
-  type Index = { [index: string]: Node };
+  type SearchByOperation = Record<string, Tag.Search[]>;
+  type Index = Record<string, Node>;
 
   interface Category {
     tag: string;

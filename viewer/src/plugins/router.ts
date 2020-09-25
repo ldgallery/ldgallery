@@ -28,7 +28,7 @@ const routes: RouteConfig[] = [
     path: "*",
     name: "GalleryNavigation",
     component: GalleryNavigation,
-    props: (route) => ({
+    props: route => ({
       path: route.params.pathMatch,
       query: Object.keys(route.query),
     }),

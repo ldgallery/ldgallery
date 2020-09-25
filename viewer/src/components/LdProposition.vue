@@ -20,7 +20,7 @@
 
 <template>
   <div class="proposition">
-    <h2 v-if="showCategory && proposedTags.length" class="subtitle category">{{title}}</h2>
+    <h2 v-if="showCategory && Object.keys(propositions).length" class="subtitle category">{{ title }}</h2>
     <div v-for="proposed in proposedTags" :key="proposed.rawTag">
       <a
         class="operation-btns link"
@@ -42,15 +42,19 @@
         class="operation-tag link"
         :title="$t('tag-propositions.intersection')"
         @click="add(Operation.INTERSECTION, proposed.rawTag)"
-      >{{proposed.rawTag}}</a>
+        >{{ proposed.rawTag }}</a
+      >
 
-      <div class="disabled" :title="$t('tag-propositions.item-count')">{{proposed.count}}</div>
+      <div class="disabled" :title="$t('tag-propositions.item-count')">{{ proposed.count }}</div>
+    </div>
+    <div v-if="showMoreCount > 0" class="showmore" @click="limit += showMoreCount">
+      {{ $t("tag-propositions.showmore", [showMoreCount]) }}<fa-icon icon="angle-double-down" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, PropSync } from "vue-property-decorator";
+import { Component, Vue, Prop, PropSync, Watch } from "vue-property-decorator";
 import { Operation } from "@/@types/Operation";
 
 @Component
@@ -61,12 +65,26 @@ export default class LdProposition extends Vue {
   @Prop({ required: true }) readonly tagsIndex!: Tag.Index;
   @PropSync("searchFilters", { type: Array, required: true }) model!: Tag.Search[];
 
+  readonly INITIAL_TAG_DISPLAY_LIMIT = this.getInitialTagDisplayLimit();
+
+  limit: number = this.INITIAL_TAG_DISPLAY_LIMIT;
+
+  getInitialTagDisplayLimit() {
+    const limit = this.$galleryStore.config?.initialTagDisplayLimit ?? 10;
+    return limit >= 0 ? limit : 1000;
+  }
+
+  @Watch("$route")
+  onRouteChange() {
+    this.limit = this.INITIAL_TAG_DISPLAY_LIMIT;
+  }
+
   get Operation() {
     return Operation;
   }
 
-  get proposedTags() {
-    let propositions: { [index: string]: number } = {};
+  get propositions(): Record<string, number> {
+    const propositions: Record<string, number> = {};
     if (this.model.length > 0) {
       // Tags count from current search
       this.extractDistinctItems(this.model)
@@ -82,10 +100,18 @@ export default class LdProposition extends Vue {
         .filter(Boolean)
         .forEach(tagindex => (propositions[tagindex.tag] = tagindex.items.length));
     }
+    return propositions;
+  }
 
-    return Object.entries(propositions)
+  get proposedTags() {
+    return Object.entries(this.propositions)
       .sort((a, b) => b[1] - a[1])
+      .slice(0, this.limit)
       .map(entry => ({ rawTag: entry[0], count: entry[1] }));
+  }
+
+  get showMoreCount(): number {
+    return Object.keys(this.propositions).length - Object.keys(this.proposedTags).length;
   }
 
   get title() {
@@ -135,6 +161,18 @@ export default class LdProposition extends Vue {
     .operation-btns {
       padding: 2px 7px;
       cursor: pointer;
+    }
+  }
+  .showmore {
+    display: block;
+    text-align: right;
+    color: $palette-300;
+    cursor: pointer;
+    > svg {
+      margin-left: 10px;
+    }
+    &:hover {
+      color: $link-hover;
     }
   }
 }

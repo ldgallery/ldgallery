@@ -17,9 +17,15 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 module Resource
-  ( ItemProcessor, ThumbnailProcessor
-  , GalleryItem(..), GalleryItemProps(..), Resolution(..), Resource(..), Thumbnail(..)
-  , buildGalleryTree, galleryCleanupResourceDir
+  ( ItemProcessor
+  , GalleryItem(..)
+  , GalleryItemProps(..)
+  , Resolution(..)
+  , Resource(..)
+  , Thumbnail(..)
+  , buildGalleryTree
+  , galleryCleanupResourceDir
+  , flattenGalleryTree
   ) where
 
 
@@ -29,15 +35,16 @@ import Data.List.Ordered (minusBy)
 import Data.Char (toLower)
 import Data.Maybe (mapMaybe, fromMaybe)
 import Data.Function ((&))
+import Data.Functor ((<&>))
 import qualified Data.Set as Set
-import Data.Text (pack)
+import Data.Text (pack, unpack, breakOn)
 import Data.Time.Clock (UTCTime)
 import Data.Time.LocalTime (ZonedTime, utc, utcToZonedTime, zonedTimeToUTC)
-import Data.Time.Format (formatTime, defaultTimeLocale)
+import Data.Time.Format (formatTime, parseTimeM, defaultTimeLocale)
 import Safe.Foldable (maximumByMay)
 
 import GHC.Generics (Generic)
-import Data.Aeson (ToJSON, genericToJSON, genericToEncoding)
+import Data.Aeson (ToJSON, FromJSON, genericToJSON, genericToEncoding, genericParseJSON)
 import qualified Data.Aeson as JSON
 
 import Files
@@ -69,12 +76,23 @@ instance ToJSON Resource where
     where
       timestamp = formatTime defaultTimeLocale "%s" modTime
 
+instance FromJSON Resource where
+  parseJSON = JSON.withText "Resource" (unpackRes . breakOn "?")
+    where
+      unpackRes (resPathStr, modTimeStr) =
+        Resource (fromWebPath $ unpack resPathStr)
+        <$> parseTimeM True defaultTimeLocale "?%s" (unpack modTimeStr)
+
 
 data GalleryItemProps =
     Directory { items :: [GalleryItem] }
   | Picture
     { resource :: Resource
     , resolution :: Resolution }
+  | PlainText { resource :: Resource }
+  | PDF { resource :: Resource }
+  | Video { resource :: Resource }
+  | Audio { resource :: Resource }
   | Other { resource :: Resource }
   deriving (Generic, Show)
 
@@ -82,15 +100,14 @@ instance ToJSON GalleryItemProps where
   toJSON = genericToJSON encodingOptions
   toEncoding = genericToEncoding encodingOptions
 
+instance FromJSON GalleryItemProps where
+  parseJSON = genericParseJSON encodingOptions
+
 
 data Thumbnail = Thumbnail
   { resource :: Resource
   , resolution :: Resolution
-  } deriving (Generic, Show)
-
-instance ToJSON Thumbnail where
-  toJSON = genericToJSON encodingOptions
-  toEncoding = genericToEncoding encodingOptions
+  } deriving (Generic, Show, ToJSON, FromJSON)
 
 
 data GalleryItem = GalleryItem
@@ -101,49 +118,49 @@ data GalleryItem = GalleryItem
   , path :: Path
   , thumbnail :: Maybe Thumbnail
   , properties :: GalleryItemProps
-  } deriving (Generic, Show)
-
-instance ToJSON GalleryItem where
-  toJSON = genericToJSON encodingOptions
-  toEncoding = genericToEncoding encodingOptions
+  } deriving (Generic, Show, ToJSON, FromJSON)
 
 
-type ItemProcessor = Path -> IO GalleryItemProps
-type ThumbnailProcessor = Path -> IO (Maybe Thumbnail)
+type ItemProcessor a =
+     Path -- Item path
+  -> Path -- Resource Path
+  -> IO a
 
 
 buildGalleryTree ::
-     ItemProcessor -> ThumbnailProcessor -> TagsFromDirectoriesConfig
+     ItemProcessor GalleryItemProps -> ItemProcessor (Maybe Thumbnail) -> TagsFromDirectoriesConfig
   -> InputTree -> IO GalleryItem
-buildGalleryTree processItem processThumbnail tagsFromDirsConfig inputTree =
-  mkGalleryItem [] inputTree
+buildGalleryTree processItem processThumbnail tagsFromDirsConfig =
+  mkGalleryItem []
   where
     mkGalleryItem :: [Tag] -> InputTree -> IO GalleryItem
-    mkGalleryItem inheritedTags InputFile{path, modTime, sidecar} =
+    mkGalleryItem inheritedTags InputFile{path, modTime, sidecar, thumbnailPath} =
       do
-        properties <- processItem path
-        processedThumbnail <- processThumbnail path
+        let itemPath = "/" /> path
+        properties <- processItem itemPath path
+        processedThumbnail <- processThumbnail itemPath (thumbnailPath ?? path)
         return GalleryItem
           { title = Input.title sidecar ?? fileName path ?? ""
           , datetime = Input.datetime sidecar ?? toZonedTime modTime
           , description = Input.description sidecar ?? ""
           , tags = unique ((Input.tags sidecar ?? []) ++ inheritedTags ++ parentDirTags path)
-          , path = "/" /> path
+          , path = itemPath
           , thumbnail = processedThumbnail
           , properties = properties }
 
-    mkGalleryItem inheritedTags InputDir{path, modTime, sidecar, dirThumbnailPath, items} =
+    mkGalleryItem inheritedTags InputDir{path, modTime, sidecar, thumbnailPath, items} =
       do
+        let itemPath = "/" /> path
         let dirTags = (Input.tags sidecar ?? []) ++ inheritedTags
         processedItems <- parallel $ map (mkGalleryItem dirTags) items
-        processedThumbnail <- maybeThumbnail dirThumbnailPath
+        processedThumbnail <- maybeThumbnail itemPath thumbnailPath
         return GalleryItem
           { title = Input.title sidecar ?? fileName path ?? ""
           , datetime = Input.datetime sidecar ?? mostRecentModTime processedItems
                                               ?? toZonedTime modTime
           , description = Input.description sidecar ?? ""
           , tags = unique (aggregateTags processedItems ++ parentDirTags path)
-          , path = "/" /> path
+          , path = itemPath
           , thumbnail = processedThumbnail
           , properties = Directory processedItems }
 
@@ -163,9 +180,9 @@ buildGalleryTree processItem processThumbnail tagsFromDirsConfig inputTree =
     aggregateTags :: [GalleryItem] -> [Tag]
     aggregateTags = concatMap (\item -> tags (item::GalleryItem))
 
-    maybeThumbnail :: Maybe Path -> IO (Maybe Thumbnail)
-    maybeThumbnail Nothing = return Nothing
-    maybeThumbnail (Just thumbnailPath) = processThumbnail thumbnailPath
+    maybeThumbnail :: Path -> Maybe Path -> IO (Maybe Thumbnail)
+    maybeThumbnail _ Nothing = return Nothing
+    maybeThumbnail itemPath (Just thumbnailPath) = processThumbnail itemPath thumbnailPath
 
     mostRecentModTime :: [GalleryItem] -> Maybe ZonedTime
     mostRecentModTime =
@@ -186,7 +203,7 @@ flattenGalleryTree simple = [simple]
 
 galleryOutputDiff :: GalleryItem -> FSNode -> [Path]
 galleryOutputDiff resources ref =
-  (filesystemPaths ref) \\ (compiledPaths $ flattenGalleryTree resources)
+  filesystemPaths ref \\ compiledPaths (flattenGalleryTree resources)
   where
     filesystemPaths :: FSNode -> [Path]
     filesystemPaths = map Files.path . tail . flattenDir
@@ -208,8 +225,7 @@ galleryOutputDiff resources ref =
 
     thumbnailPaths :: [GalleryItem] -> [Path]
     thumbnailPaths =
-        map resourcePath
-      . map (resource :: (Thumbnail -> Resource))
+        map (resourcePath . (resource :: (Thumbnail -> Resource)))
       . mapMaybe thumbnail
 
     (\\) :: [Path] -> [Path] -> [Path]
@@ -231,7 +247,7 @@ galleryOutputDiff resources ref =
 galleryCleanupResourceDir :: GalleryItem -> FileName -> IO ()
 galleryCleanupResourceDir resourceTree outputDir =
   readDirectory outputDir
-  >>= return . galleryOutputDiff resourceTree . root
-  >>= return . sortOn ((0 -) . pathLength) -- nested files before their parent dirs
-  >>= return . map (localPath . (/>) outputDir)
+  <&> galleryOutputDiff resourceTree . root
+  <&> sortOn ((0 -) . pathLength) -- nested files before their parent dirs
+  <&> map (localPath . (/>) outputDir)
   >>= mapM_ remove

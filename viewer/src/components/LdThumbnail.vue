@@ -18,20 +18,20 @@
 -->
 
 <template>
-  <div :class="{'preload': loading}">
+  <div :class="{ preload: loading }">
     <v-lazy-image
       v-if="item.thumbnail"
       :src="pictureSrc(item.thumbnail.resource)"
-      :style="pictureStyle()"
+      :style="pictureStyle"
       :title="item.title"
-      @intersect="loading=true"
-      @load="loading=false"
+      @intersect="loading = true"
+      @load="loading = false"
     />
     <div v-else class="thumbnail-other flex-column flex-center">
       <div>
-        <fa-icon :icon="getIcon()" size="4x" />
+        <fa-icon :icon="icon" size="4x" />
       </div>
-      {{item.title}}
+      {{ item.title }}
     </div>
   </div>
 </template>
@@ -47,15 +47,15 @@ export default class LdThumbnail extends Vue {
   loading: boolean = false;
 
   pictureSrc(resource: string) {
-    return `${process.env.VUE_APP_DATA_URL}${this.$galleryStore.config!.galleryRoot}${resource}`;
+    return this.$galleryStore.resourceRoot + resource;
   }
 
-  pictureStyle() {
+  get pictureStyle() {
     const resolution = this.item.thumbnail!.resolution;
     return { width: `${resolution.width}px`, height: `${resolution.height}px` };
   }
 
-  getIcon() {
+  get icon() {
     return Navigation.getIcon(this.item);
   }
 }
