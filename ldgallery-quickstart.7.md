@@ -32,7 +32,7 @@ A new gallery can be initialised by creating a directory containing a gallery co
 
 ```
 ./monument-gallery-source
-└── gallery.yaml ----------- gallery settings file
+└── gallery.yaml ------ gallery settings file
 ```
 
 __gallery.yaml__ holds the settings of the gallery.
@@ -56,9 +56,9 @@ Optionally, some metadata such as a title and some tags can be associated by cre
 
 ```
 ./monument-gallery-source
-├── gallery.yaml ----------- gallery settings file
-├── DSC0001.jpg ------------ a picture
-└── DSC0001.jpg.yaml ------- its associated optional sidecar metadata file
+├── gallery.yaml ------ gallery settings file
+├── DSC0001.jpg ------- a picture
+└── DSC0001.jpg.yaml -- its associated optional sidecar metadata file
 ```
 
 The sidecar metadata file "DSC0001.jpg.yaml" can have the following content:
