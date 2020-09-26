@@ -23,6 +23,10 @@
 
 .scrollbar {
   overflow: auto;
+
+  // enable momentum/kinetic scroll on Safari and Firefox on iOS
+  -webkit-overflow-scrolling: touch;
+
   scrollbar-color: $scrollbar-color transparent;
   scrollbar-width: thin;
   &::-webkit-scrollbar {
