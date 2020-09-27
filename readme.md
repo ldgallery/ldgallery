@@ -1,7 +1,7 @@
 ldgallery
 =========
 
-A static gallery generator which turns a collection of tagged pictures into a searchable web gallery.
+A static gallery generator which turns a collection of tagged pictures and media into a searchable web gallery.
 
 The complete list of features, the user manual, demo and download links can be found on the project's website: https://ldgallery.pacien.org.
 
