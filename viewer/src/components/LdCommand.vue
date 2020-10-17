@@ -78,7 +78,7 @@ export default class LdCommand extends Vue {
   align-items: center;
   flex: 0 0 $layout-left;
 
-  > a {
+  > * {
     // normalise icon active boxes
     width: $layout-top;
     line-height: $layout-top;

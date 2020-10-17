@@ -19,8 +19,8 @@
 -->
 
 <template>
-  <b-dropdown v-model="selectedSort" :mobile-modal="false" append-to-body>
-    <a slot="trigger" class="link">
+  <b-dropdown v-model="selectedSort" :mobile-modal="false" append-to-body class="link" :class="$style.sortBtn">
+    <a slot="trigger">
       <fa-icon icon="sort-amount-down" size="lg" />
     </a>
     <b-dropdown-item v-for="(sort, idx) in ITEM_SORTS" :key="idx" :value="sort">
@@ -51,5 +51,9 @@ export default class LdCommandSort extends Vue {
 <style lang="scss" module>
 .dropdownLabel {
   margin-left: 0.5em;
+}
+.sortBtn > div[role="button"] {
+  width: 100%;
+  height: 100%;
 }
 </style>
