@@ -25,10 +25,10 @@
     </a>
     <ld-command-sort />
     <a
-      :class="{ disabled: isEntryPoint }"
+      :class="{ disabled: isEntryPoint() }"
       class="link command-secondary"
       :title="$t('command.back')"
-      @click="isEntryPoint || $router.back()"
+      @click="isEntryPoint() || $router.back()"
     >
       <fa-icon icon="arrow-left" size="lg" />
     </a>
@@ -55,7 +55,7 @@ export default class LdCommand extends Vue {
     return this.currentItemPath.length <= 1 && !this.$uiStore.searchMode;
   }
 
-  get isEntryPoint(): boolean {
+  isEntryPoint(): boolean {
     return history.state?.ldgallery === "ENTRYPOINT"; // Set by MainLayout.vue
   }
 
