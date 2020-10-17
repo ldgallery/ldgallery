@@ -22,7 +22,7 @@
     <ld-title :gallery-title="$galleryStore.galleryTitle" :current-item="$galleryStore.currentItem" />
     <panel-top v-if="isReady" class="layout layout-top" />
     <panel-left v-if="isReady" class="layout layout-left" />
-    <router-view v-if="!isLoading" ref="content" class="layout layout-content scrollbar" />
+    <router-view v-if="!isLoading" ref="content" class="layout layout-content scrollbar" tabindex="01" />
     <b-loading :active="isLoading" is-full-page />
     <ld-key-press :keycode="27" @action="$uiStore.toggleFullscreen(false)" />
   </div>
@@ -43,6 +43,10 @@ export default class MainLayout extends Vue {
   isLoading: boolean = true;
   scrollPositions: ScrollPosition = {};
 
+  get contentDiv() {
+    return this.content.$el as HTMLDivElement;
+  }
+
   mounted() {
     history.replaceState({ ldgallery: "ENTRYPOINT" }, "");
     this.fetchGalleryItems();
@@ -53,11 +57,15 @@ export default class MainLayout extends Vue {
     document.body.removeEventListener("fullscreenchange", this.onFullscreenChange);
   }
 
+  moveFocusToContentDiv() {
+    setTimeout(() => this.contentDiv.focus());
+  }
+
   @Watch("$route")
   routeChanged(newRoute: Route, oldRoute: Route) {
-    const el = this.content.$el;
-    this.scrollPositions[oldRoute.path] = el.scrollTop;
-    this.$nextTick(() => (el.scrollTop = this.scrollPositions[newRoute.path]));
+    this.scrollPositions[oldRoute.path] = this.contentDiv.scrollTop;
+    this.$nextTick(() => (this.contentDiv.scrollTop = this.scrollPositions[newRoute.path]));
+    this.moveFocusToContentDiv();
   }
 
   fetchGalleryItems() {
@@ -66,6 +74,7 @@ export default class MainLayout extends Vue {
       .fetchConfig()
       .then(this.$uiStore.initFromConfig)
       .then(this.$galleryStore.fetchGalleryItems)
+      .then(this.moveFocusToContentDiv)
       .finally(() => (this.isLoading = false))
       .catch(this.displayError);
   }
@@ -130,6 +139,9 @@ html {
     left: var(--layout-left);
     z-index: 3;
     overflow-x: hidden;
+    &:focus {
+      outline: none;
+    }
   }
 }
 .fullscreen {
