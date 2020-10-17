@@ -19,6 +19,7 @@
 -->
 
 <template>
+  <!-- TODO: Find an alternative to this Buefy component; it causes focus and CSS issues -->
   <b-dropdown v-model="selectedSort" :mobile-modal="false" append-to-body class="link" :class="$style.sortBtn">
     <a slot="trigger">
       <fa-icon icon="sort-amount-down" size="lg" />
