@@ -37,7 +37,7 @@
         :current-tags="currentTags"
       />
     </div>
-    <h1 class="flex title" @click="infoOpen = !infoOpen">
+    <h1 :class="$style.infoPanelTitleBar" class="flex title" @click="infoOpen = !infoOpen">
       {{ $t("panelLeft.information.title") }}
       <fa-icon :icon="infoOpen ? 'caret-down' : 'caret-up'" />
     </h1>
@@ -107,6 +107,10 @@ export default class PanelLeft extends Vue {
       color: $link;
       margin-top: 2px; // Fixes a vertical centering issue with the carret
     }
+  }
+
+  .infoPanelTitleBar {
+    cursor: pointer;
   }
 }
 
