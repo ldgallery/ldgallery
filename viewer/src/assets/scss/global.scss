@@ -80,7 +80,7 @@ button svg + span {
   color: $link;
   cursor: pointer;
   text-decoration: none;
-  &:hover {
+  &:hover, &:hover a {
     color: $link-hover;
   }
 }
