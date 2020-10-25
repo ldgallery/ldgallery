@@ -54,6 +54,7 @@ formatFromPath =
       ".tiff" -> PictureFormat
       ".hdr" -> PictureFormat
       ".gif" -> PictureFormat
+      ".webp" -> PictureFormat
       ".txt" -> PlainTextFormat
       ".md" -> PlainTextFormat -- TODO: handle markdown separately
       ".pdf" -> PortableDocumentFormat
