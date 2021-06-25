@@ -21,7 +21,7 @@
   <div>
     <ld-error v-if="isError" icon="folder-open" :message="$t('gallery.unknown-resource')" />
     <gallery-search v-else-if="isSearch" :path="path" />
-    <component :is="componentName" v-else :item="$galleryStore.currentItem" />
+    <component :is="componentName" v-else :key="$galleryStore.currentItem.path" :item="$galleryStore.currentItem" />
   </div>
 </template>
 
