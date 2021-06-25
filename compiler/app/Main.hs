@@ -1,7 +1,7 @@
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019-2020  Pacien TRAN-GIRARD
+-- Copyright (C) 2019-2021  Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -94,6 +94,7 @@ options = Options
   }
 
   &= summary ("ldgallery v" ++ showVersion version ++ " - a static web gallery generator with tags")
+  &= details ["This software is distributed under the terms of the GNU Affero General Public License v3.0."]
   &= program "ldgallery"
   &= help "Compile a gallery"
   &= helpArg [explicit, name "h", name "help"]
