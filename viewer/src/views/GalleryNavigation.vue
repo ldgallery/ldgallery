@@ -21,7 +21,7 @@
   <div>
     <ld-error v-if="isError" icon="folder-open" :message="$t('gallery.unknown-resource')" />
     <gallery-search v-else-if="isSearch" :path="path" />
-    <component :is="componentName" v-else :key="$galleryStore.currentItem.path" :item="$galleryStore.currentItem" />
+    <component :is="componentName" v-else :key="componentKey" :item="$galleryStore.currentItem" />
   </div>
 </template>
 
@@ -64,6 +64,10 @@ export default class GalleryNavigation extends Vue {
 
   get componentName() {
     return this.COMPONENT_BY_TYPE[this.$galleryStore.currentItem?.properties.type ?? ItemType.OTHER];
+  }
+
+  get componentKey() {
+    return this.$galleryStore.currentItem?.path ?? "";
   }
 
   @Watch("path")
