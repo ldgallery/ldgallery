@@ -125,7 +125,7 @@ jobs:
             curl --silent "$MAGICK_ARCHIVES" \
             | hxclean \
             | hxselect 'a::attr(href)' -c -s '\n' \
-            | grep -m1 '^ImageMagick-7.*portable-Q16-x64.zip$' )
+            | grep -m1 '^ImageMagick-7.*portable-Q16-HDRI-x64.zip$' )
           mkdir -p ~/downloads
           wget --timestamping --directory-prefix ~/downloads "$MAGICK_ARCHIVES/$MAGICK_LATEST"
           7z e ~/downloads/"$MAGICK_LATEST" -odist/ magick.exe
