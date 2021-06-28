@@ -102,7 +102,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y pandoc wget p7zip-full
+          sudo apt-get install -y pandoc wget curl html-xml-utils p7zip-full
       - name: Copy scripts
         run: |
           mkdir dist/scripts
@@ -114,16 +114,20 @@ jobs:
           pandoc --standalone --to html viewer/ldgallery-viewer.7.md --output dist/ldgallery-viewer.7.html
           pandoc --standalone --to html changelog.md --output dist/changelog.html
           pandoc --standalone --to html license.md --output dist/license.html
-      # TODO: automatically get the latest imagemagick version, since old archives disappear from the website
-      # See https://github.com/ldgallery/ldgallery/issues/281
       - name: Bundle ImageMagick
         run: |
-          wget -O magick.zip \
-            https://download.imagemagick.org/ImageMagick/download/binaries/ImageMagick-7.1.0-2-portable-Q16-x64.zip
-          7z e magick.zip -odist/ magick.exe
-          7z e magick.zip -so LICENSE.txt > dist/magick.license.txt
-          7z e magick.zip -so NOTICE.txt > dist/magick.notice.txt
-          7z e magick.zip -so README.txt > dist/magick.readme.txt
+          MAGICK_ARCHIVES="https://download.imagemagick.org/ImageMagick/download/binaries/"
+          MAGICK_LATEST=$( \
+            curl --silent "$MAGICK_ARCHIVES" \
+            | hxclean \
+            | hxselect 'a::attr(href)' -c -s '\n' \
+            | grep -m1 '^ImageMagick-7.*portable-Q16-x64.zip$' )
+          mkdir -p ~/downloads
+          wget --timestamping --directory-prefix ~/downloads "$MAGICK_ARCHIVES/$MAGICK_LATEST"
+          7z e ~/downloads/"$MAGICK_LATEST" -odist/ magick.exe
+          7z e ~/downloads/"$MAGICK_LATEST" -so LICENSE.txt > dist/magick.license.txt
+          7z e ~/downloads/"$MAGICK_LATEST" -so NOTICE.txt > dist/magick.notice.txt
+          7z e ~/downloads/"$MAGICK_LATEST" -so README.txt > dist/magick.readme.txt
       - uses: actions/upload-artifact@v2
         with:
           name: archive-win64
