@@ -5,7 +5,7 @@ github:              "pacien/ldgallery"
 license:             AGPL-3
 author:              "Pacien TRAN-GIRARD, Guillaume FOUET"
 maintainer:          ""
-copyright:           "2019-2020 Pacien TRAN-GIRARD, Guillaume FOUET"
+copyright:           "2019-2021 Pacien TRAN-GIRARD, Guillaume FOUET"
 
 extra-source-files:
 - readme.md
@@ -54,6 +54,15 @@ data-files: ["**/*"]
 library:
   source-dirs: src
 
+flags:
+  portable:
+    description: >
+      Make the output binary portable.
+      It will look in its own runtime location for its assets instead of
+      absolute installation paths.
+    manual: true
+    default: false
+
 executables:
   ldgallery:
     main:                Main.hs
@@ -64,6 +73,9 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - ldgallery-compiler
+    when:
+    - condition: flag(portable)
+      cpp-options: -DFLAG_PORTABLE
 
 tests:
   ldgallery-compiler-test:
