@@ -17,8 +17,6 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-// polyfill still required for IE and Safari, see https://caniuse.com/#feat=resizeobserver
-import ResizeObserver from "resize-observer-polyfill";
 import "hammerjs";
 
 /**
