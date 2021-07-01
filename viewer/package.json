@@ -35,7 +35,7 @@
     "vuex-class-component": "2.3.5"
   },
   "devDependencies": {
-    "@types/webpack": "4.41.22",
+    "@types/webpack": "4.41.29",
     "@typescript-eslint/eslint-plugin": "2.34.0",
     "@typescript-eslint/parser": "2.34.0",
     "@vue/cli-plugin-babel": "4.4.6",
