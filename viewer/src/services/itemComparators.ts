@@ -16,14 +16,15 @@
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-import { TranslateResult } from "vue-i18n";
+import { Item, ItemSortStr } from "@/@types/gallery";
 import i18n from "@/plugins/i18n";
+import { TranslateResult } from "vue-i18n";
 
-export type ItemComparator = (left: Gallery.Item, right: Gallery.Item) => number;
+export type ItemComparator = (left: Item, right: Item) => number;
 export type ItemSort = { text: TranslateResult; fn: ItemComparator };
 
 export default class ItemComparators {
-  static readonly ITEM_SORTS: Record<Gallery.ItemSortStr, ItemSort> = {
+  static readonly ITEM_SORTS: Record<ItemSortStr, ItemSort> = {
     title_asc: {
       text: i18n.t("command.sort.byTitleAsc"),
       fn: ItemComparators.chain(ItemComparators.sortByTitleAsc, ItemComparators.sortByPathAsc),
@@ -40,7 +41,7 @@ export default class ItemComparators {
 
   static readonly DEFAULT = ItemComparators.ITEM_SORTS.date_asc;
 
-  static sortByPathAsc(left: Gallery.Item, right: Gallery.Item): number {
+  static sortByPathAsc(left: Item, right: Item): number {
     return left.path.localeCompare(right.path, undefined, {
       sensitivity: "base",
       ignorePunctuation: true,
@@ -48,7 +49,7 @@ export default class ItemComparators {
     });
   }
 
-  static sortByTitleAsc(left: Gallery.Item, right: Gallery.Item): number {
+  static sortByTitleAsc(left: Item, right: Item): number {
     return left.title.localeCompare(right.title, undefined, {
       sensitivity: "base",
       ignorePunctuation: true,
@@ -56,7 +57,7 @@ export default class ItemComparators {
     });
   }
 
-  static sortByDateAsc(left: Gallery.Item, right: Gallery.Item): number {
+  static sortByDateAsc(left: Item, right: Item): number {
     return left.datetime.localeCompare(right.datetime); // TODO: handle timezones
   }
 

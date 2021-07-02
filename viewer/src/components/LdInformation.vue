@@ -26,12 +26,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Item } from "@/@types/gallery";
 import marked from "marked";
+import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class LdInformation extends Vue {
-  @Prop({ required: true }) readonly item!: Gallery.Item;
+  @Prop({ required: true }) readonly item!: Item;
 
   get formatDate() {
     const date = this.item.datetime.substr(0, 10);

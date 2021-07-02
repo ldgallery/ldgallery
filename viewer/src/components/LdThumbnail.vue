@@ -37,12 +37,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Item } from "@/@types/gallery";
 import Navigation from "@/services/navigation";
+import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class LdThumbnail extends Vue {
-  @Prop({ required: true }) readonly item!: Gallery.Item;
+  @Prop({ required: true }) readonly item!: Item;
 
   loading: boolean = false;
 

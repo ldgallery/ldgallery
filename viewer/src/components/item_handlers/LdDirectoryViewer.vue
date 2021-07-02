@@ -22,12 +22,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { DirectoryItem } from "@/@types/gallery";
 import Navigation from "@/services/navigation";
+import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
-export default class LdDirectory extends Vue {
-  @Prop({ required: true }) readonly item!: Gallery.Directory;
+export default class LdDirectoryViewer extends Vue {
+  @Prop({ required: true }) readonly item!: DirectoryItem;
 
   mounted() {
     this.$uiStore.toggleFullscreen(false);

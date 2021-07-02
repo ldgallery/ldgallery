@@ -40,10 +40,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, PropSync, Emit } from "vue-property-decorator";
-import { Operation } from "@/@types/Operation";
-import Navigation from "@/services/navigation";
 import IndexFactory from "@/services/indexfactory";
+import { Component, Emit, Prop, PropSync, Vue } from "vue-property-decorator";
 
 @Component
 export default class LdTagInput extends Vue {

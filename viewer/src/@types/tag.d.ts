@@ -19,11 +19,11 @@
 
 declare namespace Tag {
   interface Node {
-    tag: Gallery.RawTag;
-    tagfiltered: Gallery.RawTag;
+    tag: RawTag;
+    tagfiltered: RawTag;
     rootPart: boolean;
     childPart: boolean;
-    items: Gallery.Item[];
+    items: Item[];
     children: Index;
   }
   interface Search extends Node {

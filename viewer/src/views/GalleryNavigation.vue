@@ -26,10 +26,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import { ItemType } from "@/@types/ItemType";
 import Navigation from "@/services/navigation";
 import GallerySearch from "@/views/GallerySearch.vue";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
 @Component({
   components: {
@@ -41,13 +41,13 @@ export default class GalleryNavigation extends Vue {
   @Prop(Array) readonly query!: string[];
 
   readonly COMPONENT_BY_TYPE: Record<ItemType, string> = {
-    directory: "ld-directory",
-    picture: "ld-picture",
+    directory: "ld-directory-viewer",
+    picture: "ld-picture-viewer",
     plaintext: "ld-plain-text-viewer",
     pdf: "ld-pdf-viewer",
     video: "ld-video-viewer",
     audio: "ld-audio-viewer",
-    other: "ld-download",
+    other: "ld-download-viewer",
   };
 
   mounted() {

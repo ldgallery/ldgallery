@@ -27,11 +27,12 @@
 </template>
 
 <script lang="ts">
+import { PlainTextItem } from "@/@types/gallery";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class LdPlainTextViewer extends Vue {
-  @Prop({ required: true }) readonly item!: Gallery.PlainText;
+  @Prop({ required: true }) readonly item!: PlainTextItem;
 
   get itemResourceUrl(): string {
     return this.$galleryStore.resourceRoot + this.item.properties.resource;

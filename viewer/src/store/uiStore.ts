@@ -17,8 +17,9 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { createModule, mutation, action } from "vuex-class-component";
+import { Config } from "@/@types/gallery";
 import ItemComparators, { ItemSort } from "@/services/itemComparators";
+import { action, createModule, mutation } from "vuex-class-component";
 
 const VuexModule = createModule({
   namespaced: "uiStore",
@@ -49,7 +50,7 @@ export default class UIStore extends VuexModule {
     this.sort = sort;
   }
 
-  @action async initFromConfig(config: Gallery.Config) {
+  @action async initFromConfig(config: Config) {
     if (config.initialItemSort) {
       const itemSort = ItemComparators.ITEM_SORTS[config.initialItemSort];
       if (itemSort) this.setSort(itemSort);

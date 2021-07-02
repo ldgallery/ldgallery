@@ -17,19 +17,20 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { Operation } from "@/@types/Operation";
+import { Item, RawTag } from "@/@types/gallery";
 import { ItemType } from "@/@types/ItemType";
+import { Operation } from "@/@types/Operation";
 import Navigation from "@/services/navigation";
 
 export default class IndexFactory {
-  public static generateTags(root: Gallery.Item | null): Tag.Index {
+  public static generateTags(root: Item | null): Tag.Index {
     const tagsIndex: Tag.Index = {};
     if (root) IndexFactory.pushTagsForItem(tagsIndex, root);
     return tagsIndex;
   }
 
   // Pushes all tags for a root item (and its children) to the index
-  private static pushTagsForItem(tagsIndex: Tag.Index, item: Gallery.Item): void {
+  private static pushTagsForItem(tagsIndex: Tag.Index, item: Item): void {
     if (item.properties.type === ItemType.DIRECTORY) {
       item.properties.items.forEach(item => this.pushTagsForItem(tagsIndex, item));
       return; // Directories are not indexed
@@ -49,7 +50,7 @@ export default class IndexFactory {
     }
   }
 
-  private static pushPartToIndex(index: Tag.Node, part: string, item: Gallery.Item, rootPart: boolean): Tag.Node {
+  private static pushPartToIndex(index: Tag.Node, part: string, item: Item, rootPart: boolean): Tag.Node {
     if (!index)
       index = {
         tag: part,
@@ -131,7 +132,7 @@ export default class IndexFactory {
 
   // ---
 
-  public static generateCategories(tagsIndex: Tag.Index, categoryTags?: Gallery.RawTag[]): Tag.Category[] {
+  public static generateCategories(tagsIndex: Tag.Index, categoryTags?: RawTag[]): Tag.Category[] {
     if (!categoryTags?.length) return [{ tag: "", index: tagsIndex }];
 
     const tagsCategories: Tag.Category[] = [];
@@ -149,7 +150,7 @@ export default class IndexFactory {
     return tagsCategories;
   }
 
-  private static isDiscriminantTagOnly(tags: Gallery.RawTag[], node: Tag.Node): boolean {
+  private static isDiscriminantTagOnly(tags: RawTag[], node: Tag.Node): boolean {
     return !tags.includes(node.tag) || !node.childPart;
   }
 }

@@ -17,6 +17,7 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import { PictureProperties, Resolution } from "@/@types/gallery";
 import "hammerjs";
 
 /**
@@ -25,7 +26,7 @@ import "hammerjs";
 export default class LdZoom {
   readonly containerElement: HTMLDivElement;
   readonly imageElement: HTMLImageElement;
-  readonly pictureProperties: Gallery.PictureProperties;
+  readonly pictureProperties: PictureProperties;
   readonly maxScaleFactor: number;
   readonly scrollZoomSpeed: number;
   scaleFactor: number = 0.0;
@@ -33,7 +34,7 @@ export default class LdZoom {
   constructor(
     containerElement: HTMLDivElement,
     imageElement: HTMLImageElement,
-    pictureProperties: Gallery.PictureProperties,
+    pictureProperties: PictureProperties,
     maxScaleFactor: number,
     scrollZoomSpeed: number
   ) {
@@ -83,7 +84,7 @@ export default class LdZoom {
   /**
    * Returns the picture resolution as it should be displayed.
    */
-  private getDisplayResolution(): Gallery.Resolution {
+  private getDisplayResolution(): Resolution {
     return {
       width: this.pictureProperties.resolution.width * this.scaleFactor,
       height: this.pictureProperties.resolution.height * this.scaleFactor,

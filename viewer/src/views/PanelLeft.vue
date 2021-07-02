@@ -48,10 +48,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { Dictionary, Route } from "vue-router/types/router";
 import Navigation from "@/services/navigation";
-import IndexFactory from "@/services/indexfactory";
+import { Component, Vue, Watch } from "vue-property-decorator";
+import { Dictionary, Route } from "vue-router/types/router";
 
 @Component
 export default class PanelLeft extends Vue {

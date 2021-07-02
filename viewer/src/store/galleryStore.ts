@@ -17,9 +17,10 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { createModule, mutation, action } from "vuex-class-component";
+import { Config, Index, Item } from "@/@types/gallery";
 import IndexFactory from "@/services/indexfactory";
 import Navigation from "@/services/navigation";
+import { action, createModule, mutation } from "vuex-class-component";
 
 const VuexModule = createModule({
   namespaced: "galleryStore",
@@ -27,8 +28,8 @@ const VuexModule = createModule({
 });
 
 export default class GalleryStore extends VuexModule {
-  config: Gallery.Config | null = null;
-  galleryIndex: Gallery.Index | null = null;
+  config: Config | null = null;
+  galleryIndex: Index | null = null;
   tagsIndex: Tag.Index = {};
   tagsCategories: Tag.Category[] = [];
   currentPath: string | null = null;
@@ -36,11 +37,11 @@ export default class GalleryStore extends VuexModule {
 
   // ---
 
-  @mutation private setConfig(config: Gallery.Config) {
+  @mutation private setConfig(config: Config) {
     this.config = config;
   }
 
-  @mutation setGalleryIndex(galleryIndex: Gallery.Index) {
+  @mutation setGalleryIndex(galleryIndex: Index) {
     this.galleryIndex = Object.freeze(galleryIndex);
   }
 
@@ -62,13 +63,13 @@ export default class GalleryStore extends VuexModule {
 
   // ---
 
-  get currentItemPath(): Gallery.Item[] {
+  get currentItemPath(): Item[] {
     const root = this.galleryIndex?.tree;
     if (root && this.currentPath) return Navigation.searchCurrentItemPath(root, this.currentPath);
     return [];
   }
 
-  get currentItem(): Gallery.Item | null {
+  get currentItem(): Item | null {
     const path = this.currentItemPath;
     return path.length > 0 ? path[path.length - 1] : null;
   }

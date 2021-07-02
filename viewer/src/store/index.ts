@@ -17,12 +17,11 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import GalleryStore from "@/store/galleryStore";
+import UIStore from "@/store/uiStore";
 import Vue from "vue";
 import Vuex from "vuex";
-import { extractVuexModule } from "vuex-class-component";
-import { createProxy } from "vuex-class-component";
-import UIStore from "@/store/uiStore";
-import GalleryStore from "@/store/galleryStore";
+import { createProxy, extractVuexModule } from "vuex-class-component";
 
 Vue.use(Vuex);
 

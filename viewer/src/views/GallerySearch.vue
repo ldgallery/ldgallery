@@ -22,9 +22,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
-import { Operation } from "@/@types/Operation";
 import IndexSearch from "@/services/indexsearch";
+import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class GalleryPicture extends Vue {

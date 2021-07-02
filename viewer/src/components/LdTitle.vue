@@ -18,12 +18,13 @@
 -->
 
 <script lang="ts">
-import { Component, Vue, Watch, Prop } from "vue-property-decorator";
+import { Item } from "@/@types/gallery";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
 @Component
 export default class LdTitle extends Vue {
   @Prop({ required: true }) readonly galleryTitle!: string;
-  @Prop() readonly currentItem?: Gallery.Item;
+  @Prop() readonly currentItem?: Item;
 
   render() {
     return null;
