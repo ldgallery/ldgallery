@@ -95,14 +95,19 @@ export default class MainLayout extends Vue {
     });
   }
 
+  isFullscreenActive(): boolean {
+    return Boolean(document.fullscreenElement);
+  }
+
   @Watch("$uiStore.fullscreen")
   applyFullscreen(fullscreen: boolean) {
-    if (fullscreen && !document.fullscreen) document.body.requestFullscreen();
-    else if (document.fullscreen) document.exitFullscreen();
+    const isFullscreenActive = this.isFullscreenActive();
+    if (fullscreen && !isFullscreenActive) document.body.requestFullscreen();
+    else if (isFullscreenActive) document.exitFullscreen();
   }
 
   onFullscreenChange() {
-    this.$uiStore.toggleFullscreen(document.fullscreen);
+    this.$uiStore.toggleFullscreen(this.isFullscreenActive());
   }
 }
 </script>
