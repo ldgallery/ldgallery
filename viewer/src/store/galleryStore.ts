@@ -18,6 +18,7 @@
 */
 
 import { Config, Index, Item } from "@/@types/gallery";
+import { TagCategory, TagIndex, TagSearch } from "@/@types/tag";
 import IndexFactory from "@/services/indexfactory";
 import Navigation from "@/services/navigation";
 import { action, createModule, mutation } from "vuex-class-component";
@@ -30,10 +31,10 @@ const VuexModule = createModule({
 export default class GalleryStore extends VuexModule {
   config: Config | null = null;
   galleryIndex: Index | null = null;
-  tagsIndex: Tag.Index = {};
-  tagsCategories: Tag.Category[] = [];
+  tagsIndex: TagIndex = {};
+  tagsCategories: TagCategory[] = [];
   currentPath: string | null = null;
-  currentSearch: Tag.Search[] = [];
+  currentSearch: TagSearch[] = [];
 
   // ---
 
@@ -45,11 +46,11 @@ export default class GalleryStore extends VuexModule {
     this.galleryIndex = Object.freeze(galleryIndex);
   }
 
-  @mutation private setTagsIndex(tagsIndex: Tag.Index) {
+  @mutation private setTagsIndex(tagsIndex: TagIndex) {
     this.tagsIndex = Object.freeze(tagsIndex);
   }
 
-  @mutation private setTagsCategories(tagsCategories: Tag.Category[]) {
+  @mutation private setTagsCategories(tagsCategories: TagCategory[]) {
     this.tagsCategories = tagsCategories;
   }
 
@@ -57,7 +58,7 @@ export default class GalleryStore extends VuexModule {
     this.currentPath = currentPath;
   }
 
-  @mutation setCurrentSearch(currentSearch: Tag.Search[]) {
+  @mutation setCurrentSearch(currentSearch: TagSearch[]) {
     this.currentSearch = currentSearch;
   }
 

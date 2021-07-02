@@ -40,22 +40,23 @@
 </template>
 
 <script lang="ts">
+import { TagIndex, TagSearch } from "@/@types/tag";
 import IndexFactory from "@/services/indexfactory";
 import { Component, Emit, Prop, PropSync, Vue } from "vue-property-decorator";
 
 @Component
 export default class LdTagInput extends Vue {
-  @Prop({ required: true }) readonly tagsIndex!: Tag.Index;
-  @PropSync("searchFilters", { type: Array, required: true }) model!: Tag.Search[];
+  @Prop({ required: true }) readonly tagsIndex!: TagIndex;
+  @PropSync("searchFilters", { type: Array, required: true }) model!: TagSearch[];
 
   currentFilter: string = "";
-  filteredTags: Tag.Search[] = [];
+  filteredTags: TagSearch[] = [];
 
-  displayOption(option: Tag.Search): string {
+  displayOption(option: TagSearch): string {
     return `${option.display} (${option.items.length})`;
   }
 
-  filterAlreadyPresent(newSearch: Tag.Search) {
+  filterAlreadyPresent(newSearch: TagSearch) {
     return !this.model.find(
       currentSearch =>
         currentSearch.tag === newSearch.tag && (!currentSearch.parent || currentSearch.parent === newSearch.parent)

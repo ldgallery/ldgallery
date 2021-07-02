@@ -56,15 +56,16 @@
 <script lang="ts">
 import { Item, RawTag } from "@/@types/gallery";
 import { Operation } from "@/@types/Operation";
+import { TagIndex, TagNode, TagSearch } from "@/@types/tag";
 import { Component, Prop, PropSync, Vue, Watch } from "vue-property-decorator";
 
 @Component
 export default class LdProposition extends Vue {
-  @Prop() readonly category?: Tag.Node;
+  @Prop() readonly category?: TagNode;
   @Prop({ type: Boolean, required: true }) readonly showCategory!: boolean;
   @Prop({ type: Array, required: true }) readonly currentTags!: string[];
-  @Prop({ required: true }) readonly tagsIndex!: Tag.Index;
-  @PropSync("searchFilters", { type: Array, required: true }) model!: Tag.Search[];
+  @Prop({ required: true }) readonly tagsIndex!: TagIndex;
+  @PropSync("searchFilters", { type: Array, required: true }) model!: TagSearch[];
 
   readonly INITIAL_TAG_DISPLAY_LIMIT = this.getInitialTagDisplayLimit();
 
@@ -119,7 +120,7 @@ export default class LdProposition extends Vue {
     return this.category?.tag ?? this.$t("panelLeft.propositions.other");
   }
 
-  extractDistinctItems(currentTags: Tag.Search[]): Item[] {
+  extractDistinctItems(currentTags: TagSearch[]): Item[] {
     return [...new Set(currentTags.flatMap(tag => tag.items))];
   }
 

@@ -48,13 +48,14 @@
 </template>
 
 <script lang="ts">
+import { TagSearch } from "@/@types/tag";
 import Navigation from "@/services/navigation";
 import { Component, Vue, Watch } from "vue-property-decorator";
 import { Dictionary, Route } from "vue-router/types/router";
 
 @Component
 export default class PanelLeft extends Vue {
-  searchFilters: Tag.Search[] = [];
+  searchFilters: TagSearch[] = [];
   infoOpen: boolean = true;
 
   mounted() {

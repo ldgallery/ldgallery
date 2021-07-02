@@ -17,25 +17,25 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-declare namespace Tag {
-  interface Node {
-    tag: RawTag;
-    tagfiltered: RawTag;
-    rootPart: boolean;
-    childPart: boolean;
-    items: Item[];
-    children: Index;
-  }
-  interface Search extends Node {
-    parent?: Node;
-    operation: string; // Enum Operation
-    display: string;
-  }
-  type SearchByOperation = Record<string, Tag.Search[]>;
-  type Index = Record<string, Node>;
+import { Item, RawTag } from "./gallery";
 
-  interface Category {
-    tag: string;
-    index: Index;
-  }
+export interface TagNode {
+  tag: RawTag;
+  tagfiltered: RawTag;
+  rootPart: boolean;
+  childPart: boolean;
+  items: Item[];
+  children: TagIndex;
+}
+export interface TagSearch extends TagNode {
+  parent?: TagNode;
+  operation: string; // Enum Operation
+  display: string;
+}
+export type TagSearchByOperation = Record<string, TagSearch[]>;
+export type TagIndex = Record<string, TagNode>;
+
+export interface TagCategory {
+  tag: string;
+  index: TagIndex;
 }
