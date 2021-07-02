@@ -17,98 +17,99 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-declare namespace Gallery {
-  type ItemSortStr = "title_asc" | "date_asc" | "date_desc";
+import { ItemType } from "./ItemType";
 
-  interface Config {
-    galleryRoot: string;
-    galleryIndex?: string;
-    initialItemSort?: ItemSortStr;
-    initialTagDisplayLimit?: number;
-  }
+export type ItemSortStr = "title_asc" | "date_asc" | "date_desc";
 
-  interface GalleryProperties {
-    galleryTitle: string;
-    tagCategories: RawTag[];
-  }
-  interface Index {
-    properties: GalleryProperties;
-    tree: Directory;
-  }
-
-  interface Other extends Item {
-    properties: OtherProperties;
-  }
-  interface Picture extends Item {
-    properties: PictureProperties;
-  }
-  interface PlainText extends Item {
-    properties: PlainTextProperties;
-  }
-  interface PDF extends Item {
-    properties: PDFProperties;
-  }
-  interface Video extends Item {
-    properties: VideoProperties;
-  }
-  interface Audio extends Item {
-    properties: AudioProperties;
-  }
-  interface Directory extends Item {
-    properties: DirectoryProperties;
-  }
-  interface Item {
-    title: string;
-    datetime: string;
-    description: string;
-    tags: RawTag[];
-    path: string;
-    thumbnail?: Thumbnail;
-    properties:
-      | OtherProperties
-      | PictureProperties
-      | PlainTextProperties
-      | PDFProperties
-      | VideoProperties
-      | AudioProperties
-      | DirectoryProperties;
-  }
-  interface Resolution {
-    width: number;
-    height: number;
-  }
-  interface OtherProperties {
-    type: import("./ItemType").ItemType.OTHER;
-    resource: string;
-  }
-  interface PictureProperties {
-    type: import("./ItemType").ItemType.PICTURE;
-    resource: string;
-    resolution: Resolution;
-  }
-  interface PlainTextProperties {
-    type: import("./ItemType").ItemType.PLAINTEXT;
-    resource: string;
-  }
-  interface PDFProperties {
-    type: import("./ItemType").ItemType.PDF;
-    resource: string;
-  }
-  interface VideoProperties {
-    type: import("./ItemType").ItemType.VIDEO;
-    resource: string;
-  }
-  interface AudioProperties {
-    type: import("./ItemType").ItemType.AUDIO;
-    resource: string;
-  }
-  interface DirectoryProperties {
-    type: import("./ItemType").ItemType.DIRECTORY;
-    items: Item[];
-  }
-  interface Thumbnail {
-    resource: string;
-    resolution: Resolution;
-  }
-  type RawTag = string;
+export interface Config {
+  galleryRoot: string;
+  galleryIndex?: string;
+  initialItemSort?: ItemSortStr;
+  initialTagDisplayLimit?: number;
 }
+
+export interface Properties {
+  galleryTitle: string;
+  tagCategories: RawTag[];
+}
+export interface Index {
+  properties: Properties;
+  tree: DirectoryItem;
+}
+
+export interface OtherItem extends Item {
+  properties: OtherProperties;
+}
+export interface PictureItem extends Item {
+  properties: PictureProperties;
+}
+export interface PlainTextItem extends Item {
+  properties: PlainTextProperties;
+}
+export interface PDFItem extends Item {
+  properties: PDFProperties;
+}
+export interface VideoItem extends Item {
+  properties: VideoProperties;
+}
+export interface AudioItem extends Item {
+  properties: AudioProperties;
+}
+export interface DirectoryItem extends Item {
+  properties: DirectoryProperties;
+}
+export interface Item {
+  title: string;
+  datetime: string;
+  description: string;
+  tags: RawTag[];
+  path: string;
+  thumbnail?: Thumbnail;
+  properties:
+    | OtherProperties
+    | PictureProperties
+    | PlainTextProperties
+    | PDFProperties
+    | VideoProperties
+    | AudioProperties
+    | DirectoryProperties;
+}
+export interface Resolution {
+  width: number;
+  height: number;
+}
+export interface OtherProperties {
+  type: ItemType.OTHER;
+  resource: string;
+}
+export interface PictureProperties {
+  type: ItemType.PICTURE;
+  resource: string;
+  resolution: Resolution;
+}
+export interface PlainTextProperties {
+  type: ItemType.PLAINTEXT;
+  resource: string;
+}
+export interface PDFProperties {
+  type: ItemType.PDF;
+  resource: string;
+}
+export interface VideoProperties {
+  type: ItemType.VIDEO;
+  resource: string;
+}
+export interface AudioProperties {
+  type: ItemType.AUDIO;
+  resource: string;
+}
+export interface DirectoryProperties {
+  type: ItemType.DIRECTORY;
+  items: Item[];
+}
+
+export interface Thumbnail {
+  resource: string;
+  resolution: Resolution;
+}
+export type RawTag = string;

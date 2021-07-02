@@ -17,9 +17,11 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { createModule, mutation, action } from "vuex-class-component";
+import { Config, Index, Item } from "@/@types/gallery";
+import { TagCategory, TagIndex, TagSearch } from "@/@types/tag";
 import IndexFactory from "@/services/indexfactory";
 import Navigation from "@/services/navigation";
+import { action, createModule, mutation } from "vuex-class-component";
 
 const VuexModule = createModule({
   namespaced: "galleryStore",
@@ -27,28 +29,28 @@ const VuexModule = createModule({
 });
 
 export default class GalleryStore extends VuexModule {
-  config: Gallery.Config | null = null;
-  galleryIndex: Gallery.Index | null = null;
-  tagsIndex: Tag.Index = {};
-  tagsCategories: Tag.Category[] = [];
+  config: Config | null = null;
+  galleryIndex: Index | null = null;
+  tagsIndex: TagIndex = {};
+  tagsCategories: TagCategory[] = [];
   currentPath: string | null = null;
-  currentSearch: Tag.Search[] = [];
+  currentSearch: TagSearch[] = [];
 
   // ---
 
-  @mutation private setConfig(config: Gallery.Config) {
+  @mutation private setConfig(config: Config) {
     this.config = config;
   }
 
-  @mutation setGalleryIndex(galleryIndex: Gallery.Index) {
+  @mutation setGalleryIndex(galleryIndex: Index) {
     this.galleryIndex = Object.freeze(galleryIndex);
   }
 
-  @mutation private setTagsIndex(tagsIndex: Tag.Index) {
+  @mutation private setTagsIndex(tagsIndex: TagIndex) {
     this.tagsIndex = Object.freeze(tagsIndex);
   }
 
-  @mutation private setTagsCategories(tagsCategories: Tag.Category[]) {
+  @mutation private setTagsCategories(tagsCategories: TagCategory[]) {
     this.tagsCategories = tagsCategories;
   }
 
@@ -56,19 +58,19 @@ export default class GalleryStore extends VuexModule {
     this.currentPath = currentPath;
   }
 
-  @mutation setCurrentSearch(currentSearch: Tag.Search[]) {
+  @mutation setCurrentSearch(currentSearch: TagSearch[]) {
     this.currentSearch = currentSearch;
   }
 
   // ---
 
-  get currentItemPath(): Gallery.Item[] {
+  get currentItemPath(): Item[] {
     const root = this.galleryIndex?.tree;
     if (root && this.currentPath) return Navigation.searchCurrentItemPath(root, this.currentPath);
     return [];
   }
 
-  get currentItem(): Gallery.Item | null {
+  get currentItem(): Item | null {
     const path = this.currentItemPath;
     return path.length > 0 ? path[path.length - 1] : null;
   }

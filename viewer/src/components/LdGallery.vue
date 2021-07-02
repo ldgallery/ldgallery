@@ -27,12 +27,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Model } from "vue-property-decorator";
-import DragScrollClickFix from "@/services/dragscrollclickfix";
+import { Item } from "@/@types/gallery";
+import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class LdPicture extends Vue {
-  @Prop({ type: Array, required: true }) readonly items!: Gallery.Item[];
+  @Prop({ type: Array, required: true }) readonly items!: Item[];
   @Prop(String) readonly noresult?: string;
 
   get sortedItems() {

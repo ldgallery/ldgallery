@@ -29,12 +29,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { OtherItem } from "@/@types/gallery";
 import Navigation from "@/services/navigation";
+import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
-export default class LdDownload extends Vue {
-  @Prop({ required: true }) readonly item!: Gallery.Other;
+export default class LdDownloadViewer extends Vue {
+  @Prop({ required: true }) readonly item!: OtherItem;
 
   get itemFileName(): string {
     return Navigation.getFileName(this.item);

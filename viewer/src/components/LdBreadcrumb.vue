@@ -47,13 +47,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Ref, Watch, Prop } from "vue-property-decorator";
+import { Item } from "@/@types/gallery";
 import DragScrollClickFix from "@/services/dragscrollclickfix";
 import Navigation from "@/services/navigation";
+import { Component, Prop, Ref, Vue, Watch } from "vue-property-decorator";
 
 @Component
 export default class LdBreadcrumb extends Vue {
-  @Prop({ type: Array, required: true }) readonly currentItemPath!: Gallery.Item[];
+  @Prop({ type: Array, required: true }) readonly currentItemPath!: Item[];
   @Prop(Boolean) readonly searchMode!: boolean;
   @Ref() readonly breadcrumb!: HTMLUListElement;
 
@@ -82,7 +83,7 @@ export default class LdBreadcrumb extends Vue {
     });
   }
 
-  getIcon(item: Gallery.Item) {
+  getIcon(item: Item) {
     return Navigation.getIcon(item);
   }
 }

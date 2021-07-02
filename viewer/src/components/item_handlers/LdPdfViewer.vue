@@ -30,11 +30,12 @@
 </template>
 
 <script lang="ts">
+import { PDFItem } from "@/@types/gallery";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class LdPdfViewer extends Vue {
-  @Prop({ required: true }) readonly item!: Gallery.PDF;
+  @Prop({ required: true }) readonly item!: PDFItem;
 
   get itemResourceUrl(): string {
     return this.$galleryStore.resourceRoot + this.item.properties.resource;

@@ -29,10 +29,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Ref, Watch } from "vue-property-decorator";
+import { ScrollPosition } from "@/@types/scrollposition";
+import { Component, Ref, Vue, Watch } from "vue-property-decorator";
+import { Route } from "vue-router";
 import PanelLeft from "./PanelLeft.vue";
 import PanelTop from "./PanelTop.vue";
-import { Route } from "vue-router";
 
 @Component({
   components: { PanelLeft, PanelTop },

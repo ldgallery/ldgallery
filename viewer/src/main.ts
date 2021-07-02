@@ -17,13 +17,13 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import Vue from "vue";
 import "@/assets/scss/global.scss";
 import "@/assets/scss/scrollbar.scss";
 import "@/assets/scss/transition.scss";
-import store from "@/store";
 import i18n from "@/plugins/i18n";
 import router from "@/plugins/router";
+import store from "@/store";
+import Vue from "vue";
 Vue.config.productionTip = false;
 
 import(/* webpackChunkName: "ui" */ "@/plugins/buefy");

@@ -32,8 +32,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
 import ItemComparators, { ItemSort } from "@/services/itemComparators";
+import { Component, Vue } from "vue-property-decorator";
 
 @Component
 export default class LdCommandSort extends Vue {

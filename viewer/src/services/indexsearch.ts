@@ -17,27 +17,29 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import { Item } from "@/@types/gallery";
 import { Operation } from "@/@types/Operation";
+import { TagSearch, TagSearchByOperation } from "@/@types/tag";
 
 export default class IndexSearch {
   // Results of the search (by tags)
-  public static search(searchTags: Tag.Search[]): Gallery.Item[] {
+  public static search(searchTags: TagSearch[]): Item[] {
     const byOperation = this.extractTagsByOperation(searchTags);
     const intersection = this.extractIntersection(byOperation);
     const substraction = this.extractSubstraction(byOperation);
     return this.aggregateAll(byOperation, intersection, substraction);
   }
 
-  private static extractTagsByOperation(searchTags: Tag.Search[]): Tag.SearchByOperation {
-    const byOperation: Tag.SearchByOperation = {};
+  private static extractTagsByOperation(searchTags: TagSearch[]): TagSearchByOperation {
+    const byOperation: TagSearchByOperation = {};
     Object.values(Operation).forEach(
       operation => (byOperation[operation] = searchTags.filter(tag => tag.operation === operation))
     );
     return byOperation;
   }
 
-  private static extractIntersection(byOperation: Tag.SearchByOperation): Set<Gallery.Item> {
-    const intersection = new Set<Gallery.Item>();
+  private static extractIntersection(byOperation: TagSearchByOperation): Set<Item> {
+    const intersection = new Set<Item>();
     if (byOperation[Operation.INTERSECTION].length > 0) {
       byOperation[Operation.INTERSECTION]
         .map(tag => tag.items)
@@ -48,8 +50,8 @@ export default class IndexSearch {
     return intersection;
   }
 
-  private static extractSubstraction(byOperation: Tag.SearchByOperation): Set<Gallery.Item> {
-    const substraction = new Set<Gallery.Item>();
+  private static extractSubstraction(byOperation: TagSearchByOperation): Set<Item> {
+    const substraction = new Set<Item>();
     if (byOperation[Operation.SUBSTRACTION].length > 0) {
       byOperation[Operation.SUBSTRACTION].flatMap(tag => tag.items).forEach(item => substraction.add(item));
     }
@@ -57,10 +59,10 @@ export default class IndexSearch {
   }
 
   private static aggregateAll(
-    byOperation: Tag.SearchByOperation,
-    intersection: Set<Gallery.Item>,
-    substraction: Set<Gallery.Item>
-  ): Gallery.Item[] {
+    byOperation: TagSearchByOperation,
+    intersection: Set<Item>,
+    substraction: Set<Item>
+  ): Item[] {
     byOperation[Operation.ADDITION].flatMap(tag => tag.items).forEach(item => intersection.add(item));
     substraction.forEach(item => intersection.delete(item));
     return [...intersection];

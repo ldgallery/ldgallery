@@ -28,12 +28,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { AudioItem } from "@/@types/gallery";
 import Navigation from "@/services/navigation";
+import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class LdAudioViewer extends Vue {
-  @Prop({ required: true }) readonly item!: Gallery.Audio;
+  @Prop({ required: true }) readonly item!: AudioItem;
 
   get itemResourceUrl(): string {
     return this.$galleryStore.resourceRoot + this.item.properties.resource;

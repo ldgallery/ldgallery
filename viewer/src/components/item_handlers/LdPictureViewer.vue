@@ -42,13 +42,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Ref } from "vue-property-decorator";
-import LdZoom from "@/services/ldzoom";
+import { PictureItem } from "@/@types/gallery";
 import DragScrollClickFix from "@/services/dragscrollclickfix";
+import LdZoom from "@/services/ldzoom";
+import { Component, Prop, Ref, Vue } from "vue-property-decorator";
 
 @Component
-export default class LdPicture extends Vue {
-  @Prop({ required: true }) readonly item!: Gallery.Picture;
+export default class LdPictureViewer extends Vue {
+  @Prop({ required: true }) readonly item!: PictureItem;
   @Ref() readonly containerElement!: HTMLDivElement;
   @Ref() readonly imageElement!: Vue;
 

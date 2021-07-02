@@ -17,19 +17,21 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { Operation } from "@/@types/Operation";
+import { Item, RawTag } from "@/@types/gallery";
 import { ItemType } from "@/@types/ItemType";
+import { Operation } from "@/@types/Operation";
+import { TagCategory, TagIndex, TagNode, TagSearch } from "@/@types/tag";
 import Navigation from "@/services/navigation";
 
 export default class IndexFactory {
-  public static generateTags(root: Gallery.Item | null): Tag.Index {
-    const tagsIndex: Tag.Index = {};
+  public static generateTags(root: Item | null): TagIndex {
+    const tagsIndex: TagIndex = {};
     if (root) IndexFactory.pushTagsForItem(tagsIndex, root);
     return tagsIndex;
   }
 
   // Pushes all tags for a root item (and its children) to the index
-  private static pushTagsForItem(tagsIndex: Tag.Index, item: Gallery.Item): void {
+  private static pushTagsForItem(tagsIndex: TagIndex, item: Item): void {
     if (item.properties.type === ItemType.DIRECTORY) {
       item.properties.items.forEach(item => this.pushTagsForItem(tagsIndex, item));
       return; // Directories are not indexed
@@ -49,7 +51,7 @@ export default class IndexFactory {
     }
   }
 
-  private static pushPartToIndex(index: Tag.Node, part: string, item: Gallery.Item, rootPart: boolean): Tag.Node {
+  private static pushPartToIndex(index: TagNode, part: string, item: Item, rootPart: boolean): TagNode {
     if (!index)
       index = {
         tag: part,
@@ -68,8 +70,8 @@ export default class IndexFactory {
 
   // ---
 
-  public static searchTags(tagsIndex: Tag.Index, filter: string, strict: boolean): Tag.Search[] {
-    let search: Tag.Search[] = [];
+  public static searchTags(tagsIndex: TagIndex, filter: string, strict: boolean): TagSearch[] {
+    let search: TagSearch[] = [];
     if (tagsIndex && filter) {
       const operation = IndexFactory.extractOperation(filter);
       if (operation !== Operation.INTERSECTION) filter = filter.slice(1);
@@ -95,12 +97,12 @@ export default class IndexFactory {
   }
 
   private static searchTagsFromFilterWithCategory(
-    tagsIndex: Tag.Index,
+    tagsIndex: TagIndex,
     operation: Operation,
     category: string,
     disambiguation: string,
     strict: boolean
-  ): Tag.Search[] {
+  ): TagSearch[] {
     category = Navigation.normalize(category);
     disambiguation = Navigation.normalize(disambiguation);
     return Object.values(tagsIndex)
@@ -113,28 +115,28 @@ export default class IndexFactory {
   }
 
   private static searchTagsFromFilter(
-    tagsIndex: Tag.Index,
+    tagsIndex: TagIndex,
     operation: Operation,
     filter: string,
     strict: boolean
-  ): Tag.Search[] {
+  ): TagSearch[] {
     filter = Navigation.normalize(filter);
     return Object.values(tagsIndex)
       .filter(node => IndexFactory.matches(node, filter, strict))
       .map(node => ({ ...node, operation, display: `${operation}${node.tag}` }));
   }
 
-  private static matches(node: Tag.Node, filter: string, strict: boolean): boolean {
+  private static matches(node: TagNode, filter: string, strict: boolean): boolean {
     if (strict) return node.tagfiltered === filter;
     return node.tagfiltered.includes(filter);
   }
 
   // ---
 
-  public static generateCategories(tagsIndex: Tag.Index, categoryTags?: Gallery.RawTag[]): Tag.Category[] {
+  public static generateCategories(tagsIndex: TagIndex, categoryTags?: RawTag[]): TagCategory[] {
     if (!categoryTags?.length) return [{ tag: "", index: tagsIndex }];
 
-    const tagsCategories: Tag.Category[] = [];
+    const tagsCategories: TagCategory[] = [];
     const tagsRemaining = new Map(Object.entries(tagsIndex));
     categoryTags
       .map(tag => ({ tag, index: tagsIndex[tag]?.children }))
@@ -149,7 +151,7 @@ export default class IndexFactory {
     return tagsCategories;
   }
 
-  private static isDiscriminantTagOnly(tags: Gallery.RawTag[], node: Tag.Node): boolean {
+  private static isDiscriminantTagOnly(tags: RawTag[], node: TagNode): boolean {
     return !tags.includes(node.tag) || !node.childPart;
   }
 }

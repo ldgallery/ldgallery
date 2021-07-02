@@ -28,11 +28,12 @@
 </template>
 
 <script lang="ts">
+import { VideoItem } from "@/@types/gallery";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class LdVideoViewer extends Vue {
-  @Prop({ required: true }) readonly item!: Gallery.Video;
+  @Prop({ required: true }) readonly item!: VideoItem;
 
   get itemResourceUrl(): string {
     return this.$galleryStore.resourceRoot + this.item.properties.resource;
