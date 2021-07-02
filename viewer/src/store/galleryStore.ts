@@ -126,7 +126,7 @@ export default class GalleryStore extends VuexModule {
   }
 
   private static getUrlConfig() {
-    let search = window.location.search;
+    const search = window.location.search;
     if (search.length > 1) return search.substr(1) + ".json";
     return "config.json";
   }

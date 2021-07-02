@@ -8,14 +8,14 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          # Latest version officially tested for Vue
-          node-version: 12.16.1
+          # Latest version officially tested for Ld
+          node-version: 12.22.2
       - name: Lint and build Node.js Vue project
         working-directory: viewer
         run: |
-          npm install
-          npm run lint
-          npm run build
+          yarn
+          yarn run lint
+          yarn run build
       - uses: actions/upload-artifact@v2
         with:
           name: viewer-dist
