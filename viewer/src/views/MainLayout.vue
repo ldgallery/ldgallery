@@ -29,6 +29,7 @@
 </template>
 
 <script lang="ts">
+import { ScrollPosition } from "@/@types/scrollposition";
 import { Component, Ref, Vue, Watch } from "vue-property-decorator";
 import { Route } from "vue-router";
 import PanelLeft from "./PanelLeft.vue";
