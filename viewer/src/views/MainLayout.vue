@@ -18,12 +18,19 @@
 -->
 
 <template>
-  <div :class="{ fullscreen: $uiStore.fullscreen, fullwidth: $uiStore.fullWidth }">
+  <div :class="{ [$style.fullscreen]: $uiStore.fullscreen, [$style.fullwidth]: $uiStore.fullWidth }">
     <ld-title :gallery-title="$galleryStore.galleryTitle" :current-item="$galleryStore.currentItem" />
-    <panel-top v-if="isReady" class="layout layout-top" />
-    <panel-left v-if="isReady" class="layout layout-left" />
-    <router-view v-if="!isLoading" ref="content" class="layout layout-content scrollbar" tabindex="01" />
-    <b-loading :active="isLoading" is-full-page />
+    <PanelTop v-if="isReady" :class="[$style.layout, $style.layoutTop]" />
+    <PanelLeft v-if="isReady" :class="[$style.layout, $style.layoutLeft]" />
+    <SplashScreen v-if="hasSplashScreen" :class="$style.layout" @validation="$uiStore.validateSpashScreen()" />
+    <router-view
+      v-else-if="!isLoading"
+      ref="content"
+      :class="[$style.layout, $style.layoutContent]"
+      class="scrollbar"
+      tabindex="01"
+    />
+    <b-loading v-else active is-full-page />
     <ld-key-press :keycode="27" @action="$uiStore.toggleFullscreen(false)" />
   </div>
 </template>
@@ -34,18 +41,36 @@ import { Component, Ref, Vue, Watch } from "vue-property-decorator";
 import { Route } from "vue-router";
 import PanelLeft from "./PanelLeft.vue";
 import PanelTop from "./PanelTop.vue";
+const SplashScreen = () => import(/* webpackChunkName: "splashscreen" */ "./SplashScreen.vue");
 
 @Component({
-  components: { PanelLeft, PanelTop },
+  components: {
+    PanelLeft,
+    PanelTop,
+    SplashScreen,
+  },
 })
 export default class MainLayout extends Vue {
-  @Ref() readonly content!: Vue;
+  @Ref() readonly content?: Vue;
 
   isLoading: boolean = true;
   scrollPositions: ScrollPosition = {};
 
-  get contentDiv() {
-    return this.content.$el as HTMLDivElement;
+  get contentDiv(): HTMLDivElement | null {
+    return (this.content?.$el as HTMLDivElement) ?? null;
+  }
+
+  get isReady(): boolean {
+    return (
+      !this.hasSplashScreen &&
+      !this.isLoading &&
+      this.$galleryStore.config !== null &&
+      this.$galleryStore.currentPath !== null
+    );
+  }
+
+  get hasSplashScreen(): boolean {
+    return Boolean(this.$uiStore.splashScreenData);
   }
 
   mounted() {
@@ -59,13 +84,14 @@ export default class MainLayout extends Vue {
   }
 
   moveFocusToContentDiv() {
-    setTimeout(() => this.contentDiv.focus());
+    setTimeout(() => this.contentDiv?.focus());
   }
 
   @Watch("$route")
   routeChanged(newRoute: Route, oldRoute: Route) {
+    if (!this.contentDiv) return;
     this.scrollPositions[oldRoute.path] = this.contentDiv.scrollTop;
-    this.$nextTick(() => (this.contentDiv.scrollTop = this.scrollPositions[newRoute.path]));
+    this.$nextTick(() => (this.contentDiv!.scrollTop = this.scrollPositions[newRoute.path]));
     this.moveFocusToContentDiv();
   }
 
@@ -74,14 +100,11 @@ export default class MainLayout extends Vue {
     this.$galleryStore
       .fetchConfig()
       .then(this.$uiStore.initFromConfig)
+      .then(this.$uiStore.fetchSplashScreenIfNeeded)
       .then(this.$galleryStore.fetchGalleryItems)
       .then(this.moveFocusToContentDiv)
       .finally(() => (this.isLoading = false))
       .catch(this.displayError);
-  }
-
-  get isReady() {
-    return !this.isLoading && this.$galleryStore.config && this.$galleryStore.currentPath !== null;
   }
 
   displayError(reason: any) {
@@ -107,11 +130,11 @@ export default class MainLayout extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" module>
 @import "~@/assets/scss/theme.scss";
 
-body,
-html {
+:global(body),
+:global(html) {
   height: 100%;
   overflow: hidden;
   touch-action: none;
@@ -126,16 +149,16 @@ html {
   bottom: 0;
   left: 0;
   right: 0;
-  &.layout-top {
+  &.layoutTop {
     height: $layout-top;
     z-index: 1;
   }
-  &.layout-left {
+  &.layoutLeft {
     top: $layout-top;
     width: $layout-left;
     z-index: 2;
   }
-  &.layout-content {
+  &.layoutContent {
     top: var(--layout-top);
     left: var(--layout-left);
     z-index: 3;
@@ -159,17 +182,16 @@ html {
 }
 
 .layout {
-  &.layout-top {
+  &.layoutTop {
     background-color: $panel-top-bgcolor;
     color: $panel-top-txtcolor;
   }
-  &.layout-left {
+  &.layoutLeft {
     background-color: $panel-left-bgcolor;
     color: $panel-left-txtcolor;
   }
-  &.layout-content {
+  &.layoutContent {
     background-color: $content-bgcolor;
   }
 }
-// =====
 </style>

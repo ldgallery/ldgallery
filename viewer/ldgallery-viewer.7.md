@@ -32,7 +32,7 @@ This panel features a list of relevant tags, grouped by categories, that can be 
 The information panel at the bottom of the sidebar displays various metadata about the currently viewed item.
 Those include the title, date and description of the file or directory.
 
-Items of the following formats can be opened and visualised within the web application:
+Items of the following formats can be opened and visualized within the web application:
 
 * Pictures (Bitmap, JPEG, PNG, TIFF, HDR, GIF)
 * Videos (OGV, WebM, Matroska, MPEG-4)
@@ -79,7 +79,7 @@ initialItemSort
   Possible values are "title_asc", "date_asc", "date_desc".
   Defaults to "date_asc".
   Titles are sorted using a human-friendly _natural sort order_ which treats multi-digit numbers atomically.
-  The item path is used as a tie-breaker for all the defined orders.
+  The item path is used as a tiebreaker for all the defined orders.
 
 <!-- https://github.com/pacien/ldgallery/issues/27
 initialSearchQuery
@@ -96,6 +96,48 @@ An alternative viewer configuration file located in the viewer's directory can b
 without the ".json" extension, as a query parameter given before the page anchor;
 for example, some alternative configuration named "config_2.json" can be loaded with "http://gallery/?config_2#".
 
+splashScreen
+: Displays an information message before opening the gallery (see below).
+
+
+# SPLASH SCREEN CONFIGURATION
+
+resource
+: Absolute or relative path to the MarkDown information message
+
+dontshowagainUID
+: Optional unique ID; when set, the information message will appear only the first
+  time it is proposed to the client. To display the message again, change this UID.
+  When left empty, the message will appear every time.
+
+buttonOkayLabel
+: Optional label for the validation button. *Defaults to "Close"*
+
+style
+: Optional CSS attributes for the information message. String or JSON formats are
+  accepted.
+
+
+# CONFIGURATION EXAMPLE
+
+```
+{
+  "galleryRoot": "./gallery/",
+  "galleryIndex": "index.json",
+  "initialItemSort": "date_desc",
+  "initialTagDisplayLimit": 10,
+  "splashScreen": {
+    "resource": "./splashscreen.md",
+    "dontshowagainUID": "v001",
+    "buttonOkayLabel": "I agree",
+    "style": {
+      "max-width": "45em",
+      "font-size": "20px",
+      "padding-top": "20vh"
+    }
+  }
+}
+```
 
 # PROGRESSIVE WEB APPLICATION
 
