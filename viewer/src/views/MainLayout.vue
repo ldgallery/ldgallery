@@ -59,6 +59,7 @@ export default class MainLayout extends Vue {
   }
 
   moveFocusToContentDiv() {
+    if (document.activeElement?.tagName === "INPUT") return;
     setTimeout(() => this.contentDiv.focus());
   }
 
