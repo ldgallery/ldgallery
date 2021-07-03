@@ -18,6 +18,7 @@
 */
 
 import { Config } from "@/@types/gallery";
+import { SplashScreenConfig } from "@/@types/splashscreen";
 import ItemComparators, { ItemSort } from "@/services/itemComparators";
 import { action, createModule, mutation } from "vuex-class-component";
 
@@ -26,11 +27,16 @@ const VuexModule = createModule({
   strict: true,
 });
 
+const STORAGE_SPLASHSCREEN_VALIDATION = "splashScreenValidation";
+
 export default class UIStore extends VuexModule {
   fullscreen: boolean = false;
   fullWidth: boolean = window.innerWidth < Number(process.env.VUE_APP_FULLWIDTH_LIMIT);
   searchMode: boolean = false;
   sort: ItemSort = ItemComparators.DEFAULT;
+
+  splashScreenConfig: SplashScreenConfig | null = null;
+  splashScreenEnabled: boolean = false;
 
   // ---
 
@@ -50,11 +56,34 @@ export default class UIStore extends VuexModule {
     this.sort = sort;
   }
 
+  @mutation setSplashScreenConfig(splashScreenConfig: SplashScreenConfig) {
+    this.splashScreenConfig = splashScreenConfig;
+  }
+
+  @mutation setSplashScreenEnabled(enabled: boolean) {
+    this.splashScreenEnabled = enabled;
+  }
+
+  // ---
+
   @action async initFromConfig(config: Config) {
     if (config.initialItemSort) {
       const itemSort = ItemComparators.ITEM_SORTS[config.initialItemSort];
       if (itemSort) this.setSort(itemSort);
       else throw new Error("Unknown sort type: " + config.initialItemSort);
     }
+    if (config.splashScreen) {
+      this.setSplashScreenConfig(config.splashScreen);
+      const uid = config.splashScreen.dontshowagainUID;
+      this.setSplashScreenEnabled(!uid || localStorage.getItem(STORAGE_SPLASHSCREEN_VALIDATION) !== uid);
+    }
+  }
+
+  // ---
+
+  @action async validateSpashScreen() {
+    this.setSplashScreenEnabled(false);
+    const uid = this.splashScreenConfig?.dontshowagainUID;
+    if (uid) localStorage.setItem(STORAGE_SPLASHSCREEN_VALIDATION, String(uid));
   }
 }

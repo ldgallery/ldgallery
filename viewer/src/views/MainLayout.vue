@@ -22,14 +22,13 @@
     <ld-title :gallery-title="$galleryStore.galleryTitle" :current-item="$galleryStore.currentItem" />
     <PanelTop v-if="isReady" :class="[$style.layout, $style.layoutTop]" />
     <PanelLeft v-if="isReady" :class="[$style.layout, $style.layoutLeft]" />
-    <router-view
-      v-if="!isLoading"
-      ref="content"
-      :class="[$style.layout, $style.layoutContent]"
-      class="scrollbar"
-      tabindex="01"
+    <b-loading v-if="isLoading" active />
+    <SplashScreen
+      v-else-if="$uiStore.splashScreenEnabled"
+      :class="$style.layout"
+      @validation="$uiStore.validateSpashScreen()"
     />
-    <b-loading :active="isLoading" is-full-page />
+    <router-view v-else ref="content" :class="[$style.layout, $style.layoutContent]" class="scrollbar" tabindex="01" />
     <ld-key-press :keycode="27" @action="$uiStore.toggleFullscreen(false)" />
   </div>
 </template>
@@ -40,18 +39,32 @@ import { Component, Ref, Vue, Watch } from "vue-property-decorator";
 import { Route } from "vue-router";
 import PanelLeft from "./PanelLeft.vue";
 import PanelTop from "./PanelTop.vue";
+import SplashScreen from "./SplashScreen.vue";
 
 @Component({
-  components: { PanelLeft, PanelTop },
+  components: {
+    PanelLeft,
+    PanelTop,
+    SplashScreen,
+  },
 })
 export default class MainLayout extends Vue {
-  @Ref() readonly content!: Vue;
+  @Ref() readonly content?: Vue;
 
   isLoading: boolean = true;
   scrollPositions: ScrollPosition = {};
 
-  get contentDiv() {
-    return this.content.$el as HTMLDivElement;
+  get contentDiv(): HTMLDivElement | null {
+    return (this.content?.$el as HTMLDivElement) ?? null;
+  }
+
+  get isReady(): boolean {
+    return (
+      !this.$uiStore.splashScreenEnabled &&
+      !this.isLoading &&
+      this.$galleryStore.config !== null &&
+      this.$galleryStore.currentPath !== null
+    );
   }
 
   mounted() {
@@ -65,13 +78,14 @@ export default class MainLayout extends Vue {
   }
 
   moveFocusToContentDiv() {
-    setTimeout(() => this.contentDiv.focus());
+    setTimeout(() => this.contentDiv?.focus());
   }
 
   @Watch("$route")
   routeChanged(newRoute: Route, oldRoute: Route) {
+    if (!this.contentDiv) return;
     this.scrollPositions[oldRoute.path] = this.contentDiv.scrollTop;
-    this.$nextTick(() => (this.contentDiv.scrollTop = this.scrollPositions[newRoute.path]));
+    this.$nextTick(() => (this.contentDiv!.scrollTop = this.scrollPositions[newRoute.path]));
     this.moveFocusToContentDiv();
   }
 
@@ -86,14 +100,10 @@ export default class MainLayout extends Vue {
       .catch(this.displayError);
   }
 
-  get isReady() {
-    return !this.isLoading && this.$galleryStore.config && this.$galleryStore.currentPath !== null;
-  }
-
   displayError(reason: any) {
     this.$buefy.snackbar.open({
       message: `${reason}`,
-      actionText: "Retry",
+      actionText: this.$t("snack.retry"),
       position: "is-top",
       type: "is-danger",
       indefinite: true,

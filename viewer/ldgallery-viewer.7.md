@@ -96,6 +96,53 @@ An alternative viewer configuration file located in the viewer's directory can b
 without the ".json" extension, as a query parameter given before the page anchor;
 for example, some alternative configuration named "config_2.json" can be loaded with "http://gallery/?config_2#".
 
+splashScreen
+: Displays an information notice before opening the gallery (see below).
+
+
+# SPLASH SCREEN CONFIGURATION
+
+splashScreen.resource
+: Absolute or relative path to the information notice. The user is prompted to explicitly acknowledge such notice before being allowed to browse the gallery.
+  Rich text formatting is possible through the use of the [GitHub Flavoured Markdown syntax][GFM].
+  Inline HTML and CSS are also supported.
+
+splashScreen.dontshowagainUID
+: Optional unique ID; when set, the information notice will appear only the first time it is proposed to the user. To display the notice again, change this UID.
+  When left empty, the notice will appear every time.
+
+splashScreen.buttonAcknowledgeLabel
+: Optional label for the acknowledge button shown below the notice.
+  *Defaults to "Acknowledge"*
+
+splashScreen.style
+: Optional CSS attributes for the information notice's container.
+  String or JSON formats are supported.
+
+  [GFM]: https://github.github.com/gfm/
+
+# CONFIGURATION EXAMPLE
+
+Viewer __config.json__:
+
+```json
+{
+  "galleryRoot": "./gallery/",
+  "galleryIndex": "index.json",
+  "initialItemSort": "date_desc",
+  "initialTagDisplayLimit": 10,
+  "splashScreen": {
+    "resource": "./splashscreen.md",
+    "dontshowagainUID": "v001",
+    "buttonAcknowledgeLabel": "I agree",
+    "style": {
+      "max-width": "45em",
+      "font-size": "20px",
+      "padding-top": "20vh"
+    }
+  }
+}
+```
 
 # PROGRESSIVE WEB APPLICATION
 
