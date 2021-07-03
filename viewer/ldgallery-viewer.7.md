@@ -32,7 +32,7 @@ This panel features a list of relevant tags, grouped by categories, that can be 
 The information panel at the bottom of the sidebar displays various metadata about the currently viewed item.
 Those include the title, date and description of the file or directory.
 
-Items of the following formats can be opened and visualized within the web application:
+Items of the following formats can be opened and visualised within the web application:
 
 * Pictures (Bitmap, JPEG, PNG, TIFF, HDR, GIF)
 * Videos (OGV, WebM, Matroska, MPEG-4)
@@ -79,7 +79,7 @@ initialItemSort
   Possible values are "title_asc", "date_asc", "date_desc".
   Defaults to "date_asc".
   Titles are sorted using a human-friendly _natural sort order_ which treats multi-digit numbers atomically.
-  The item path is used as a tiebreaker for all the defined orders.
+  The item path is used as a tie-breaker for all the defined orders.
 
 <!-- https://github.com/pacien/ldgallery/issues/27
 initialSearchQuery
@@ -97,30 +97,35 @@ without the ".json" extension, as a query parameter given before the page anchor
 for example, some alternative configuration named "config_2.json" can be loaded with "http://gallery/?config_2#".
 
 splashScreen
-: Displays an information message before opening the gallery (see below).
+: Displays an information notice before opening the gallery (see below).
 
 
 # SPLASH SCREEN CONFIGURATION
 
-resource
-: Absolute or relative path to the Markdown information message
+splashScreen.resource
+: Absolute or relative path to the information notice. The user is prompted to explicitly acknowledge such notice before being allowed to browse the gallery.
+  Rich text formatting is possible through the use of the [GitHub Flavoured Markdown syntax][GFM].
+  Inline HTML and CSS are also supported.
 
-dontshowagainUID
-: Optional unique ID; when set, the information message will appear only the first
-  time it is proposed to the client. To display the message again, change this UID.
-  When left empty, the message will appear every time.
+splashScreen.dontshowagainUID
+: Optional unique ID; when set, the information notice will appear only the first time it is proposed to the user. To display the notice again, change this UID.
+  When left empty, the notice will appear every time.
 
-buttonValidateLabel
-: Optional label for the validation button. *Defaults to "Close"*
+splashScreen.buttonAcknowledgeLabel
+: Optional label for the acknowledge button shown below the notice.
+  *Defaults to "Acknowledge"*
 
-style
-: Optional CSS attributes for the information message. String or JSON formats are
-  accepted.
+splashScreen.style
+: Optional CSS attributes for the information notice's container.
+  String or JSON formats are supported.
 
+  [GFM]: https://github.github.com/gfm/
 
 # CONFIGURATION EXAMPLE
 
-```
+Viewer __config.json__:
+
+```json
 {
   "galleryRoot": "./gallery/",
   "galleryIndex": "index.json",
@@ -129,7 +134,7 @@ style
   "splashScreen": {
     "resource": "./splashscreen.md",
     "dontshowagainUID": "v001",
-    "buttonValidateLabel": "I agree",
+    "buttonAcknowledgeLabel": "I agree",
     "style": {
       "max-width": "45em",
       "font-size": "20px",

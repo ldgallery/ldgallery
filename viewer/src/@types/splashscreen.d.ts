@@ -20,6 +20,6 @@
 export interface SplashScreenConfig {
   resource?: string;
   dontshowagainUID?: string;
-  buttonValidateLabel?: string;
+  buttonAcknowledgeLabel?: string;
   style?: any;
 }
