@@ -1,37 +1,35 @@
 <template>
   <b-loading v-if="isLoading" active />
-  <div v-else-if="markdown" :class="$style.splashscreen" class="scrollbar">
-    <MarkDown :style="config.style" class="flex-grow-1" :markdown="markdown" />
-    <b-button size="is-large" :label="buttonValidateLabel" :class="$style.buttonOkay" @click="validation" />
-  </div>
+  <MarkDown v-else-if="markdown" class="flex-grow-1" :markdown="markdown" />
 </template>
 
 <script lang="ts">
-import { SplashScreenConfig } from "@/@types/splashscreen";
+import { MarkDownItem } from "@/@types/gallery";
 import { MarkDown } from "@/components/async";
 import FetchWithCheck from "@/services/fetchWithCheck";
-import { TranslateResult } from "vue-i18n";
-import { Component, Emit, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component({
   components: {
     MarkDown,
   },
 })
-export default class SplashScreen extends Vue {
+export default class LdMarkDownViewer extends Vue {
+  @Prop({ required: true }) readonly item!: MarkDownItem;
+
   isLoading: boolean = true;
   markdown: string | null = null;
-
-  get config(): SplashScreenConfig {
-    return this.$uiStore.splashScreenConfig!;
-  }
 
   created() {
     this.fetchMarkDown();
   }
 
+  get itemResourceUrl(): string {
+    return this.$galleryStore.resourceRoot + this.item.properties.resource;
+  }
+
   fetchMarkDown() {
-    FetchWithCheck.get(`${process.env.VUE_APP_DATA_URL}${this.config.resource}?${this.config.dontshowagainUID ?? ""}`)
+    FetchWithCheck.get(this.itemResourceUrl)
       .then(response => response.text())
       .then(text => (this.markdown = text))
       .finally(() => (this.isLoading = false))
@@ -43,18 +41,10 @@ export default class SplashScreen extends Vue {
       message: `${reason}`,
       actionText: this.$t("snack.retry"),
       position: "is-top",
-      type: "is-danger",
-      indefinite: true,
+      type: "is-warning",
       onAction: this.fetchMarkDown,
     });
   }
-
-  get buttonValidateLabel(): TranslateResult {
-    return this.config.buttonValidateLabel ?? this.$t("splashScreen.button.validation");
-  }
-
-  @Emit()
-  validation() {}
 }
 </script>
 

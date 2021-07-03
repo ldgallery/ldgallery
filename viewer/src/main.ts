@@ -20,18 +20,13 @@
 import "@/assets/scss/global.scss";
 import "@/assets/scss/scrollbar.scss";
 import "@/assets/scss/transition.scss";
+import { MainLayout } from "@/plugins";
 import i18n from "@/plugins/i18n";
 import router from "@/plugins/router";
 import store from "@/store";
 import Vue from "vue";
-Vue.config.productionTip = false;
 
-import(/* webpackChunkName: "ui" */ "@/plugins/buefy");
-import(/* webpackChunkName: "ui" */ "@/components");
-import(/* webpackChunkName: "ui" */ "@/plugins/lazyimage");
-import(/* webpackChunkName: "ui" */ "@/plugins/dragscroll");
-import(/* webpackChunkName: "ui" */ "@/plugins/fontawesome");
-const MainLayout = () => import(/* webpackChunkName: "ui" */ "@/views/MainLayout.vue");
+Vue.config.productionTip = false;
 
 declare module "vue/types/vue" {
   interface Vue {

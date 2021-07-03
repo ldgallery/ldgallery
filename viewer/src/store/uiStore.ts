@@ -36,7 +36,7 @@ export default class UIStore extends VuexModule {
   sort: ItemSort = ItemComparators.DEFAULT;
 
   splashScreenConfig: SplashScreenConfig | null = null;
-  splashScreenData: string | null = null;
+  splashScreenEnabled: boolean = false;
 
   // ---
 
@@ -56,12 +56,12 @@ export default class UIStore extends VuexModule {
     this.sort = sort;
   }
 
-  @mutation setSplashScreenConfig(splashScreenConfig?: SplashScreenConfig) {
-    this.splashScreenConfig = splashScreenConfig ?? null;
+  @mutation setSplashScreenConfig(splashScreenConfig: SplashScreenConfig) {
+    this.splashScreenConfig = splashScreenConfig;
   }
 
-  @mutation setSplashScreenData(data: string | null) {
-    this.splashScreenData = data;
+  @mutation setSplashScreenEnabled(enabled: boolean) {
+    this.splashScreenEnabled = enabled;
   }
 
   // ---
@@ -72,26 +72,17 @@ export default class UIStore extends VuexModule {
       if (itemSort) this.setSort(itemSort);
       else throw new Error("Unknown sort type: " + config.initialItemSort);
     }
-    this.setSplashScreenConfig(config.splashScreen);
+    if (config.splashScreen) {
+      this.setSplashScreenConfig(config.splashScreen);
+      const uid = config.splashScreen.dontshowagainUID;
+      this.setSplashScreenEnabled(!uid || localStorage.getItem(STORAGE_SPLASHSCREEN_VALIDATION) !== uid);
+    }
   }
 
   // ---
 
-  // Fetches the gallery's SplashScreen if the version UID isn't already stored
-  @action async fetchSplashScreenIfNeeded() {
-    const ssc = this.splashScreenConfig;
-    if (!ssc?.resource) return;
-
-    const uid = ssc.dontshowagainUID;
-    if (uid && localStorage.getItem(STORAGE_SPLASHSCREEN_VALIDATION) === uid) return;
-
-    await fetch(`${process.env.VUE_APP_DATA_URL}${ssc.resource}?${ssc.dontshowagainUID ?? ""}`)
-      .then(response => response.text())
-      .then(this.setSplashScreenData);
-  }
-
   @action async validateSpashScreen() {
-    this.setSplashScreenData(null);
+    this.setSplashScreenEnabled(false);
     const uid = this.splashScreenConfig?.dontshowagainUID;
     if (uid) localStorage.setItem(STORAGE_SPLASHSCREEN_VALIDATION, String(uid));
   }

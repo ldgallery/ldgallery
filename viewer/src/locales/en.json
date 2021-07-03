@@ -14,6 +14,7 @@
   "panelLeft.propositions": "Related filters",
   "panelLeft.propositions.other": "other filters",
   "search.no-result-fmt": "No result<br>({0} match in other folders) | No result<br>({0} matches in other folders)",
+  "snack.retry": "Retry",
   "splashScreen.button.validation": "Close",
   "tag-propositions.addition": "Include all items with this tag",
   "tag-propositions.intersection": "Search for this tag",

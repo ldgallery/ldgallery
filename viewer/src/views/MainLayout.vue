@@ -22,15 +22,13 @@
     <ld-title :gallery-title="$galleryStore.galleryTitle" :current-item="$galleryStore.currentItem" />
     <PanelTop v-if="isReady" :class="[$style.layout, $style.layoutTop]" />
     <PanelLeft v-if="isReady" :class="[$style.layout, $style.layoutLeft]" />
-    <SplashScreen v-if="hasSplashScreen" :class="$style.layout" @validation="$uiStore.validateSpashScreen()" />
-    <router-view
-      v-else-if="!isLoading"
-      ref="content"
-      :class="[$style.layout, $style.layoutContent]"
-      class="scrollbar"
-      tabindex="01"
+    <b-loading v-if="isLoading" active />
+    <SplashScreen
+      v-else-if="$uiStore.splashScreenEnabled"
+      :class="$style.layout"
+      @validation="$uiStore.validateSpashScreen()"
     />
-    <b-loading v-else active is-full-page />
+    <router-view v-else ref="content" :class="[$style.layout, $style.layoutContent]" class="scrollbar" tabindex="01" />
     <ld-key-press :keycode="27" @action="$uiStore.toggleFullscreen(false)" />
   </div>
 </template>
@@ -41,7 +39,7 @@ import { Component, Ref, Vue, Watch } from "vue-property-decorator";
 import { Route } from "vue-router";
 import PanelLeft from "./PanelLeft.vue";
 import PanelTop from "./PanelTop.vue";
-const SplashScreen = () => import(/* webpackChunkName: "splashscreen" */ "./SplashScreen.vue");
+import SplashScreen from "./SplashScreen.vue";
 
 @Component({
   components: {
@@ -62,15 +60,11 @@ export default class MainLayout extends Vue {
 
   get isReady(): boolean {
     return (
-      !this.hasSplashScreen &&
+      !this.$uiStore.splashScreenEnabled &&
       !this.isLoading &&
       this.$galleryStore.config !== null &&
       this.$galleryStore.currentPath !== null
     );
-  }
-
-  get hasSplashScreen(): boolean {
-    return Boolean(this.$uiStore.splashScreenData);
   }
 
   mounted() {
@@ -100,7 +94,6 @@ export default class MainLayout extends Vue {
     this.$galleryStore
       .fetchConfig()
       .then(this.$uiStore.initFromConfig)
-      .then(this.$uiStore.fetchSplashScreenIfNeeded)
       .then(this.$galleryStore.fetchGalleryItems)
       .then(this.moveFocusToContentDiv)
       .finally(() => (this.isLoading = false))
@@ -110,7 +103,7 @@ export default class MainLayout extends Vue {
   displayError(reason: any) {
     this.$buefy.snackbar.open({
       message: `${reason}`,
-      actionText: "Retry",
+      actionText: this.$t("snack.retry"),
       position: "is-top",
       type: "is-danger",
       indefinite: true,
