@@ -22,7 +22,7 @@
   <!-- intermediate container necessary to eliminate the scrollbar -->
   <div class="fill no-scroll">
     <video class="fill" :src="itemResourceUrl" :poster="thumbnailResourceUrl" preload="auto" controls>
-      <ld-download :item="item" />
+      <ld-download-viewer :item="item" />
     </video>
   </div>
 </template>

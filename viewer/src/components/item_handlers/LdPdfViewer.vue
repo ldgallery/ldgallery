@@ -24,7 +24,7 @@
     <!-- prefer native browser PDF viewer if available -->
     <object class="fill" :data="itemResourceUrl" type="application/pdf">
       <!-- TODO: fallback to PDF.js (https://github.com/pacien/ldgallery/issues/212) -->
-      <ld-download :item="item" />
+      <ld-download-viewer :item="item" />
     </object>
   </div>
 </template>
