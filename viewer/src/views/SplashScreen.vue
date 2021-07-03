@@ -1,7 +1,7 @@
 <template>
   <div :class="$style.splashscreen" class="scrollbar">
     <div :style="config.style" :class="$style.markdown" class="flex-grow-1" v-html="splashScreenMd" />
-    <b-button size="is-large" :label="buttonOkayLabel" :class="$style.buttonOkay" @click="validation" />
+    <b-button size="is-large" :label="buttonValidateLabel" :class="$style.buttonOkay" @click="validation" />
   </div>
 </template>
 
@@ -21,8 +21,8 @@ export default class SplashScreen extends Vue {
     return marked(this.$uiStore.splashScreenData!);
   }
 
-  get buttonOkayLabel(): TranslateResult {
-    return this.config.buttonOkayLabel ?? this.$t("splashScreen.button.validation");
+  get buttonValidateLabel(): TranslateResult {
+    return this.config.buttonValidateLabel ?? this.$t("splashScreen.button.validation");
   }
 
   @Emit()

@@ -110,7 +110,7 @@ dontshowagainUID
   time it is proposed to the client. To display the message again, change this UID.
   When left empty, the message will appear every time.
 
-buttonOkayLabel
+buttonValidateLabel
 : Optional label for the validation button. *Defaults to "Close"*
 
 style
@@ -129,7 +129,7 @@ style
   "splashScreen": {
     "resource": "./splashscreen.md",
     "dontshowagainUID": "v001",
-    "buttonOkayLabel": "I agree",
+    "buttonValidateLabel": "I agree",
     "style": {
       "max-width": "45em",
       "font-size": "20px",
