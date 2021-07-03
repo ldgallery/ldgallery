@@ -48,8 +48,8 @@ export interface PictureItem extends Item {
 export interface PlainTextItem extends Item {
   properties: PlainTextProperties;
 }
-export interface MarkDownItem extends Item {
-  properties: MarkDownProperties;
+export interface MarkdownItem extends Item {
+  properties: MarkdownProperties;
 }
 export interface PDFItem extends Item {
   properties: PDFProperties;
@@ -74,7 +74,7 @@ export interface Item {
     | OtherProperties
     | PictureProperties
     | PlainTextProperties
-    | MarkDownProperties
+    | MarkdownProperties
     | PDFProperties
     | VideoProperties
     | AudioProperties
@@ -97,7 +97,7 @@ export interface PlainTextProperties {
   type: ItemType.PLAINTEXT;
   resource: string;
 }
-export interface MarkDownProperties {
+export interface MarkdownProperties {
   type: ItemType.MARKDOWN;
   resource: string;
 }

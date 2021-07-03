@@ -1,34 +1,34 @@
 <template>
   <b-loading v-if="isLoading" active />
-  <MarkDown v-else-if="markdown" class="flex-grow-1" :markdown="markdown" />
+  <Markdown v-else-if="markdown" class="flex-grow-1" :markdown="markdown" />
 </template>
 
 <script lang="ts">
-import { MarkDownItem } from "@/@types/gallery";
-import { MarkDown } from "@/components/async";
+import { MarkdownItem } from "@/@types/gallery";
+import { Markdown } from "@/components/async";
 import FetchWithCheck from "@/services/fetchWithCheck";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component({
   components: {
-    MarkDown,
+    Markdown,
   },
 })
-export default class LdMarkDownViewer extends Vue {
-  @Prop({ required: true }) readonly item!: MarkDownItem;
+export default class LdMarkdownViewer extends Vue {
+  @Prop({ required: true }) readonly item!: MarkdownItem;
 
   isLoading: boolean = true;
   markdown: string | null = null;
 
   created() {
-    this.fetchMarkDown();
+    this.fetchMarkdown();
   }
 
   get itemResourceUrl(): string {
     return this.$galleryStore.resourceRoot + this.item.properties.resource;
   }
 
-  fetchMarkDown() {
+  fetchMarkdown() {
     FetchWithCheck.get(this.itemResourceUrl)
       .then(response => response.text())
       .then(text => (this.markdown = text))
@@ -42,7 +42,7 @@ export default class LdMarkDownViewer extends Vue {
       actionText: this.$t("snack.retry"),
       position: "is-top",
       type: "is-warning",
-      onAction: this.fetchMarkDown,
+      onAction: this.fetchMarkdown,
     });
   }
 }

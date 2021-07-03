@@ -21,18 +21,18 @@
   <div v-if="item" class="flex-column" :class="$style.infopanel">
     <div v-if="item.title" :class="$style.title">{{ item.title }}</div>
     <time v-if="item.datetime" :datetime="item.datetime" :class="$style.datetime">{{ formatDate }}</time>
-    <MarkDown v-if="item.description" :class="$style.description" :markdown="item.description" />
+    <Markdown v-if="item.description" :class="$style.description" :markdown="item.description" />
   </div>
 </template>
 
 <script lang="ts">
 import { Item } from "@/@types/gallery";
-import { MarkDown } from "@/components/async";
+import { Markdown } from "@/components/async";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component({
   components: {
-    MarkDown,
+    Markdown,
   },
 })
 export default class LdInformation extends Vue {

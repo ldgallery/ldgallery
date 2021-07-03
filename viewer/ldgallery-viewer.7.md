@@ -103,7 +103,7 @@ splashScreen
 # SPLASH SCREEN CONFIGURATION
 
 resource
-: Absolute or relative path to the MarkDown information message
+: Absolute or relative path to the Markdown information message
 
 dontshowagainUID
 : Optional unique ID; when set, the information message will appear only the first

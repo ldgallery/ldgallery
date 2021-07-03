@@ -27,7 +27,7 @@ import marked from "marked";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
-export default class MarkDown extends Vue {
+export default class Markdown extends Vue {
   @Prop({ required: true }) readonly markdown!: string;
 
   get html(): string {
