@@ -21,16 +21,20 @@
   <div v-if="item" class="flex-column" :class="$style.infopanel">
     <div v-if="item.title" :class="$style.title">{{ item.title }}</div>
     <time v-if="item.datetime" :datetime="item.datetime" :class="$style.datetime">{{ formatDate }}</time>
-    <div v-if="item.description" :class="$style.description" v-html="formatDescription" />
+    <Markdown v-if="item.description" :class="$style.description" :markdown="item.description" />
   </div>
 </template>
 
 <script lang="ts">
 import { Item } from "@/@types/gallery";
-import marked from "marked";
+import { Markdown } from "@/components/async";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
-@Component
+@Component({
+  components: {
+    Markdown,
+  },
+})
 export default class LdInformation extends Vue {
   @Prop({ required: true }) readonly item!: Item;
 
@@ -38,11 +42,6 @@ export default class LdInformation extends Vue {
     const date = this.item.datetime.substr(0, 10);
     const time = this.item.datetime.substr(11, 5);
     return `${date} ${time}`;
-  }
-
-  get formatDescription() {
-    if (!this.item.description) return "";
-    return marked(this.item.description);
   }
 }
 </script>
