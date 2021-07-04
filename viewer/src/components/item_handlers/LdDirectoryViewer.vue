@@ -39,5 +39,3 @@ export default class LdDirectoryViewer extends Vue {
   }
 }
 </script>
-
-<style lang="scss"></style>

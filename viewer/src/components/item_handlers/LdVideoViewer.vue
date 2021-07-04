@@ -44,5 +44,3 @@ export default class LdVideoViewer extends Vue {
   }
 }
 </script>
-
-<style lang="scss" module></style>

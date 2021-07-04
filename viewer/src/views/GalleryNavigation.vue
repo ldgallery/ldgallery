@@ -80,5 +80,3 @@ export default class GalleryNavigation extends Vue {
   }
 }
 </script>
-
-<style lang="scss"></style>

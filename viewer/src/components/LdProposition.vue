@@ -19,11 +19,14 @@
 -->
 
 <template>
-  <div class="proposition">
-    <h2 v-if="showCategory && Object.keys(propositions).length" class="subtitle category">{{ title }}</h2>
+  <div :class="$style.proposition">
+    <h2 v-if="showCategory && Object.keys(propositions).length" :class="[$style.subtitle, $style.category]">
+      {{ title }}
+    </h2>
     <div v-for="proposed in proposedTags" :key="proposed.rawTag">
       <a
-        class="operation-btns link"
+        class="link"
+        :class="$style.operationBtns"
         :title="$t('tag-propositions.substraction')"
         @click="add(Operation.SUBSTRACTION, proposed.rawTag)"
       >
@@ -31,7 +34,8 @@
       </a>
 
       <a
-        class="operation-btns link"
+        class="link"
+        :class="$style.operationBtns"
         :title="$t('tag-propositions.addition')"
         @click="add(Operation.ADDITION, proposed.rawTag)"
       >
@@ -39,7 +43,8 @@
       </a>
 
       <a
-        class="operation-tag link"
+        class="link"
+        :class="$style.operationTag"
         :title="$t('tag-propositions.intersection')"
         @click="add(Operation.INTERSECTION, proposed.rawTag)"
         >{{ proposed.rawTag }}</a
@@ -47,7 +52,7 @@
 
       <div class="disabled" :title="$t('tag-propositions.item-count')">{{ proposed.count }}</div>
     </div>
-    <div v-if="showMoreCount > 0" class="showmore" @click="limit += showMoreCount">
+    <div v-if="showMoreCount > 0" :class="$style.showmore" @click="limit += showMoreCount">
       {{ $t("tag-propositions.showmore", [showMoreCount]) }}<fa-icon icon="angle-double-down" />
     </div>
   </div>
@@ -137,7 +142,7 @@ export default class LdProposition extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" module>
 @import "~@/assets/scss/theme.scss";
 
 .proposition {
@@ -153,14 +158,14 @@ export default class LdProposition extends Vue {
     display: flex;
     align-items: center;
     padding-right: 7px;
-    .operation-tag {
+    .operationTag {
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
       flex-grow: 1;
       cursor: pointer;
     }
-    .operation-btns {
+    .operationBtns {
       padding: 2px 7px;
       cursor: pointer;
     }
