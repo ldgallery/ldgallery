@@ -19,14 +19,14 @@
 -->
 
 <template>
-  <div class="flex command-btns">
+  <div class="flex" :class="$style.commandBtns">
     <a class="link" :title="$t('command.search')" @click="$uiStore.toggleFullWidth()">
       <fa-icon :icon="commandToggleSearchPanelIcon" size="lg" />
     </a>
     <ld-command-sort />
     <a
-      :class="{ disabled: isEntryPoint() }"
-      class="link command-secondary"
+      class="link"
+      :class="{ disabled: isEntryPoint(), [$style.commandSecondary]: true }"
       :title="$t('command.back')"
       @click="isEntryPoint() || $router.back()"
     >
@@ -68,11 +68,11 @@ export default class LdCommand extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" module>
 @import "~@/assets/scss/_buefy_variables.scss";
 @import "~@/assets/scss/theme.scss";
 
-.command-btns {
+.commandBtns {
   background-color: $command-buttons-bgcolor;
   justify-content: space-around;
   vertical-align: middle;
@@ -90,7 +90,7 @@ export default class LdCommand extends Vue {
   @media only screen and (max-width: $tablet) {
     flex: 0 1;
 
-    > .command-secondary {
+    > .commandSecondary {
       display: none;
     }
   }

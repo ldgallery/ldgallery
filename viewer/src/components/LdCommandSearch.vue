@@ -18,7 +18,7 @@
 -->
 
 <template>
-  <div class="flex webkit-flex-shrink-fix">
+  <div class="flex" :class="$style.webkitFlexShrinkFix">
     <b-button @click="clear">
       <fa-icon icon="eraser" />
       <span>{{ $t("command.search.clear") }}</span>
@@ -47,10 +47,10 @@ export default class LdCommandSearch extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" module>
 // fix flexbox shrinking and overlap in old webkit versions
 // https://github.com/pacien/ldgallery/issues/183
-.webkit-flex-shrink-fix {
+.webkitFlexShrinkFix {
   flex: none;
 }
 </style>

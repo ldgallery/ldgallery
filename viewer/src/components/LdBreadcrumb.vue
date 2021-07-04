@@ -21,14 +21,15 @@
   <div
     ref="breadcrumb"
     v-dragscroll
-    class="ld-breadcrumb flex scrollbar"
+    class="flex scrollbar"
+    :class="$style.ldBreadcrumb"
     @click.capture="e => dragScrollClickFix.onClickCapture(e)"
     @dragscrollstart="dragScrollClickFix.onDragScrollStart()"
     @dragscrollend="dragScrollClickFix.onDragScrollEnd()"
     @dragscrollmove="checkForOverflowMask"
   >
-    <div v-show="overflowMask" class="ld-breadcrumb-overflow-mask"></div>
-    <ul class="ld-breadcrumb">
+    <div v-show="overflowMask" :class="$style.ldBreadcrumbOverflowMask"></div>
+    <ul>
       <li v-for="(item, idx) in currentItemPath" :key="item.path">
         <fa-icon v-if="idx > 0" icon="angle-right" class="disabled" />
         <router-link :to="item.path" class="link">
@@ -89,10 +90,10 @@ export default class LdBreadcrumb extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" module>
 @import "~@/assets/scss/theme.scss";
 
-.ld-breadcrumb-overflow-mask {
+.ldBreadcrumbOverflowMask {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -104,7 +105,7 @@ export default class LdBreadcrumb extends Vue {
   pointer-events: none;
 }
 
-.ld-breadcrumb {
+.ldBreadcrumb {
   ul {
     display: flex;
     white-space: nowrap;
@@ -117,7 +118,7 @@ export default class LdBreadcrumb extends Vue {
     align-self: center;
     margin-right: $breadcrumb-margins;
   }
-  &.scrollbar {
+  &:global(.scrollbar) {
     overflow-y: hidden;
     scrollbar-width: none;
     &::-webkit-scrollbar {

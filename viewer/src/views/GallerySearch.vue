@@ -52,5 +52,3 @@ export default class GalleryPicture extends Vue {
   }
 }
 </script>
-
-<style lang="scss"></style>

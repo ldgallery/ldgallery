@@ -42,5 +42,3 @@ export default class LdPdfViewer extends Vue {
   }
 }
 </script>
-
-<style lang="scss" module></style>
