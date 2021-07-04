@@ -2,7 +2,7 @@
   <b-loading v-if="isLoading" active />
   <div v-else-if="markdown" :class="$style.splashscreen" class="scrollbar">
     <Markdown :style="config.style" class="flex-grow-1" :markdown="markdown" />
-    <b-button size="is-large" :label="buttonAcknowledgeLabel" :class="$style.buttonAcknowledge" @click="validation" />
+    <b-button size="is-large" :label="buttonAcknowledgeLabel" @click="validation" />
   </div>
 </template>
 
@@ -64,9 +64,5 @@ export default class SplashScreen extends Vue {
   flex-flow: column;
   align-items: center;
   padding: 32px;
-}
-.buttonAcknowledge {
-  min-width: 310px;
-  align-self: center;
 }
 </style>
