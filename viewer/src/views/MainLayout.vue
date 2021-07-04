@@ -18,11 +18,17 @@
 -->
 
 <template>
-  <div :class="{ fullscreen: $uiStore.fullscreen, fullwidth: $uiStore.fullWidth }">
+  <div :class="{ [$style.fullscreen]: $uiStore.fullscreen, [$style.fullwidth]: $uiStore.fullWidth }">
     <ld-title :gallery-title="$galleryStore.galleryTitle" :current-item="$galleryStore.currentItem" />
-    <panel-top v-if="isReady" class="layout layout-top" />
-    <panel-left v-if="isReady" class="layout layout-left" />
-    <router-view v-if="!isLoading" ref="content" class="layout layout-content scrollbar" tabindex="01" />
+    <PanelTop v-if="isReady" :class="[$style.layout, $style.layoutTop]" />
+    <PanelLeft v-if="isReady" :class="[$style.layout, $style.layoutLeft]" />
+    <router-view
+      v-if="!isLoading"
+      ref="content"
+      :class="[$style.layout, $style.layoutContent]"
+      class="scrollbar"
+      tabindex="01"
+    />
     <b-loading :active="isLoading" is-full-page />
     <ld-key-press :keycode="27" @action="$uiStore.toggleFullscreen(false)" />
   </div>
@@ -112,11 +118,11 @@ export default class MainLayout extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" module>
 @import "~@/assets/scss/theme.scss";
 
-body,
-html {
+:global(body),
+:global(html) {
   height: 100%;
   overflow: hidden;
   touch-action: none;
@@ -131,16 +137,16 @@ html {
   bottom: 0;
   left: 0;
   right: 0;
-  &.layout-top {
+  &.layoutTop {
     height: $layout-top;
     z-index: 1;
   }
-  &.layout-left {
+  &.layoutLeft {
     top: $layout-top;
     width: $layout-left;
     z-index: 2;
   }
-  &.layout-content {
+  &.layoutContent {
     top: var(--layout-top);
     left: var(--layout-left);
     z-index: 3;
@@ -164,17 +170,16 @@ html {
 }
 
 .layout {
-  &.layout-top {
+  &.layoutTop {
     background-color: $panel-top-bgcolor;
     color: $panel-top-txtcolor;
   }
-  &.layout-left {
+  &.layoutLeft {
     background-color: $panel-left-bgcolor;
     color: $panel-left-txtcolor;
   }
-  &.layout-content {
+  &.layoutContent {
     background-color: $content-bgcolor;
   }
 }
-// =====
 </style>

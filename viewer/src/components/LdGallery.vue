@@ -19,7 +19,7 @@
 
 <template>
   <ld-error v-if="hasNoResults" icon="search" :message="noresult" />
-  <div v-else class="thumbnail-tiles">
+  <div v-else :class="$style.thumbnailTiles">
     <router-link v-for="item in sortedItems" :key="item.path" :to="item.path">
       <ld-thumbnail :item="item" />
     </router-link>
@@ -45,8 +45,8 @@ export default class LdPicture extends Vue {
 }
 </script>
 
-<style lang="scss">
-.thumbnail-tiles {
+<style lang="scss" module>
+.thumbnailTiles {
   display: flex;
   flex-wrap: wrap;
   align-items: center;

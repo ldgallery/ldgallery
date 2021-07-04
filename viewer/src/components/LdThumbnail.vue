@@ -18,7 +18,7 @@
 -->
 
 <template>
-  <div :class="{ preload: loading }">
+  <div :class="{ [$style.preload]: loading }">
     <v-lazy-image
       v-if="item.thumbnail"
       :src="pictureSrc(item.thumbnail.resource)"
@@ -27,7 +27,7 @@
       @intersect="loading = true"
       @load="loading = false"
     />
-    <div v-else class="thumbnail-other flex-column flex-center">
+    <div v-else class="flex-column flex-center" :class="$style.thumbnailOther">
       <div>
         <fa-icon :icon="icon" size="4x" />
       </div>
@@ -62,10 +62,10 @@ export default class LdThumbnail extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" module>
 @import "~@/assets/scss/theme.scss";
 
-.thumbnail-other {
+.thumbnailOther {
   width: $thumbnail-other-size;
   height: $thumbnail-other-size;
   padding-top: $body-line-height * 1em;
