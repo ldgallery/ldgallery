@@ -18,6 +18,7 @@
 */
 
 import { ItemType } from "./ItemType";
+import { SplashScreenConfig } from "./splashscreen";
 
 export type ItemSortStr = "title_asc" | "date_asc" | "date_desc";
 
@@ -26,6 +27,7 @@ export interface Config {
   galleryIndex?: string;
   initialItemSort?: ItemSortStr;
   initialTagDisplayLimit?: number;
+  splashScreen?: SplashScreenConfig;
 }
 
 export interface Properties {
