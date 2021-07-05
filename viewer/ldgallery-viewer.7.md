@@ -92,12 +92,12 @@ initialTagDisplayLimit
   Set to -1 to disable the limit on suggestions.
   Defaults to 10.
 
+splashScreen
+: Displays an information notice before opening the gallery (see below).
+
 An alternative viewer configuration file located in the viewer's directory can be loaded by specifying its name,
 without the ".json" extension, as a query parameter given before the page anchor;
 for example, some alternative configuration named "config_2.json" can be loaded with "http://gallery/?config_2#".
-
-splashScreen
-: Displays an information notice before opening the gallery (see below).
 
 
 # SPLASH SCREEN CONFIGURATION
@@ -106,9 +106,10 @@ splashScreen.resource
 : Absolute or relative path to the information notice. The user is prompted to explicitly acknowledge such notice before being allowed to browse the gallery.
   Rich text formatting is possible through the use of the [GitHub Flavoured Markdown syntax][GFM].
   Inline HTML and CSS are also supported.
+  [GFM]: https://github.github.com/gfm/
 
-splashScreen.dontshowagainUID
-: Optional unique ID; when set, the information notice will appear only the first time it is proposed to the user. To display the notice again, change this UID.
+splashScreen.acknowledgmentKey
+: Optional key; when set to an arbitrary string, the information notice will appear only the first time it is proposed to the user. Once the notice acknowledged, the key is saved to the device's local storage. To display the notice again, change this key to another value.
   When left empty, the notice will appear every time.
 
 splashScreen.buttonAcknowledgeLabel
@@ -119,7 +120,6 @@ splashScreen.style
 : Optional CSS attributes for the information notice's container.
   String or JSON formats are supported.
 
-  [GFM]: https://github.github.com/gfm/
 
 # CONFIGURATION EXAMPLE
 
@@ -133,7 +133,7 @@ Viewer __config.json__:
   "initialTagDisplayLimit": 10,
   "splashScreen": {
     "resource": "./splashscreen.md",
-    "dontshowagainUID": "v001",
+    "acknowledgmentKey": "v001",
     "buttonAcknowledgeLabel": "I agree",
     "style": {
       "max-width": "45em",

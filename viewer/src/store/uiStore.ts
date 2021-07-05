@@ -27,7 +27,7 @@ const VuexModule = createModule({
   strict: true,
 });
 
-const STORAGE_SPLASHSCREEN_VALIDATION = "splashScreenValidation";
+const STORAGE_SPLASHSCREEN_ACKNOWLEDGMENT = "splashScreenAcknowledgment";
 
 export default class UIStore extends VuexModule {
   fullscreen: boolean = false;
@@ -74,8 +74,8 @@ export default class UIStore extends VuexModule {
     }
     if (config.splashScreen) {
       this.setSplashScreenConfig(config.splashScreen);
-      const uid = config.splashScreen.dontshowagainUID;
-      this.setSplashScreenEnabled(!uid || localStorage.getItem(STORAGE_SPLASHSCREEN_VALIDATION) !== uid);
+      const uid = config.splashScreen.acknowledgmentKey;
+      this.setSplashScreenEnabled(!uid || localStorage.getItem(STORAGE_SPLASHSCREEN_ACKNOWLEDGMENT) !== uid);
     }
   }
 
@@ -83,7 +83,7 @@ export default class UIStore extends VuexModule {
 
   @action async validateSpashScreen() {
     this.setSplashScreenEnabled(false);
-    const uid = this.splashScreenConfig?.dontshowagainUID;
-    if (uid) localStorage.setItem(STORAGE_SPLASHSCREEN_VALIDATION, String(uid));
+    const uid = this.splashScreenConfig?.acknowledgmentKey;
+    if (uid) localStorage.setItem(STORAGE_SPLASHSCREEN_ACKNOWLEDGMENT, String(uid));
   }
 }

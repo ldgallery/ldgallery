@@ -31,7 +31,7 @@ export default class SplashScreen extends Vue {
   }
 
   fetchMarkdown() {
-    FetchWithCheck.get(`${process.env.VUE_APP_DATA_URL}${this.config.resource}?${this.config.dontshowagainUID ?? ""}`)
+    FetchWithCheck.get(`${process.env.VUE_APP_DATA_URL}${this.config.resource}?${this.config.acknowledgmentKey ?? ""}`)
       .then(response => response.text())
       .then(text => (this.markdown = text))
       .finally(() => (this.isLoading = false))

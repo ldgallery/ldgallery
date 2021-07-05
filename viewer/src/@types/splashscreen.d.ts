@@ -19,7 +19,7 @@
 
 export interface SplashScreenConfig {
   resource?: string;
-  dontshowagainUID?: string;
+  acknowledgmentKey?: string;
   buttonAcknowledgeLabel?: string;
   style?: any;
 }
