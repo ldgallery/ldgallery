@@ -9,7 +9,7 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           # Latest version officially tested for Ld
-          node-version: 12.22.2
+          node-version: 16.14.2
       - name: Lint and build Node.js Vue project
         working-directory: viewer
         run: |
