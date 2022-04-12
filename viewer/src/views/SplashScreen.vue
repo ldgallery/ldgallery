@@ -30,6 +30,7 @@ export default class SplashScreen extends Vue {
     this.fetchMarkdown();
   }
 
+  // TODO: Identical to LdMarkdownViewer.vue, use composition with Vue3.
   fetchMarkdown() {
     FetchWithCheck.get(`${process.env.VUE_APP_DATA_URL}${this.config.resource}?${this.config.acknowledgmentKey ?? ""}`)
       .then(response => response.text())

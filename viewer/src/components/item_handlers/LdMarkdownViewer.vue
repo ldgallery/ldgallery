@@ -20,7 +20,7 @@
 
 <template>
   <b-loading v-if="isLoading" active />
-  <Markdown v-else-if="markdown" class="flex-grow-1" :markdown="markdown" />
+  <Markdown v-else-if="markdown" :class="$style.container" :markdown="markdown" />
 </template>
 
 <script lang="ts">
@@ -48,6 +48,7 @@ export default class LdMarkdownViewer extends Vue {
     return this.$galleryStore.resourceRoot + this.item.properties.resource;
   }
 
+  // TODO: Identical to SplashScreen.vue, use composition with Vue3.
   fetchMarkdown() {
     FetchWithCheck.get(this.itemResourceUrl)
       .then(response => response.text())
@@ -69,14 +70,7 @@ export default class LdMarkdownViewer extends Vue {
 </script>
 
 <style lang="scss" module>
-.splashscreen {
-  display: flex;
-  flex-flow: column;
-  align-items: center;
-  padding: 32px;
-}
-.buttonOkay {
-  min-width: 310px;
-  align-self: center;
+.container {
+  padding: 8px;
 }
 </style>
