@@ -1,62 +1,63 @@
+<!-- ldgallery - A static generator which turns a collection of tagged
+--             pictures into a searchable web gallery.
+--
+-- Copyright (C) 2019-2022  Guillaume FOUET
+--
+-- This program is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Affero General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU Affero General Public License for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License
+-- along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
 <template>
-  <b-loading v-if="isLoading" active />
-  <div v-else-if="markdown" :class="$style.splashscreen" class="scrollbar">
-    <Markdown :style="config.style" class="flex-grow-1" :markdown="markdown" />
-    <b-button size="is-large" :label="buttonAcknowledgeLabel" @click="validation" />
+  <LdLoading v-if="isFetching" />
+  <div
+    v-else-if="!error && data"
+    :class="$style.splashscreen"
+    class="scrollbar"
+  >
+    <LdMarkdown
+      :style="config.style"
+      class="flex-grow-1"
+      :markdown="data"
+    />
+    <button
+      tabindex="1"
+      autofocus
+      @click="emit('validation')"
+    >
+      {{ buttonAcknowledgeLabel }}
+    </button>
   </div>
 </template>
 
-<script lang="ts">
-import { SplashScreenConfig } from "@/@types/splashscreen";
-import { Markdown } from "@/components/async";
-import FetchWithCheck from "@/services/fetchWithCheck";
-import { TranslateResult } from "vue-i18n";
-import { Component, Emit, Vue } from "vue-property-decorator";
+<script setup lang="ts">
+import { LdMarkdown } from '@/components/async';
+import LdLoading from '@/components/LdLoading.vue';
+import { useLdFetch } from '@/services/api/ldFetch';
+import { useUiStore } from '@/store/uiStore';
+import { computed, readonly } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-@Component({
-  components: {
-    Markdown,
-  },
-})
-export default class SplashScreen extends Vue {
-  isLoading: boolean = true;
-  markdown: string | null = null;
+const emit = defineEmits(['validation']);
 
-  get config(): SplashScreenConfig {
-    return this.$uiStore.splashScreenConfig!;
-  }
+const { t } = useI18n();
+const uiStore = useUiStore();
 
-  created() {
-    this.fetchMarkdown();
-  }
+const config = readonly(uiStore.splashScreenConfig ?? {});
 
-  // TODO: Identical to LdMarkdownViewer.vue, use composition with Vue3.
-  fetchMarkdown() {
-    FetchWithCheck.get(`${process.env.VUE_APP_DATA_URL}${this.config.resource}?${this.config.acknowledgmentKey ?? ""}`)
-      .then(response => response.text())
-      .then(text => (this.markdown = text))
-      .finally(() => (this.isLoading = false))
-      .catch(this.displayError);
-  }
+const buttonAcknowledgeLabel = computed(() => config.buttonAcknowledgeLabel ?? t('splashScreen.button.acknowledge'));
+const itemResourceUrl = computed(() => `${process.env.VUE_APP_DATA_URL}${config.resource}?${config.acknowledgmentKey ?? ''}`);
 
-  displayError(reason: any) {
-    this.$buefy.snackbar.open({
-      message: `${reason}`,
-      actionText: this.$t("snack.retry"),
-      position: "is-top",
-      type: "is-danger",
-      indefinite: true,
-      onAction: this.fetchMarkdown,
-    });
-  }
-
-  get buttonAcknowledgeLabel(): TranslateResult {
-    return this.config.buttonAcknowledgeLabel ?? this.$t("splashScreen.button.acknowledge");
-  }
-
-  @Emit()
-  validation() {}
-}
+const { isFetching, data, error } = useLdFetch(itemResourceUrl).text();
 </script>
 
 <style lang="scss" module>
@@ -65,5 +66,10 @@ export default class SplashScreen extends Vue {
   flex-flow: column;
   align-items: center;
   padding: 32px;
+
+  button {
+    font-size: 1.5rem;
+    margin-top: 1em;
+  }
 }
 </style>

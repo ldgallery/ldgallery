@@ -123,7 +123,7 @@ jobs:
           pandoc --standalone --to html license.md --output dist/license.html
       - name: Bundle ImageMagick
         run: |
-          MAGICK_ARCHIVES="https://download.imagemagick.org/ImageMagick/download/binaries/"
+          MAGICK_ARCHIVES="https://imagemagick.org/archive/binaries/"
           MAGICK_LATEST=$( \
             curl --silent "$MAGICK_ARCHIVES" \
             | hxclean \

@@ -1,7 +1,7 @@
 /* ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019-2020  Guillaume FOUET
+-- Copyright (C) 2019-2022  Guillaume FOUET
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -17,26 +17,22 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import Vue from "vue";
-import VueRouter, { RouteConfig } from "vue-router";
-import GalleryNavigation from "@/views/GalleryNavigation.vue";
+import GalleryNavigation from '@/views/GalleryNavigation.vue';
+import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
 
-Vue.use(VueRouter);
-
-const routes: RouteConfig[] = [
+const routes: Array<RouteRecordRaw> = [
   {
-    path: "*",
-    name: "GalleryNavigation",
+    path: '/:catchAll(.*)',
+    name: 'GalleryNavigation',
     component: GalleryNavigation,
     props: route => ({
-      path: route.params.pathMatch,
+      path: decodeURIComponent(route.path),
       query: Object.keys(route.query),
     }),
   },
 ];
 
-const router = new VueRouter({
+export default createRouter({
+  history: createWebHashHistory(),
   routes,
 });
-
-export default router;

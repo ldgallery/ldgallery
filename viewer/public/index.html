@@ -1,7 +1,7 @@
 <!-- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019-2020  Guillaume FOUET
+-- Copyright (C) 2019-2022  Guillaume FOUET
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -18,27 +18,19 @@
 -->
 
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="user-scalable=no,width=device-width,initial-scale=1.0">
-  <meta name="generator" content="ldgallery, software distributed under the terms of the GNU Affero General Public License v3.0">
-
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-  <title>ldgallery</title>
-</head>
-
-<body>
-  <noscript>
-    <strong>We're sorry but ldgallery doesn't work properly without JavaScript enabled. Please enable it to
-      continue.</strong>
-  </noscript>
-  <div id="ldgallery"></div>
-  <!-- built files will be auto injected -->
-</body>
-
+<html lang="en" class="notranslate" translate="no" style="background-color: #333;">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
 </html>

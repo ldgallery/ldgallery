@@ -1,42 +1,27 @@
-/* ldgallery - A static generator which turns a collection of tagged
---             pictures into a searchable web gallery.
---
--- Copyright (C) 2019-2020  Guillaume FOUET
---
--- This program is free software: you can redistribute it and/or modify
--- it under the terms of the GNU Affero General Public License as
--- published by the Free Software Foundation, either version 3 of the
--- License, or (at your option) any later version.
---
--- This program is distributed in the hope that it will be useful,
--- but WITHOUT ANY WARRANTY; without even the implied warranty of
--- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
--- GNU Affero General Public License for more details.
---
--- You should have received a copy of the GNU Affero General Public License
--- along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+/* eslint-disable import/extensions */
+import '@/assets/scss/global.scss';
+import '@/assets/scss/scrollbar.scss';
+import '@/assets/scss/transition.scss';
+import 'mosha-vue-toastify/dist/style.css';
+import { createPinia } from 'pinia';
+import { createApp, defineAsyncComponent } from 'vue';
+import VueDragscroll from 'vue-dragscroll';
+import { importFaIcon } from './plugins/asyncLib';
+import i18n from './plugins/i18n';
+import router from './plugins/router';
+import { useLdFullscreen } from './services/ui/ldFullscreen';
+import { useLdKeyboard } from './services/ui/ldKeyboard';
+import { useLdTitle } from './services/ui/ldTitle';
+import App from './views/MainLayout.vue';
 
-import "@/assets/scss/global.scss";
-import "@/assets/scss/scrollbar.scss";
-import "@/assets/scss/transition.scss";
-import { MainLayout } from "@/plugins";
-import i18n from "@/plugins/i18n";
-import router from "@/plugins/router";
-import store from "@/store";
-import Vue from "vue";
+createApp(App)
+  .use(createPinia())
+  .use(i18n)
+  .use(router)
+  .use(VueDragscroll)
+  .component('fa-icon', defineAsyncComponent(importFaIcon))
+  .mount('#app');
 
-Vue.config.productionTip = false;
-
-declare module "vue/types/vue" {
-  interface Vue {
-    $style: any; // SCSS modules
-  }
-}
-
-new Vue({
-  router,
-  i18n,
-  store,
-  render: h => h(MainLayout),
-}).$mount("#ldgallery");
+useLdTitle();
+useLdKeyboard();
+useLdFullscreen();

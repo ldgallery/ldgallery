@@ -1,7 +1,7 @@
 /* ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019-2020  Guillaume FOUET
+-- Copyright (C) 2019-2022  Guillaume FOUET
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -22,49 +22,37 @@
 -- VUE_APP_DEVSERVER_CONFIG_PATH=<http_url> will use the dev_proxyconfig
 -- VUE_APP_DEVSERVER_CONFIG_PATH=<fs_path> will use the dev_fsconfig
 */
-const dev_ready = Boolean(process.env.VUE_APP_DEVSERVER_CONFIG_PATH);
-const dev_isproxy = dev_ready && Boolean(process.env.VUE_APP_DEVSERVER_CONFIG_PATH.match(/^https?:\/\//i));
-const dev_localpath = `^/${process.env.VUE_APP_DATA_URL}`;
-const dev_proxyconfig = {
-  [dev_localpath]: {
-    target: process.env.VUE_APP_DEVSERVER_CONFIG_PATH,
-    pathRewrite: { [dev_localpath]: "" },
-  },
-};
-const dev_fsconfig = (app, server, compiler) => {
-  app.get(`${dev_localpath}*`, (req, res) => {
-    const fs = require("fs");
-    const url = req.url.slice(process.env.VUE_APP_DATA_URL.length);
-    const paramIdx = url.indexOf("?");
-    const filepath = paramIdx < 0 ? url : url.substring(0, paramIdx);
-    const fullpath = `${process.env.VUE_APP_DEVSERVER_CONFIG_PATH}${decodeURIComponent(filepath)}`;
-    const file = fs.readFileSync(fullpath);
-    res.end(file);
-  });
-};
-// =================
 
-module.exports = {
-  publicPath: "./",
+const { defineConfig } = require('@vue/cli-service');
+const devServer = require('./src/plugins/devServer');
+
+module.exports = defineConfig({
+  publicPath: './',
+  transpileDependencies: false,
+  productionSourceMap: false,
+
+  devServer,
   pluginOptions: {
-    i18n: {
-      locale: "en",
-      fallbackLocale: "en",
-      localeDir: "locales",
-      enableInSFC: false,
+  },
+
+  configureWebpack: {
+    cache: {
+      type: 'filesystem',
     },
   },
+
   chainWebpack: config => {
-    config.plugins.delete("prefetch");
+    // Integrates the YAML loader, for i18n files
+    config.module
+      .rule('yaml')
+      .test(/\.ya?ml$/)
+      .use('yaml')
+      .loader('js-yaml-loader');
+    config.plugin('define')
+      .tap(args => {
+        args[0].__VUE_I18N_FULL_INSTALL__ = false;
+        args[0].__VUE_I18N_LEGACY_API__ = false;
+        return args;
+      });
   },
-  configureWebpack: {
-    devtool: "source-map",
-  },
-  productionSourceMap: false,
-  devServer: {
-    port: process.env.VUE_APP_DEVSERVER_PORT,
-    serveIndex: true,
-    proxy: dev_ready && dev_isproxy ? dev_proxyconfig : undefined,
-    before: dev_ready && !dev_isproxy ? dev_fsconfig : undefined,
-  },
-};
+});

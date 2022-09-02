@@ -1,7 +1,7 @@
 <!-- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019-2020  Guillaume FOUET
+-- Copyright (C) 2019-2022  Guillaume FOUET
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -18,131 +18,94 @@
 -->
 
 <template>
-  <div :class="{ [$style.fullscreen]: $uiStore.fullscreen, [$style.fullwidth]: $uiStore.fullWidth }">
-    <ld-title :gallery-title="$galleryStore.galleryTitle" :current-item="$galleryStore.currentItem" />
-    <PanelTop v-if="isReady" :class="[$style.layout, $style.layoutTop]" />
-    <PanelLeft v-if="isReady" :class="[$style.layout, $style.layoutLeft]" />
-    <b-loading v-if="isLoading" active />
+  <div :class="{ [$style.fullscreen]: uiStore.fullscreen, [$style.fullwidth]: uiStore.fullWidth }">
+    <LdLoading v-if="isLoading" />
     <SplashScreen
-      v-else-if="$uiStore.splashScreenEnabled"
-      :class="$style.layout"
-      @validation="$uiStore.validateSpashScreen()"
+      v-else-if="uiStore.splashScreenEnabled"
+      @validation="validateSpashScreen"
     />
-    <router-view v-else ref="content" :class="[$style.layout, $style.layoutContent]" class="scrollbar" tabindex="01" />
-    <ld-key-press :keycode="27" @action="$uiStore.toggleFullscreen(false)" />
+    <template v-else-if="galleryStore.config && galleryStore.galleryIndex">
+      <LayoutTop :class="[$style.layout, $style.layoutTop]" />
+      <LayoutLeft :class="[$style.layout, $style.layoutLeft]" />
+      <router-view
+        ref="content"
+        :class="[$style.layout, $style.layoutContent]"
+        class="scrollbar"
+        tabindex="2"
+      />
+    </template>
   </div>
 </template>
 
-<script lang="ts">
-import { ScrollPosition } from "@/@types/scrollposition";
-import { Component, Ref, Vue, Watch } from "vue-property-decorator";
-import { Route } from "vue-router";
-import PanelLeft from "./PanelLeft.vue";
-import PanelTop from "./PanelTop.vue";
-import SplashScreen from "./SplashScreen.vue";
+<script setup lang="ts">
+import LdLoading from '@/components/LdLoading.vue';
+import { useLdKeepFocus } from '@/services/ui/ldKeepFocus';
+import { useLdSaveScroll } from '@/services/ui/ldSaveScroll';
+import { useGalleryStore } from '@/store/galleryStore';
+import { useUiStore } from '@/store/uiStore';
+import { VueInstance } from '@vueuse/core';
+import { createToast } from 'mosha-vue-toastify';
+import { nextTick, ref } from 'vue';
+import LayoutLeft from './layout/left/LayoutLeft.vue';
+import LayoutTop from './layout/top/LayoutTop.vue';
+import SplashScreen from './SplashScreen.vue';
 
-@Component({
-  components: {
-    PanelLeft,
-    PanelTop,
-    SplashScreen,
-  },
-})
-export default class MainLayout extends Vue {
-  @Ref() readonly content?: Vue;
+const uiStore = useUiStore();
+const galleryStore = useGalleryStore();
 
-  isLoading: boolean = true;
-  scrollPositions: ScrollPosition = {};
+const content = ref<VueInstance>();
+const isLoading = ref(true);
 
-  get contentDiv(): HTMLDivElement | null {
-    return (this.content?.$el as HTMLDivElement) ?? null;
-  }
+useLdSaveScroll(content);
+const { moveFocus } = useLdKeepFocus(content);
 
-  get isReady(): boolean {
-    return (
-      !this.$uiStore.splashScreenEnabled &&
-      !this.isLoading &&
-      this.$galleryStore.config !== null &&
-      this.$galleryStore.currentPath !== null
-    );
-  }
+history.replaceState({ ldgallery: 'ENTRYPOINT' }, '');
+fetchGalleryItems();
 
-  mounted() {
-    history.replaceState({ ldgallery: "ENTRYPOINT" }, "");
-    this.fetchGalleryItems();
-    document.body.addEventListener("fullscreenchange", this.onFullscreenChange);
-  }
+function fetchGalleryItems() {
+  isLoading.value = true;
+  galleryStore
+    .fetchConfig()
+    .then(uiStore.initFromConfig)
+    .then(galleryStore.fetchGalleryItems)
+    .then(moveFocus)
+    .finally(() => (isLoading.value = false))
+    .catch(displayError);
+}
 
-  destroyed() {
-    document.body.removeEventListener("fullscreenchange", this.onFullscreenChange);
-  }
+function displayError(reason: unknown) {
+  createToast(String(reason), {
+    type: 'danger',
+    position: 'top-center',
+    timeout: 10000,
+    showIcon: true,
+    onClose: () => !isLoading.value && fetchGalleryItems(),
+  });
+}
 
-  moveFocusToContentDiv() {
-    setTimeout(() => this.contentDiv?.focus());
-  }
-
-  @Watch("$route")
-  routeChanged(newRoute: Route, oldRoute: Route) {
-    if (!this.contentDiv) return;
-    this.scrollPositions[oldRoute.path] = this.contentDiv.scrollTop;
-    this.$nextTick(() => (this.contentDiv!.scrollTop = this.scrollPositions[newRoute.path]));
-    this.moveFocusToContentDiv();
-  }
-
-  fetchGalleryItems() {
-    this.isLoading = true;
-    this.$galleryStore
-      .fetchConfig()
-      .then(this.$uiStore.initFromConfig)
-      .then(this.$galleryStore.fetchGalleryItems)
-      .then(this.moveFocusToContentDiv)
-      .finally(() => (this.isLoading = false))
-      .catch(this.displayError);
-  }
-
-  displayError(reason: any) {
-    this.$buefy.snackbar.open({
-      message: `${reason}`,
-      actionText: this.$t("snack.retry"),
-      position: "is-top",
-      type: "is-danger",
-      indefinite: true,
-      onAction: this.fetchGalleryItems,
-    });
-  }
-
-  isFullscreenActive(): boolean {
-    return Boolean(document.fullscreenElement);
-  }
-
-  @Watch("$uiStore.fullscreen")
-  applyFullscreen(fullscreen: boolean) {
-    const isFullscreenActive = this.isFullscreenActive();
-    if (fullscreen && !isFullscreenActive) document.body.requestFullscreen();
-    else if (isFullscreenActive) document.exitFullscreen();
-  }
-
-  onFullscreenChange() {
-    this.$uiStore.toggleFullscreen(this.isFullscreenActive());
-  }
+function validateSpashScreen() {
+  uiStore.validateSpashScreen();
+  nextTick(moveFocus);
 }
 </script>
 
 <style lang="scss" module>
-@import "~@/assets/scss/theme.scss";
+@import "~@/assets/scss/theme";
 
+:root {
+  --layout-top: #{$layout-top};
+  --layout-left: #{$layout-left};
+}
 :global(body),
 :global(html) {
+  font-family: $family-sans-serif;
   height: 100%;
   overflow: hidden;
   touch-action: none;
   background-color: $content-bgcolor;
-  --layout-top: #{$layout-top};
-  --layout-left: #{$layout-left};
 }
 .layout {
   position: fixed;
-  transition: all $transition-flex-expand linear;
   top: 0;
   bottom: 0;
   left: 0;

@@ -1,0 +1,44 @@
+command:
+  back: Go back
+  parent: Go to parent directory
+  search:
+    clear: Clear
+    search: Search
+    slider: Open/close search panel
+  sort:
+    byDateAsc: By date (oldest first)
+    byDateDesc: By date (most recent first)
+    byTitleAsc: By title (A to Z)
+    title: Sort by...
+directory:
+  no-results: Empty directory
+download:
+  download-file-fmt: Download {0}
+gallery:
+  resource-loading-error: Error loading resource
+  unknown-resource: Resource not found
+panelLeft:
+  information:
+    title: Information
+  propositions:
+    other: other filters
+    related: Related filters
+  taglist:
+    activetag:
+      title: Remove tag
+search:
+  no-result-fmt: >-
+    No result<br>({0} match in other folders) | No result<br>({0} matches in
+    other folders)
+splashScreen:
+  button:
+    acknowledge: Acknowledge
+tag-propositions:
+  addition: Include all items with this tag
+  intersection: Search for this tag
+  item-count: Item count
+  showmore: show more ({0})
+  substraction: Exclude items with this tag
+tagInput:
+  nomatch: No match
+  placeholder: Filters
