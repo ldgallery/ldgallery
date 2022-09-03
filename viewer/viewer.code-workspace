@@ -18,5 +18,13 @@
       "src/locales"
     ],
     "i18n-ally.keystyle": "nested",
+  },
+  "extensions": {
+    "recommendations": [
+      "vue.volar",
+      "dbaeumer.vscode-eslint",
+      "lokalise.i18n-ally",
+      "sibiraj-s.vscode-scss-formatter"
+    ]
   }
 }
