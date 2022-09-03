@@ -22,41 +22,35 @@
   <LdLink
     :title="t('command.sort.title')"
     :tabindex="props.tabindex"
-    @click="openDropdown"
+    @click="showDropdown=!showDropdown"
   >
     <fa-icon
       :icon="faSortAmountDown"
       size="lg"
     />
     <teleport to="body">
-      <Transition name="fade">
-        <div
-          v-if="showDropdown"
-          ref="dropdown"
-          :class="$style.dropdown"
-        >
-          <div
-            v-for="(sort,idx) in itemComparator.ITEM_SORTS"
-            :key="sort.name"
-            :tabindex="props.tabindex + idx + 1"
-            @click="selectedSort=sort"
-            @keypress.enter.space="selectedSort=sort"
-          >
-            <fa-icon :icon="sort.name == selectedSort.name ? faDotCircle : faCircle" />
-            <span v-text="sort.text" />
-          </div>
-        </div>
-      </Transition>
+      <LdDropdown
+        v-model="showDropdown"
+        :list="itemComparator.ITEM_SORTS"
+        :tabindex-root="props.tabindex + 1"
+        :class="$style.dropdown"
+        @select="(sort: ItemSort) => selectedSort=sort"
+      >
+        <template #option="{option}:{option:ItemSort}">
+          <fa-icon :icon="option.name == selectedSort.name ? faDotCircle : faCircle" />
+          <span v-text="option.text" />
+        </template>
+      </LdDropdown>
     </teleport>
   </LdLink>
 </template>
 
 <script setup lang="ts">
+import LdDropdown from '@/components/LdDropdown.vue';
 import LdLink from '@/components/LdLink.vue';
 import { ItemSort, useItemComparator } from '@/services/itemComparator';
 import { useUiStore } from '@/store/uiStore';
 import { faCircle, faDotCircle, faSortAmountDown } from '@fortawesome/free-solid-svg-icons';
-import { onClickOutside, onKeyStroke } from '@vueuse/core';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -74,43 +68,17 @@ const selectedSort = computed({
 });
 
 const showDropdown = ref(false);
-
-const dropdown = ref();
-onClickOutside(dropdown, closeDropdown);
-onKeyStroke('Escape', closeDropdown);
-
-function openDropdown() {
-  showDropdown.value = true;
-}
-function closeDropdown() {
-  setTimeout(() => (showDropdown.value = false));
-}
 </script>
 
 <style lang="scss" module>
 @import "~@/assets/scss/theme";
 
 .dropdown {
-  position: absolute;
   top: $layout-top;
-  left: 0;
-  z-index: 10;
-  width: $layout-left;
-  color: $input-color;
-  background-color: $dropdown-item-color;
-  padding: 8px 0px;
-  cursor: pointer;
   > div {
     padding: 8px 14px;
-    margin: 2px; // For the focus border
     > span {
       padding-left: 12px;
-    }
-    &:hover {
-      background-color: $dropdown-item-hover-color;
-    }
-    &:focus {
-      outline: solid 1px $button-active-color;
     }
   }
 }

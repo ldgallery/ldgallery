@@ -103,6 +103,7 @@ function validateSpashScreen() {
   overflow: hidden;
   touch-action: none;
   background-color: $content-bgcolor;
+  margin: 0;
 }
 .layout {
   position: fixed;

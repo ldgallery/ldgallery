@@ -27,42 +27,38 @@
     @keypress.enter="inputEnter"
     @keydown.backspace="inputBackspace"
   />
-  <div style="position:relative;">
-    <Transition name="fade">
+  <LdDropdown
+    ref="dropdown"
+    v-model="showDropdown"
+    :list="filteredTags"
+    list-key="tagfiltered"
+    :tabindex-root="51"
+    :class="$style.dropdown"
+    :style="dropdownStyle"
+    @select="addTag"
+    @opening="emit('opening')"
+    @closing="cleanSearch(); emit('closing');"
+  >
+    <template #option="{option}:{option:TagSearch}">
+      <div v-text="option.display" />
+      <div v-text="option.items.length" />
+    </template>
+    <template #empty>
       <div
-        v-if="openDropdown"
-        ref="dropdown"
-        class="scrollbar"
-        :class="$style.dropdown"
-        :style="dropdownStyle"
-      >
-        <div
-          v-for="(tag,idx) in filteredTags"
-          :key="tag.tagfiltered"
-          :tabindex="51 + idx"
-          @click="addTag(tag)"
-          @keypress.enter.space="addTag(tag)"
-        >
-          <div v-text="tag.display" />
-          <div v-text="tag.items.length" />
-        </div>
-        <div
-          v-if="!filteredTags.length"
-          class="disaled"
-          :class="$style.nomatch"
-          v-text="t('tagInput.nomatch')"
-        />
-      </div>
-    </Transition>
-  </div>
+        :class="$style.nomatch"
+        v-text="t('tagInput.nomatch')"
+      />
+    </template>
+  </LdDropdown>
 </template>
 
 <script setup lang="ts">
 import { TagSearch } from '@/@types/tag';
+import LdDropdown from '@/components/LdDropdown.vue';
 import LdInput from '@/components/LdInput.vue';
 import { useIndexFactory } from '@/services/indexFactory';
 import { useGalleryStore } from '@/store/galleryStore';
-import { computedEager, onClickOutside, onKeyStroke, useElementBounding, useFocus, useVModel } from '@vueuse/core';
+import { computedEager, useElementBounding, useFocus, useVModel } from '@vueuse/core';
 import { computed, ref, StyleValue, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -77,19 +73,15 @@ const galeryStore = useGalleryStore();
 const indexFactory = useIndexFactory();
 
 const search = ref('');
-const openDropdown = computedEager<boolean>(() => !!search.value);
-watchEffect(() => {
-  if (openDropdown.value) emit('opening');
-  else emit('closing');
-});
+const showDropdown = ref(false);
+
+watchEffect(() => (showDropdown.value = !!search.value));
 
 // ---
 
 const dropdown = ref();
 const { top } = useElementBounding(dropdown);
 const dropdownStyle = computedEager<StyleValue>(() => ({ height: `calc(100vh - 8px - ${top.value}px)` }));
-onClickOutside(dropdown, closeDropdown);
-onKeyStroke('Escape', closeDropdown);
 
 const input = ref();
 const { focused } = useFocus(input);
@@ -111,16 +103,16 @@ function addTag(tag?: TagSearch) {
   const toPush = tag ?? filteredTags.value[0];
   if (!toPush) return;
   model.value.push(toPush);
-  closeDropdown();
+  cleanSearch();
 }
 function inputEnter() {
   if (search.value) addTag();
   else emit('search');
 }
 function inputBackspace() {
-  !openDropdown.value && model.value.pop();
+  !showDropdown.value && model.value.pop();
 }
-function closeDropdown() {
+function cleanSearch() {
   search.value = '';
   focused.value = true;
 }
@@ -130,35 +122,20 @@ function closeDropdown() {
 @import "~@/assets/scss/theme";
 
 .dropdown {
-  position: absolute;
-  left: 0;
-  z-index: 10;
-  width: $layout-left;
-  color: $input-color;
-  background-color: $dropdown-item-color;
-  padding: 4px 0px;
   > div {
     display: flex;
     justify-content: space-between;
-    padding: 4px 0;
-    margin: 2px; // For the focus border
-    cursor: pointer;
     > div {
       padding: 0 4px;
     }
     > div:last-child {
       color: $text-light;
     }
-    &:hover {
-      background-color: $dropdown-item-hover-color;
-    }
-    &:focus {
-      outline: solid 1px $button-active-color;
-    }
-    &.nomatch {
-      color: $text-light;
-      justify-content: center;
-    }
+  }
+  .nomatch {
+    color: $disabled-color;
+    justify-content: center;
+    cursor: default;
   }
 }
 </style>
