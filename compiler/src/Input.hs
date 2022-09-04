@@ -1,7 +1,7 @@
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019-2020  Pacien TRAN-GIRARD
+-- Copyright (C) 2019-2021  Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -100,9 +100,7 @@ readSidecarFile filepath =
 
 
 readInputTree :: AnchoredFSNode -> IO InputTree
-readInputTree (AnchoredFSNode _ File{}) =
-  throw $ AssertionFailed "Input directory is a file"
-readInputTree (AnchoredFSNode anchor root@Dir{}) = mkDirNode root
+readInputTree (AnchoredFSNode anchor root) = mkDirNode root
   where
     mkInputNode :: Map.Map FileName FSNode -> FSNode -> IO (Maybe InputTree)
     mkInputNode dir file@File{path} | not (isSidecar file) && not (isThumbnail file) =

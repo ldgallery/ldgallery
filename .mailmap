@@ -1,0 +1,9 @@
+# git shortlog -se
+# git config --global log.mailmap true
+# git log --use-mailmap
+
+zeroinformatique <10961896+zeroinformatique@users.noreply.github.com> <contact@zeroinformatique.fr>
+zeroinformatique <10961896+zeroinformatique@users.noreply.github.com> <OzoneGrif@users.noreply.github.com>
+
+pacien <pacien@users.noreply.github.com>
+pacien <pacien@users.noreply.github.com> <pacien.trangirard@pacien.net>

@@ -1,0 +1,53 @@
+/* ldgallery - A static generator which turns a collection of tagged
+--             pictures into a searchable web gallery.
+--
+-- Copyright (C) 2019-2022  Guillaume FOUET
+--
+-- This program is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Affero General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU Affero General Public License for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License
+-- along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+// Typography
+
+$family-sans-serif: BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
+  "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif !default;
+
+$size-1: 3rem !default;
+$size-2: 2.5rem !default;
+$size-3: 2rem !default;
+$size-4: 1.5rem !default;
+$size-5: 1.25rem !default;
+$size-6: 1rem !default;
+$size-7: 0.75rem !default;
+
+$weight-light: 300 !default;
+$weight-normal: 400 !default;
+$weight-medium: 500 !default;
+$weight-semibold: 600 !default;
+$weight-bold: 700 !default;
+
+// Responsiveness
+$tablet: 769px !default;
+
+// Material Design Blue Gray colour palette
+$palette-000: #ffffff;
+$palette-050: #eceff1;
+$palette-100: #cfd8dc;
+$palette-200: #b0bec5;
+$palette-300: #90a4ae;
+$palette-400: #78909c;
+$palette-500: #607d8b;
+$palette-600: #546e7a;
+$palette-700: #455a64;
+$palette-800: #37474f;
+$palette-900: #263238;

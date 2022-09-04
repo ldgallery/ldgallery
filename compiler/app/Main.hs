@@ -1,7 +1,7 @@
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019-2020  Pacien TRAN-GIRARD
+-- Copyright (C) 2019-2021  Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -19,7 +19,7 @@
 module Main where
 
 import GHC.Generics (Generic)
-import Paths_ldgallery_compiler (version, getDataFileName)
+import Paths_ldgallery_compiler (version)
 import Control.Monad (when)
 import Data.Functor ((<&>))
 import Data.Maybe (isJust)
@@ -31,7 +31,7 @@ import System.Console.CmdArgs
 
 import Compiler
 import Files (readDirectory, copyTo, remove)
-
+import ViewerDist (viewerDistPath)
 
 newtype ViewerConfig = ViewerConfig
   { galleryRoot :: String
@@ -94,6 +94,7 @@ options = Options
   }
 
   &= summary ("ldgallery v" ++ showVersion version ++ " - a static web gallery generator with tags")
+  &= details ["This software is distributed under the terms of the GNU Affero General Public License v3.0."]
   &= program "ldgallery"
   &= help "Compile a gallery"
   &= helpArg [explicit, name "h", name "help"]
@@ -105,10 +106,7 @@ main =
   do
     opts <- cmdArgs options
     buildGallery opts
-
-    when (isJust $ withViewer opts) $ do
-      viewerDist <- viewerDistPath $ withViewer opts
-      deployViewer viewerDist opts
+    deployViewer opts
 
   where
     gallerySubdir :: String
@@ -116,11 +114,6 @@ main =
 
     viewerConfig :: ViewerConfig
     viewerConfig = ViewerConfig (gallerySubdir ++ "/")
-
-    viewerDistPath :: Maybe FilePath -> IO FilePath
-    viewerDistPath (Just "") = getDataFileName "viewer"
-    viewerDistPath (Just dist) = return dist
-    viewerDistPath Nothing = fail "No viewer distribution"
 
     buildGallery :: Options -> IO ()
     buildGallery opts =
@@ -145,10 +138,11 @@ main =
           | isJust withViewer = outputDir </> gallerySubdir
           | otherwise = outputDir
 
-    deployViewer :: FilePath -> Options -> IO ()
-    deployViewer distPath Options{outputDir, cleanOutput} =
+    deployViewer :: Options -> IO ()
+    deployViewer Options{withViewer = Nothing} = pure ()
+    deployViewer Options{withViewer = Just viewerPath, outputDir, cleanOutput} =
       when cleanOutput (cleanViewerDir outputDir)
-      >> copyViewer distPath outputDir
+      >> viewerDistOr viewerPath >>= deployTo outputDir
       >> writeJSON (outputDir </> "config.json") viewerConfig
 
       where
@@ -158,8 +152,12 @@ main =
           <&> filter (/= gallerySubdir)
           >>= mapM_ (remove . (target </>))
 
-        copyViewer :: FilePath -> FilePath -> IO ()
-        copyViewer dist target =
+        viewerDistOr :: FilePath -> IO FilePath
+        viewerDistOr "" = viewerDistPath
+        viewerDistOr custom = pure custom
+
+        deployTo :: FilePath -> FilePath -> IO ()
+        deployTo target dist =
           putStrLn "Copying viewer webapp"
           >>  readDirectory dist
           >>= copyTo target

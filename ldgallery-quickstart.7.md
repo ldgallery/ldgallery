@@ -2,7 +2,7 @@
 pagetitle: Quickstart guide - ldgallery
 title: LDGALLERY-QUICKSTART(7) ldgallery
 author: Pacien TRAN-GIRARD, Guillaume FOUET
-date: 2020-09-19 (v2.0)
+date: 2022-09-04 (v2.1)
 ---
 
 # ABOUT
@@ -32,7 +32,7 @@ A new gallery can be initialised by creating a directory containing a gallery co
 
 ```
 ./monument-gallery-source
-└── gallery.yaml ----------- gallery settings file
+└── gallery.yaml ------ gallery settings file
 ```
 
 __gallery.yaml__ holds the settings of the gallery.
@@ -56,9 +56,9 @@ Optionally, some metadata such as a title and some tags can be associated by cre
 
 ```
 ./monument-gallery-source
-├── gallery.yaml ----------- gallery settings file
-├── DSC0001.jpg ------------ a picture
-└── DSC0001.jpg.yaml ------- its associated optional sidecar metadata file
+├── gallery.yaml ------ gallery settings file
+├── DSC0001.jpg ------- a picture
+└── DSC0001.jpg.yaml -- its associated optional sidecar metadata file
 ```
 
 The sidecar metadata file "DSC0001.jpg.yaml" can have the following content:
@@ -81,16 +81,6 @@ The gallery can now be compiled by running the following command in a terminal w
 ```sh
 ldgallery \
   --with-viewer \
-  --input-dir ./monument-gallery-source \
-  --output-dir ./monument-gallery-output
-```
-
-If the compiler was installed manually through the extraction of a pre-built archive,
-it might be necessary to specify the full path of the installation:
-
-```sh
-<installation path>/ldgallery \
-  --with-viewer=<installation path>/viewer \
   --input-dir ./monument-gallery-source \
   --output-dir ./monument-gallery-output
 ```
@@ -125,7 +115,7 @@ The ldgallery source code is available on <https://ldgallery.pacien.org>.
 
 # LICENSE
 
-Copyright (C) 2019-2020  Pacien TRAN-GIRARD and Guillaume FOUET.
+Copyright (C) 2019-2022  Pacien TRAN-GIRARD and Guillaume FOUET.
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

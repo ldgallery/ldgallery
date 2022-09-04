@@ -1,0 +1,30 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+    "settings": {
+    "editor.tabSize": 2,
+    "editor.wordBasedSuggestions": false,
+    "editor.detectIndentation": false,
+    "editor.formatOnSave": false,
+    "eslint.format.enable": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true,
+    },
+    "javascript.format.semicolons": "insert",
+    "i18n-ally.localesPaths": [
+      "src/locales"
+    ],
+    "i18n-ally.keystyle": "nested",
+  },
+  "extensions": {
+    "recommendations": [
+      "vue.volar",
+      "dbaeumer.vscode-eslint",
+      "lokalise.i18n-ally",
+      "sibiraj-s.vscode-scss-formatter"
+    ]
+  }
+}

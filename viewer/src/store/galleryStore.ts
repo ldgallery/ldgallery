@@ -1,7 +1,7 @@
 /* ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019-2020  Guillaume FOUET
+-- Copyright (C) 2019-2022  Guillaume FOUET
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -17,122 +17,89 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { createModule, mutation, action } from "vuex-class-component";
-import IndexFactory from "@/services/indexfactory";
-import Navigation from "@/services/navigation";
+import { Config, Index, Item } from '@/@types/gallery';
+import { TagCategory, TagIndex, TagSearch } from '@/@types/tag';
+import { useIndexFactory } from '@/services/indexFactory';
+import { useNavigation } from '@/services/navigation';
+import { defineStore } from 'pinia';
 
-const VuexModule = createModule({
-  namespaced: "galleryStore",
-  strict: true,
-});
+const navigation = useNavigation();
+const indexFactory = useIndexFactory();
 
-export default class GalleryStore extends VuexModule {
-  config: Gallery.Config | null = null;
-  galleryIndex: Gallery.Index | null = null;
-  tagsIndex: Tag.Index = {};
-  tagsCategories: Tag.Category[] = [];
-  currentPath: string | null = null;
-  currentSearch: Tag.Search[] = [];
-
-  // ---
-
-  @mutation private setConfig(config: Gallery.Config) {
-    this.config = config;
-  }
-
-  @mutation setGalleryIndex(galleryIndex: Gallery.Index) {
-    this.galleryIndex = Object.freeze(galleryIndex);
-  }
-
-  @mutation private setTagsIndex(tagsIndex: Tag.Index) {
-    this.tagsIndex = Object.freeze(tagsIndex);
-  }
-
-  @mutation private setTagsCategories(tagsCategories: Tag.Category[]) {
-    this.tagsCategories = tagsCategories;
-  }
-
-  @mutation setCurrentPath(currentPath: string) {
-    this.currentPath = currentPath;
-  }
-
-  @mutation setCurrentSearch(currentSearch: Tag.Search[]) {
-    this.currentSearch = currentSearch;
-  }
-
-  // ---
-
-  get currentItemPath(): Gallery.Item[] {
-    const root = this.galleryIndex?.tree;
-    if (root && this.currentPath) return Navigation.searchCurrentItemPath(root, this.currentPath);
-    return [];
-  }
-
-  get currentItem(): Gallery.Item | null {
-    const path = this.currentItemPath;
-    return path.length > 0 ? path[path.length - 1] : null;
-  }
-
-  get galleryTitle(): string {
-    return this.galleryIndex?.properties.galleryTitle ?? "ldgallery";
-  }
-
-  get resourceRoot(): string {
-    return process.env.VUE_APP_DATA_URL + this.config!.galleryRoot;
-  }
-
-  // ---
-
-  // Fetches the gallery's JSON config
-  @action async fetchConfig() {
-    await fetch(`${process.env.VUE_APP_DATA_URL}${GalleryStore.getUrlConfig()}`, { cache: "no-cache" })
-      .then(GalleryStore.responseToJson)
-      .then(this.setConfig);
-    return this.config!;
-  }
-
-  // Fetches the gallery's JSON metadata
-  @action async fetchGalleryItems() {
-    const root = this.config?.galleryRoot ?? "";
-    const index = this.config?.galleryIndex ?? "index.json";
-    await fetch(`${process.env.VUE_APP_DATA_URL}${root}${index}`, { cache: "no-cache" })
-      .then(GalleryStore.responseToJson)
-      .then(this.setGalleryIndex)
-      .then(this.indexTags)
-      .then(this.indexTagCategories);
-    return this.galleryIndex!;
-  }
-
-  // Indexes the gallery
-  @action async indexTags() {
-    const root = this.galleryIndex?.tree ?? null;
-    const index = IndexFactory.generateTags(root);
-    this.setTagsIndex(index);
-    return index;
-  }
-
-  // Indexes the proposed categories
-  @action async indexTagCategories() {
-    const categories = IndexFactory.generateCategories(this.tagsIndex, this.galleryIndex?.properties.tagCategories);
-    this.setTagsCategories(categories);
-    return categories;
-  }
-
-  // Searches for tags
-  @action async search(filters: string[]) {
-    const results = filters.flatMap(filter => IndexFactory.searchTags(this.tagsIndex, filter, true));
-    this.setCurrentSearch(results);
-    return results;
-  }
-
-  private static getUrlConfig() {
-    let search = window.location.search;
-    if (search.length > 1) return search.substr(1) + ".json";
-    return "config.json";
-  }
-
-  private static responseToJson(response: Response) {
-    if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`);
-    return response.json();
-  }
+function getUrlConfig() {
+  const search = window.location.search;
+  if (search.length > 1) return search.substring(1) + '.json';
+  return 'config.json';
 }
+
+function responseToJson(response: Response) {
+  if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`);
+  return response.json();
+}
+
+export const useGalleryStore = defineStore('gallery', {
+  state: () => ({
+    config: null as Config | null,
+    galleryIndex: null as Index | null,
+    tagsIndex: {} as TagIndex,
+    tagsCategories: [] as TagCategory[],
+    currentPath: null as string | null,
+    currentSearch: [] as TagSearch[],
+  }),
+  getters: {
+    currentItemPath(): Item[] {
+      const root = this.galleryIndex?.tree;
+      if (root && this.currentPath) return navigation.searchCurrentItemPath(root, this.currentPath);
+      return [];
+    },
+    currentItem(): Item | null {
+      const path = this.currentItemPath;
+      return path.length > 0 ? path[path.length - 1] : null;
+    },
+    galleryTitle(): string {
+      return this.galleryIndex?.properties.galleryTitle ?? 'ldgallery';
+    },
+    resourceRoot(): string {
+      return process.env.VUE_APP_DATA_URL + (this.config?.galleryRoot ?? '');
+    },
+  },
+  actions: {
+    // Fetches the gallery's JSON config
+    async fetchConfig() {
+      await fetch(`${process.env.VUE_APP_DATA_URL}${getUrlConfig()}`, { cache: 'no-cache' })
+        .then(responseToJson)
+        .then(v => (this.config = v));
+      return this.config as Config;
+    },
+    // Fetches the gallery's JSON metadata
+    async fetchGalleryItems() {
+      const root = this.config?.galleryRoot ?? '';
+      const index = this.config?.galleryIndex ?? 'index.json';
+      await fetch(`${process.env.VUE_APP_DATA_URL}${root}${index}`, { cache: 'no-cache' })
+        .then(responseToJson)
+        .then(v => (this.galleryIndex = v))
+        .then(this.indexTags)
+        .then(this.indexTagCategories);
+      return this.galleryIndex;
+    },
+    // Indexes the gallery
+    async indexTags() {
+      const root = this.galleryIndex?.tree ?? null;
+      const index = indexFactory.generateTags(root);
+      this.tagsIndex = index;
+      return index;
+    },
+    // Indexes the proposed categories
+    async indexTagCategories() {
+      const categories = indexFactory.generateCategories(this.tagsIndex, this.galleryIndex?.properties.tagCategories);
+      this.tagsCategories = categories;
+      return categories;
+    },
+    // Searches for tags
+    async search(filters: string[]) {
+      const results = filters.flatMap(filter => indexFactory.searchTags(this.tagsIndex, filter, true));
+      this.currentSearch = results;
+      return results;
+    },
+  },
+});

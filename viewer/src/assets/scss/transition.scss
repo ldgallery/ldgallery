@@ -17,16 +17,42 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-@import "~@/assets/scss/theme.scss";
+@import "theme";
 
 // === Transitions for Vue
 
-.flex-expand-enter-active, .flex-expand-leave-active {
-  transition: max-height $transition-flex-expand linear;
+// slide
+.slide-enter-active, 
+.slide-leave-active {
+  transition: transform $transition-slide linear;
 }
-.flex-expand-enter, .flex-expand-leave-to {
-  max-height: 0%;
+.slide-enter-from, 
+.slide-leave-to {
+  transform: translateX(-100%);
 }
-.flex-expand-enter-to, .flex-expand-leave {
-  max-height: 100%;
+
+// fade
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity $transition-fade ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+// moving
+.move-move,
+.move-enter-active,
+.move-leave-active {
+  transition: all $transition-move ease-in-out;
+}
+.move-enter-from,
+.move-leave-to {
+  opacity: 0;
+  transform: translateX(15px);
+}
+.move-leave-active {
+  position: absolute;
 }

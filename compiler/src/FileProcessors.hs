@@ -1,7 +1,7 @@
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019-2020  Pacien TRAN-GIRARD
+-- Copyright (C) 2019-2022  Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -79,7 +79,7 @@ copyFileProcessor inputPath outputPath =
 
 resizePictureUpTo :: Resolution -> FileTransformer
 resizePictureUpTo maxResolution inputPath outputPath =
-  putStrLn ("Generating:\t" ++ outputPath)
+  putStrLn ("Processing:\t" ++ outputPath)
   >> ensureParentDir (flip resize) outputPath inputPath
   where
     maxSize :: Resolution -> String

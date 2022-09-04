@@ -1,7 +1,7 @@
 /* ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019-2020  Guillaume FOUET
+-- Copyright (C) 2019-2022  Guillaume FOUET
 --               2020       Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
@@ -18,47 +18,27 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-@import "_buefy_variables.scss";
-@import "palette.scss";
-
-// Buefy components
+@import "constants";
 
 $primary: $palette-000;
 $text: $primary;
 $text-light: $palette-100;
-$text-strong: $primary;
 $input-color: $text;
 $input-placeholder-color: $text-light;
-$input-shadow: none;
-$input-border-color: transparent;
 $input-background-color: $palette-500;
 $input-focus-box-border-color: $palette-200;
-$input-focus-box-shadow-color: transparent;
 $link: $primary;
-$link-visited: $link;
 $link-hover: $palette-100;
 $disabled-color: $palette-400;
-$radius: 0;
-$loading-background: $palette-800;
 $title-color: $palette-200;
-$title-size: $size-5;
-$subtitle-color: $palette-200;
-$subtitle-size: $size-5;
-$tag-background-color: $palette-800;
+$tag-background-color: $palette-900;
 $button-color: $palette-100;
 $button-active-color: $palette-100;
-$button-active-border-color: $palette-500;
 $button-background-color: $palette-700;
 $button-border-color: $palette-500;
-$button-focus-color: $button-color;
-$button-focus-border-color: $link;
-$button-focus-box-shadow-size: 0;
 $body-line-height: 1.5;
-$dropdown-item-color: $palette-900;
-$dropdown-item-active-color: $palette-900;
-
-// Custom components
-
+$dropdown-item-color: $palette-600;
+$dropdown-item-hover-color: $palette-500;
 $panel-top-bgcolor: $palette-800;
 $panel-top-txtcolor: $primary;
 $panel-left-bgcolor: $palette-800;
@@ -67,12 +47,14 @@ $command-buttons-bgcolor: $palette-700;
 $content-bgcolor: $palette-900;
 $scrollbar-color: $palette-300;
 $scrollbar-width: 10px;
-$loader-color: $palette-800;
-$input-tag-delete-background-color: $palette-700;
-$breadcrumb-margins: 12px;
+$loader-color: $palette-200;
+$skeleton-color: $palette-800;
+$breadcrumb-margins: 10px;
 $breadcrumb-overflow-mask-size: $breadcrumb-margins + 60px;
 $thumbnail-other-size: $body-line-height * 7em;
 $proposed-category-bgcolor: $palette-700;
+$viewer-text: $palette-000;
+$viewer-text-background: $palette-900;
 
 // Layout
 
@@ -81,4 +63,6 @@ $layout-left: 250px;
 
 // Transitions
 
-$transition-flex-expand: 0.1s;
+$transition-slide: 0.1s;
+$transition-fade: 0.1s;
+$transition-move: 0.1s;

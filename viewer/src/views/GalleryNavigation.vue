@@ -1,7 +1,7 @@
 <!-- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019-2020  Guillaume FOUET
+-- Copyright (C) 2019-2022  Guillaume FOUET
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -19,62 +19,63 @@
 
 <template>
   <div>
-    <ld-error v-if="isError" icon="folder-open" :message="$t('gallery.unknown-resource')" />
-    <gallery-search v-else-if="isSearch" :path="path" />
-    <component :is="componentName" v-else :item="$galleryStore.currentItem" />
+    <LdNotice
+      v-if="isError"
+      :icon="faFolderOpen"
+      :message="t('gallery.unknown-resource')"
+    />
+    <GallerySearch v-else-if="isSearch" />
+    <component
+      :is="componentName"
+      v-else
+      :key="componentKey"
+      :item="galleryStore.currentItem"
+    />
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { ItemType } from "@/@types/ItemType";
-import Navigation from "@/services/navigation";
-import GallerySearch from "@/views/GallerySearch.vue";
+<script setup lang="ts">
+import { ItemType } from '@/@types/itemType';
+import LdNotice from '@/components/LdNotice.vue';
+import { isDirectory } from '@/services/itemGuards';
+import { useGalleryStore } from '@/store/galleryStore';
+import { faFolderOpen } from '@fortawesome/free-solid-svg-icons';
+import { computedEager } from '@vueuse/shared';
+import { computed, watchEffect } from 'vue';
+import { useI18n } from 'vue-i18n';
+import GallerySearch from './GallerySearch.vue';
+import AudioViewer from './item_handlers/AudioViewer.vue';
+import DirectoryViewer from './item_handlers/DirectoryViewer.vue';
+import DownloadViewer from './item_handlers/DownloadViewer.vue';
+import MarkdownViewer from './item_handlers/MarkdownViewer.vue';
+import PdfViewer from './item_handlers/PdfViewer.vue';
+import PictureViewer from './item_handlers/PictureViewer.vue';
+import PlainTextViewer from './item_handlers/PlainTextViewer.vue';
+import VideoViewer from './item_handlers/VideoViewer.vue';
 
-@Component({
-  components: {
-    GallerySearch,
-  },
-})
-export default class GalleryNavigation extends Vue {
-  @Prop(String) readonly path!: string;
-  @Prop(Array) readonly query!: string[];
+const props = defineProps({
+  path: { type: String, required: true },
+  query: { type: Array<string>, required: true },
+});
 
-  readonly COMPONENT_BY_TYPE: Record<ItemType, string> = {
-    directory: "ld-directory",
-    picture: "ld-picture",
-    plaintext: "ld-plain-text-viewer",
-    pdf: "ld-pdf-viewer",
-    video: "ld-video-viewer",
-    audio: "ld-audio-viewer",
-    other: "ld-download",
-  };
+const { t } = useI18n();
+const galleryStore = useGalleryStore();
 
-  mounted() {
-    this.pathChanged();
-  }
+const COMPONENT_BY_TYPE: Record<ItemType, unknown> = {
+  directory: DirectoryViewer,
+  picture: PictureViewer,
+  plaintext: PlainTextViewer,
+  markdown: MarkdownViewer,
+  pdf: PdfViewer,
+  video: VideoViewer,
+  audio: AudioViewer,
+  other: DownloadViewer,
+};
 
-  get isError() {
-    return this.checkType(null);
-  }
+const isError = computedEager(() => !galleryStore.currentItem?.properties.type);
+const isSearch = computedEager(() => isDirectory(galleryStore.currentItem) && props.query.length > 0);
+const componentName = computed(() => COMPONENT_BY_TYPE[galleryStore.currentItem?.properties.type ?? ItemType.OTHER]);
+const componentKey = computed(() => galleryStore.currentItem?.path ?? '');
 
-  get isSearch() {
-    return this.checkType(ItemType.DIRECTORY) && this.query.length > 0;
-  }
-
-  get componentName() {
-    return this.COMPONENT_BY_TYPE[this.$galleryStore.currentItem?.properties.type ?? ItemType.OTHER];
-  }
-
-  @Watch("path")
-  pathChanged() {
-    this.$galleryStore.setCurrentPath(this.path);
-  }
-
-  checkType(type: ItemType | null): boolean {
-    return Navigation.checkType(this.$galleryStore.currentItem, type);
-  }
-}
+watchEffect(() => (galleryStore.currentPath = props.path));
 </script>
-
-<style lang="scss"></style>

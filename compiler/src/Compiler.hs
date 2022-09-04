@@ -147,8 +147,8 @@ compileGallery configPath inputDirPath outputDirPath outputIndexPath excludedDir
     cachedIndex <- loadCachedIndex galleryIndexPath
     let cache = mkCache cachedIndex
 
-    let itemProc = itemProcessor config (cache Resource.properties)
-    let thumbnailProc = thumbnailProcessor config (cache Resource.thumbnail)
+    let itemProc = itemProcessor config (cache $ return . Resource.properties)
+    let thumbnailProc = thumbnailProcessor config (cache $ fmap return . Resource.thumbnail)
     let galleryBuilder = buildGalleryTree itemProc thumbnailProc (tagsFromDirectories config)
     resources <- galleryBuilder curatedInputTree
 
@@ -170,7 +170,7 @@ compileGallery configPath inputDirPath outputDirPath outputIndexPath excludedDir
         then return Nothing
         else loadGalleryIndex galleryIndexPath
 
-    mkCache :: Maybe GalleryIndex -> (GalleryItem -> a) -> Cache a
+    mkCache :: Maybe GalleryIndex -> (GalleryItem -> Maybe a) -> Cache a
     mkCache refGalleryIndex =
       if rebuildAll
         then const noCache

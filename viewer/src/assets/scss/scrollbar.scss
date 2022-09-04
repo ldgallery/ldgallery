@@ -17,12 +17,16 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-@import "~@/assets/scss/theme.scss";
+@import "theme";
 
 // === Scrollbar styling
 
 .scrollbar {
   overflow: auto;
+
+  // enable momentum/kinetic scroll on Safari and Firefox on iOS
+  -webkit-overflow-scrolling: touch;
+
   scrollbar-color: $scrollbar-color transparent;
   scrollbar-width: thin;
   &::-webkit-scrollbar {

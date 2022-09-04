@@ -1,0 +1,141 @@
+name: Build
+on: [ pull_request, push ]
+
+jobs:
+  build-viewer:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          # Latest version officially tested for Ld
+          node-version: 16.14.2
+      - name: Lint and build Node.js Vue project
+        working-directory: viewer
+        run: |
+          yarn
+          yarn run lint
+          yarn run build
+      - uses: actions/upload-artifact@v2
+        with:
+          name: viewer-dist
+          path: viewer/dist
+
+  # TODO: do not hard-code the CI install path in the output binary
+  # See https://github.com/ldgallery/ldgallery/issues/286
+  build-compiler:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-20.04, windows-2019 ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: ~/.stack
+          key: compiler-${{ runner.os }}-${{ hashFiles('compiler/stack.yaml') }}
+      - uses: haskell/actions/setup@v1
+        with:
+          ghc-version: 8.10.4
+          enable-stack: true
+      - name: Build Haskell Stack project
+        working-directory: compiler
+        shell: bash
+        run: |
+          STACK_ROOT=~/.stack  # make it the same on all platforms
+          stack setup --no-terminal
+          stack build --no-terminal \
+            --flag ldgallery-compiler:portable \
+            --copy-bins \
+            --local-bin-path dist
+      - uses: actions/upload-artifact@v2
+        with:
+          name: compiler-dist-${{ matrix.os }}
+          path: compiler/dist
+
+  # TODO: generate a distro-agnostic Linux package.
+  # See https://github.com/ldgallery/ldgallery/issues/285
+  archive-linux:
+    needs: [ build-viewer, build-compiler ]
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Bundle ldgallery viewer
+        uses: actions/download-artifact@v2
+        with:
+          name: viewer-dist
+          path: dist/viewer
+      - name: Bundle ldgallery compiler
+        uses: actions/download-artifact@v2
+        with:
+          name: compiler-dist-ubuntu-20.04
+          path: dist
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y pandoc
+      - name: Build manuals
+        run: |
+          pandoc --standalone --to man ldgallery-quickstart.7.md --output dist/ldgallery-quickstart.7
+          pandoc --standalone --to man compiler/ldgallery.1.md --output dist/ldgallery.1
+          pandoc --standalone --to man viewer/ldgallery-viewer.7.md --output dist/ldgallery-viewer.7
+          cp changelog.md dist/
+          cp license.md dist/
+      - uses: actions/upload-artifact@v2
+        with:
+          name: archive-linux-amd64
+          path: dist
+
+  archive-windows:
+    needs: [ build-viewer, build-compiler ]
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: ~/downloads
+          key: archive-windows-vendored
+      - name: Bundle ldgallery viewer
+        uses: actions/download-artifact@v2
+        with:
+          name: viewer-dist
+          path: dist/viewer
+      - name: Bundle ldgallery compiler
+        uses: actions/download-artifact@v2
+        with:
+          name: compiler-dist-windows-2019
+          path: dist
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y pandoc wget curl html-xml-utils p7zip-full
+      - name: Copy scripts
+        run: |
+          mkdir dist/scripts
+          cp scripts/win_* dist/scripts/
+      - name: Build manuals
+        run: |
+          pandoc --standalone --to html ldgallery-quickstart.7.md --output dist/ldgallery-quickstart.7.html
+          pandoc --standalone --to html compiler/ldgallery.1.md --output dist/ldgallery.1.html
+          pandoc --standalone --to html viewer/ldgallery-viewer.7.md --output dist/ldgallery-viewer.7.html
+          pandoc --standalone --to html changelog.md --output dist/changelog.html
+          pandoc --standalone --to html license.md --output dist/license.html
+      - name: Bundle ImageMagick
+        run: |
+          MAGICK_ARCHIVES="https://imagemagick.org/archive/binaries/"
+          MAGICK_LATEST=$( \
+            curl --silent "$MAGICK_ARCHIVES" \
+            | hxclean \
+            | hxselect 'a::attr(href)' -c -s '\n' \
+            | grep -m1 '^ImageMagick-7.*portable-Q16-HDRI-x64.zip$' )
+          mkdir -p ~/downloads
+          wget --timestamping --directory-prefix ~/downloads "$MAGICK_ARCHIVES/$MAGICK_LATEST"
+          7z e ~/downloads/"$MAGICK_LATEST" -odist/ magick.exe
+          7z e ~/downloads/"$MAGICK_LATEST" -so LICENSE.txt > dist/magick.license.txt
+          7z e ~/downloads/"$MAGICK_LATEST" -so NOTICE.txt > dist/magick.notice.txt
+          7z e ~/downloads/"$MAGICK_LATEST" -so README.txt > dist/magick.readme.txt
+      - uses: actions/upload-artifact@v2
+        with:
+          name: archive-win64
+          path: dist

@@ -53,7 +53,7 @@ buildItemCache cachedItems = lookupCache
     cachedMap = Map.fromList (map withKey cachedItemList)
     lookupCache path = Map.lookup (webPath path) cachedMap
 
-useCached :: ItemCache -> (GalleryItem -> a) -> Cache a
+useCached :: ItemCache -> (GalleryItem -> Maybe a) -> Cache a
 useCached cache propGetter processor itemPath resPath inputFsPath outputFsPath =
   do
     isDir <- doesDirectoryExist outputFsPath
@@ -63,7 +63,7 @@ useCached cache propGetter processor itemPath resPath inputFsPath outputFsPath =
     if fileExists then
       do
         needUpdate <- isOutdated True inputFsPath outputFsPath
-        case (needUpdate, cache itemPath) of
+        case (needUpdate, cache itemPath >>= propGetter) of
           (False, Just props) -> fromCache props
           _ -> update
     else
@@ -73,4 +73,4 @@ useCached cache propGetter processor itemPath resPath inputFsPath outputFsPath =
     update = processor itemPath resPath inputFsPath outputFsPath
     fromCache props =
       putStrLn ("From cache:\t" ++ outputFsPath)
-      >> return (propGetter props)
+      >> return props
