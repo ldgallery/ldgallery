@@ -25,12 +25,13 @@ pandoc --standalone --to man viewer/ldgallery-viewer.7.md --output ldgallery-vie
 [Pandoc]: https://pandoc.org/
 
 
-License
--------
+Copyright and license
+---------------------
 
-Copyright (C) 2019-2020  Pacien TRAN-GIRARD and Guillaume FOUET.
+Copyright (C) 2019-2022  Pacien TRAN-GIRARD and Guillaume FOUET.
 
-_ldgallery_ is distributed under the terms of the GNU Affero General Public License v3.0, as detailed in `license.md`.
+_ldgallery_ is distributed under the terms of the GNU Affero General Public
+License v3.0, as detailed in `license.md`.
 
 Builds of this software embed and make use of the following libraries:
 
@@ -51,18 +52,17 @@ Builds of this software embed and make use of the following libraries:
   * process, licensed under the BSD-3-Clause License
 * Viewer (npm packages)
   * fortawesome/fontawesome-svg-core, licensed under the MIT License
-  * fortawesome/free-solid-svg-icons, licensed under the CC-BY-4.0 and MIT Licenses
-  * fortawesome/free-regular-svg-icons, licensed under the CC-BY-4.0 and MIT Licenses
+  * fortawesome/free-solid-svg-icons, licensed under the MIT License
   * fortawesome/vue-fontawesome, licensed under the MIT License
-  * buefy, licensed under the MIT License
+  * vueuse/core, licensed under the MIT License
+  * core-js, licensed under the MIT License
   * hammerjs, licensed under the MIT License
-  * marked, licensed under the MIT License
+  * marked, licensed under the MIT License
+  * mosha-vue-toastify, licensed under the MIT License
+  * "pinia, licensed under the MIT License
   * v-lazy-image, licensed under the MIT License
   * vue, licensed under the MIT License
-  * vue-class-component, licensed under the MIT License
   * vue-dragscroll, licensed under the MIT License
   * vue-i18n, licensed under the MIT License
-  * vue-property-decorator, licensed under the MIT License
   * vue-router, licensed under the MIT License
-  * vuex, licensed under the MIT License
-  * vuex-class-component, licensed under the ISC License
+
