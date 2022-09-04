@@ -4,6 +4,36 @@ This file lists notable changes that have been made to the application on each
 release. Releases are tracked and referred to using git tags.
 
 
+## v2.1 - (not yet released)
+- New features:
+  - Add support for Markdown-formatted files, which are now rendered.
+  - Add support for user-defined splash screen in the viewer.
+- Improvements:
+  - Item descriptions now support Markdown formatting.
+  - `.webp` files are now registered and displayed as pictures.
+  - Better focus management (tab and scroll) in the viewer.
+  - Prevent flashing during viewer loading.
+  - Made the viewer lighter and faster to load.
+  - Directories now stay on top of item lists in viewer.
+  - Zooming on pictures is now smoother (proportional).
+- Bug fixes:
+  - Fix cache thumbnail masking in index in the compiler.
+  - Fix momentum/kinetic scroll on Safari and Firefox on iOS.
+  - Fix sort order button hitbox.
+  - Fix viewer component not resetting on item change.
+  - Fix "Object is possibly 'null'" error in templates.
+  - Fix picture loading failure in edge case.
+  - Fix scroll position issue when switching screen orientation.
+  - Fix item aspect-ratio when the search panel is open.
+- Miscellaneous:
+  - The project is now available as a Nix Flake.
+  - Framework upgrade: Vue 2 to Vue 3
+  - Replaced viewer components for dropdown, toast, button, tag, input, loader.
+  - The Windows bundle now includes ImageMagick with HDRI enabled.
+  - Portable builds now look for the viewer at its runtime location.
+  - Plain text files are now displayed inline instead of using an iframe.
+
+
 ## v2.0 - 2020-09-25
 - Thumbnails are now allowed for all files in addition to directories.
   __Breaking change__: directory thumbnails are now named "\_thumbnail.ext"
