@@ -2,7 +2,7 @@
 pagetitle: Compiler user manual - ldgallery
 title: LDGALLERY(1) ldgallery
 author: Pacien TRAN-GIRARD, Guillaume FOUET
-date: 2020-09-19 (v2.0)
+date: 2022-09-04 (v2.1)
 ---
 
 
@@ -187,7 +187,7 @@ The ldgallery source code is available on <https://ldgallery.pacien.org>.
 
 # LICENSE
 
-Copyright (C) 2019-2020  Pacien TRAN-GIRARD and Guillaume FOUET.
+Copyright (C) 2019-2022  Pacien TRAN-GIRARD and Guillaume FOUET.
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

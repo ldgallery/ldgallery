@@ -4,7 +4,7 @@ This file lists notable changes that have been made to the application on each
 release. Releases are tracked and referred to using git tags.
 
 
-## v2.1 - (not yet released)
+## v2.1 - 2022-09-04
 - New features:
   - Add support for Markdown-formatted files, which are now rendered.
   - Add support for user-defined splash screen in the viewer.
