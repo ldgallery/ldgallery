@@ -59,7 +59,7 @@ Builds of this software embed and make use of the following libraries:
   * hammerjs, licensed under the MIT License
   * marked, licensed under the MIT License
   * mosha-vue-toastify, licensed under the MIT License
-  * "pinia, licensed under the MIT License
+  * pinia, licensed under the MIT License
   * v-lazy-image, licensed under the MIT License
   * vue, licensed under the MIT License
   * vue-dragscroll, licensed under the MIT License
