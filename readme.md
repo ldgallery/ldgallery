@@ -1,13 +1,34 @@
 ldgallery
 =========
 
-A static gallery generator which turns a collection of tagged pictures and media into a searchable web gallery.
+A static gallery generator which turns a collection of tagged pictures and
+media into a searchable web gallery.
 
-The complete list of features, the user manual, demo and download links can be found on the project's website: https://ldgallery.pacien.org.
+The complete list of features, the user manual, demo and download links can be
+found on the project's website: <https://ldgallery.pacien.org>.
 
 
-Build
------
+Usage and build (using the Nix Flake)
+-------------------------------------
+
+This program is available as a Nix Flake allowing to build both the viewer
+and compiler components and assemble those automatically.
+
+The following commands are available on NixOS, or a Linux or MacOS system
+having the Nix package manager installed:
+
+* Just running the program (compiler with bundled viewer):
+  * Using the latest release: `nix run github:ldgallery/ldgallery -- --help`
+  * Using a local source checkout: `nix run .# -- --help`
+
+* Building individual components locally:
+  `nix build .#{compiler,viewer,man} --print-build-logs`
+
+
+Manual build
+------------
+
+Without using the Nix Flake, the project can be built as follows:
 
 * Compile the web _viewer_ as detailed in `./viewer/readme.md`.
 * Copy/link the compiled _viewer_ to the _ldgallery compiler_ data directory.

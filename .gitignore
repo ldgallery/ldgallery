@@ -4,3 +4,6 @@
 
 # editor and IDE
 .idea
+
+# Nix output symlinks
+/result*
