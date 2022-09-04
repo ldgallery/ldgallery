@@ -17,10 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 {
-  description = ''
-    A static generator which turns a collection of tagged pictures into a \
-    searchable web gallery.
-  '';
+  description = "A static web gallery generator with tags";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
