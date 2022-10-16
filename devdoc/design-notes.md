@@ -1,3 +1,13 @@
+---
+title: ldgallery design notes
+author: pacien
+date: 2020-02-25
+---
+
+__Warning: this document is severely outdated.__
+
+---
+
 # ldgallery design notes
 
 _ldgallery_ consists of two main components that are packaged and distributed
