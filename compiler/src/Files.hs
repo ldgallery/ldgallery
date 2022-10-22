@@ -1,7 +1,7 @@
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019-2020  Pacien TRAN-GIRARD
+-- Copyright (C) 2019-2022  Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -25,13 +25,17 @@ module Files
   , nodeName, isHidden, flattenDir, filterDir
   , readDirectory, copyTo
   , ensureParentDir, remove, isOutdated
+  , decodeYamlFile
   ) where
 
 
+import Control.Exception (Exception, throwIO)
+import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.List (isPrefixOf, length, sortOn)
 import Data.Function ((&))
 import Data.Functor ((<&>))
 import Data.Text (pack, unpack)
+import Data.Yaml (ParseException, decodeFileEither)
 import Data.Aeson (ToJSON, FromJSON)
 import qualified Data.Aeson as JSON
 
@@ -202,3 +206,12 @@ isOutdated onMissingTarget ref target =
         return (targetTime < refTime)
     else
       return onMissingTarget
+
+
+data LoadException = LoadException String ParseException deriving Show
+instance Exception LoadException
+
+decodeYamlFile :: (MonadIO m, FromJSON a) => FileName -> m a
+decodeYamlFile path =
+  liftIO $ Data.Yaml.decodeFileEither path
+  >>= either (throwIO . LoadException path) return

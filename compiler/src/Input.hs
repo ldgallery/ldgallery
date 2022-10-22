@@ -1,7 +1,7 @@
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019-2021  Pacien TRAN-GIRARD
+-- Copyright (C) 2019-2022  Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -17,15 +17,13 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 module Input
-  ( decodeYamlFile
-  , Sidecar(..)
+  ( Sidecar(..)
   , InputTree(..), readInputTree, filterInputTree
   ) where
 
 
 import GHC.Generics (Generic)
-import Control.Exception (Exception, AssertionFailed(..), throw, throwIO)
-import Control.Monad.IO.Class (MonadIO, liftIO)
+import Control.Exception (AssertionFailed(..), throw)
 import Data.Function ((&))
 import Data.Functor ((<&>))
 import Data.Maybe (catMaybes, fromMaybe)
@@ -33,22 +31,12 @@ import Data.Bool (bool)
 import Data.List (find, isSuffixOf)
 import Data.Time.Clock (UTCTime)
 import Data.Time.LocalTime (ZonedTime)
-import Data.Yaml (ParseException, decodeFileEither)
 import Data.Aeson (FromJSON)
 import qualified Data.Map.Strict as Map
 import System.FilePath (isExtensionOf, dropExtension)
 import System.Directory (doesFileExist, getModificationTime)
 
 import Files
-
-
-data LoadException = LoadException String ParseException deriving Show
-instance Exception LoadException
-
-decodeYamlFile :: (MonadIO m, FromJSON a) => FileName -> m a
-decodeYamlFile path =
-  liftIO $ Data.Yaml.decodeFileEither path
-  >>= either (throwIO . LoadException path) return
 
 
 -- | Tree representing the input from the input directory.
