@@ -2,6 +2,7 @@
 --             pictures into a searchable web gallery.
 --
 -- Copyright (C) 2019-2022  Guillaume FOUET
+--               2022       Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -17,10 +18,11 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { Config, Index, Item } from '@/@types/gallery';
+import { Config, Index, Item, RawTag } from '@/@types/gallery';
 import { TagCategory, TagIndex, TagSearch } from '@/@types/tag';
 import { useIndexFactory } from '@/services/indexFactory';
 import { useNavigation } from '@/services/navigation';
+import { isDirectory } from '@/services/itemGuards';
 import { defineStore } from 'pinia';
 
 const navigation = useNavigation();
@@ -35,6 +37,27 @@ function getUrlConfig() {
 function responseToJson(response: Response) {
   if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`);
   return response.json();
+}
+
+/// @deprecated Adapter adding a tag string getter to gallery items.
+function patchItemStringTagsAdapter(tagArray: RawTag[], item: Item): Item {
+  Object.defineProperty(item, 'stringTags', {
+    get() { return item.tags.map(tagId => tagArray[tagId]); },
+  });
+
+  if (isDirectory(item)) {
+    for (const child of item.properties.items) {
+      patchItemStringTagsAdapter(tagArray, child);
+    }
+  }
+
+  return item;
+}
+
+/// @deprecated Adapter adding a tag string getter to all gallery items.
+function patchIndexStringTagsAdapter(index: Index): Index {
+  patchItemStringTagsAdapter(index.tags, index.tree);
+  return index;
 }
 
 export const useGalleryStore = defineStore('gallery', {
@@ -77,6 +100,7 @@ export const useGalleryStore = defineStore('gallery', {
       const index = this.config?.galleryIndex ?? 'index.json';
       await fetch(`${process.env.VUE_APP_DATA_URL}${root}${index}`, { cache: 'no-cache' })
         .then(responseToJson)
+        .then(patchIndexStringTagsAdapter)
         .then(v => (this.galleryIndex = v))
         .then(this.indexTags)
         .then(this.indexTagCategories);

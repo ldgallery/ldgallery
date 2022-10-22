@@ -48,7 +48,7 @@ function _pushTagsForItem(tagsIndex: TagIndex, item: Item): void {
     item.properties.items.forEach(item => _pushTagsForItem(tagsIndex, item));
     return; // Directories are not indexed
   }
-  for (const tag of item.tags) {
+  for (const tag of item.stringTags) {
     const parts = tag.split(':');
     let lastPart: string | null = null;
     for (const part of parts) {

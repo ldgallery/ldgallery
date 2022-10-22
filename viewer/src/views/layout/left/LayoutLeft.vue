@@ -120,7 +120,7 @@ function serializeSearch() {
   return query;
 }
 
-const currentTags = computed(() => galleryStore.currentItem?.tags ?? []);
+const currentTags = computed(() => galleryStore.currentItem?.stringTags ?? []);
 
 watch(() => route.query, (query) => {
   const filters = Object.keys(query);
