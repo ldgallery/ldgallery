@@ -118,7 +118,8 @@ const propositions = computed<Record<string, number>>(() => {
   if (searchFilters.length > 0) {
     // Tags count from current search
     extractDistinctItems(searchFilters)
-      .flatMap(item => item.stringTags)
+      .flatMap(item => item.tags)
+      .flatMap(tag => galleryStore.galleryIndex?.tags[tag])
       .map(rightmost)
       .filter(rawTag => props.tagsIndex[rawTag] && !searchFilters.find(search => search.tag === rawTag))
       .forEach(rawTag => (propositions[rawTag] = (propositions[rawTag] ?? 0) + 1));
