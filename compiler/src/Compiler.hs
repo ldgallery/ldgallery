@@ -26,6 +26,7 @@ import GHC.Generics (Generic)
 import Control.Monad (liftM2, when)
 import Data.Bool (bool)
 import Data.Maybe (fromMaybe)
+import Data.Map (fromAscList)
 import System.FilePath ((</>))
 import qualified System.FilePath.Glob as Glob
 import System.Directory (canonicalizePath, doesFileExist)
@@ -34,11 +35,18 @@ import Data.Aeson (ToJSON, FromJSON)
 import qualified Data.Aeson as JSON
 
 import Config
-import Input (InputTree, readInputTree, filterInputTree, sidecar, tags)
+import Input
+  ( InputTree
+  , readInputTree
+  , filterInputTree
+  , sidecar
+  , aggregateTags )
+import qualified Input (tags)
 import Resource
   ( GalleryItem
   , GalleryItemProps
   , Thumbnail
+  , Tag
   , buildGalleryTree
   , galleryCleanupResourceDir
   , properties
@@ -70,6 +78,7 @@ thumbnailsDir = "thumbnails"
 
 data GalleryIndex = GalleryIndex
   { properties :: ViewerConfig
+  , tags :: [Tag]
   , tree :: GalleryItem
   } deriving (Generic, Show, ToJSON, FromJSON)
 
@@ -128,7 +137,7 @@ inputTreeFilter GalleryConfig{includedTags, excludedTags} =
 
   where
     hasTagMatching :: (String -> Bool) -> InputTree -> Bool
-    hasTagMatching cond = any cond . (fromMaybe [""] . tags) . sidecar
+    hasTagMatching cond = any cond . (fromMaybe [""] . Input.tags) . sidecar
 
 
 compileGallery :: FilePath -> FilePath -> FilePath -> FilePath -> [FilePath] -> Bool -> Bool -> IO ()
@@ -147,13 +156,17 @@ compileGallery configPath inputDirPath outputDirPath outputIndexPath excludedDir
     cachedIndex <- loadCachedIndex galleryIndexPath
     let cache = mkCache cachedIndex
 
+    let tagsFromDirsCfg = tagsFromDirectories config
+    let tagList = aggregateTags tagsFromDirsCfg inputTree
+    let tagIdMap = fromAscList (zip tagList [0..])
+
     let itemProc = itemProcessor config (cache $ return . Resource.properties)
     let thumbnailProc = thumbnailProcessor config (cache $ fmap return . Resource.thumbnail)
-    let galleryBuilder = buildGalleryTree itemProc thumbnailProc (tagsFromDirectories config)
-    resources <- galleryBuilder curatedInputTree
+    let galleryBuilder = buildGalleryTree itemProc thumbnailProc tagsFromDirsCfg
+    resources <- galleryBuilder tagIdMap curatedInputTree
 
     when cleanOutput $ galleryCleanupResourceDir resources outputDirPath
-    writeJSON galleryIndexPath $ GalleryIndex (viewerConfig config) resources
+    writeJSON galleryIndexPath $ GalleryIndex (viewerConfig config) tagList resources
 
   where
     inputGalleryConf :: FilePath -> FilePath

@@ -1,7 +1,7 @@
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019-2021  Pacien TRAN-GIRARD
+-- Copyright (C) 2019-2022  Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -23,6 +23,7 @@ module Resource
   , Resolution(..)
   , Resource(..)
   , Thumbnail(..)
+  , Tag
   , buildGalleryTree
   , galleryCleanupResourceDir
   , flattenGalleryTree
@@ -30,13 +31,13 @@ module Resource
 
 
 import Control.Concurrent.ParallelIO.Global (parallel)
-import Data.List (sortOn)
+import Data.List (sortOn, sort, group)
 import Data.List.Ordered (minusBy)
+import Data.Map (Map, (!))
 import Data.Char (toLower)
 import Data.Maybe (mapMaybe, fromMaybe)
 import Data.Function ((&))
 import Data.Functor ((<&>))
-import qualified Data.Set as Set
 import Data.Text (pack, unpack, breakOn)
 import Data.Time.Clock (UTCTime)
 import Data.Time.LocalTime (ZonedTime, utc, utcToZonedTime, zonedTimeToUTC)
@@ -64,6 +65,7 @@ encodingOptions = JSON.defaultOptions
 
 
 type Tag = String
+type TagId = Int
 
 data Resource = Resource
   { resourcePath :: Path
@@ -115,7 +117,7 @@ data GalleryItem = GalleryItem
   { title :: String
   , datetime :: ZonedTime
   , description :: String
-  , tags :: [Tag]
+  , tags :: [TagId]
   , path :: Path
   , thumbnail :: Maybe Thumbnail
   , properties :: GalleryItemProps
@@ -130,11 +132,11 @@ type ItemProcessor a =
 
 buildGalleryTree ::
      ItemProcessor GalleryItemProps -> ItemProcessor (Maybe Thumbnail) -> TagsFromDirectoriesConfig
-  -> InputTree -> IO GalleryItem
-buildGalleryTree processItem processThumbnail tagsFromDirsConfig =
+  -> Map Tag TagId -> InputTree -> IO GalleryItem
+buildGalleryTree processItem processThumbnail tagsFromDirsConfig tagIdMap =
   mkGalleryItem []
   where
-    mkGalleryItem :: [Tag] -> InputTree -> IO GalleryItem
+    mkGalleryItem :: [TagId] -> InputTree -> IO GalleryItem
     mkGalleryItem inheritedTags InputFile{path, modTime, sidecar, thumbnailPath} =
       do
         let itemPath = "/" /> path
@@ -144,7 +146,7 @@ buildGalleryTree processItem processThumbnail tagsFromDirsConfig =
           { title = Input.title sidecar ?? fileName path ?? ""
           , datetime = Input.datetime sidecar ?? toZonedTime modTime
           , description = Input.description sidecar ?? ""
-          , tags = unique ((Input.tags sidecar ?? []) ++ inheritedTags ++ parentDirTags path)
+          , tags = unique ((getTagIds sidecar) ++ inheritedTags ++ parentDirTags path)
           , path = itemPath
           , thumbnail = processedThumbnail
           , properties = properties }
@@ -152,7 +154,7 @@ buildGalleryTree processItem processThumbnail tagsFromDirsConfig =
     mkGalleryItem inheritedTags InputDir{path, modTime, sidecar, thumbnailPath, items} =
       do
         let itemPath = "/" /> path
-        let dirTags = (Input.tags sidecar ?? []) ++ inheritedTags
+        let dirTags = (getTagIds sidecar) ++ inheritedTags
         processedItems <- parallel $ map (mkGalleryItem dirTags) items
         processedThumbnail <- maybeThumbnail itemPath thumbnailPath
         return GalleryItem
@@ -170,15 +172,19 @@ buildGalleryTree processItem processThumbnail tagsFromDirsConfig =
     (??) = flip fromMaybe
 
     unique :: Ord a => [a] -> [a]
-    unique = Set.toList . Set.fromList
+    unique = map head . group . sort
 
-    parentDirTags :: Path -> [Tag]
+    getTagIds :: Sidecar -> [TagId]
+    getTagIds sidecar = map (tagIdMap !) (Input.tags sidecar ?? [])
+
+    parentDirTags :: Path -> [TagId]
     parentDirTags (Path elements) =
         drop 1 elements
       & take (fromParents tagsFromDirsConfig)
       & map (prefix tagsFromDirsConfig ++)
+      & map (tagIdMap !)
 
-    aggregateTags :: [GalleryItem] -> [Tag]
+    aggregateTags :: [GalleryItem] -> [TagId]
     aggregateTags = concatMap (\item -> tags (item::GalleryItem))
 
     maybeThumbnail :: Path -> Maybe Path -> IO (Maybe Thumbnail)
