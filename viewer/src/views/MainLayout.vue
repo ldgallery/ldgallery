@@ -26,7 +26,10 @@
     />
     <template v-else-if="galleryStore.config && galleryStore.galleryIndex">
       <LayoutTop :class="[$style.layout, $style.layoutTop]" />
-      <LayoutLeft :class="[$style.layout, $style.layoutLeft]" />
+      <LayoutLeft
+        v-show="!uiStore.fullWidth"
+        :class="[$style.layout, $style.layoutLeft]"
+      />
       <router-view
         ref="content"
         :class="[$style.layout, $style.layoutContent]"
