@@ -74,7 +74,6 @@ const icon = computed(() => navigation.getIcon(props.item));
 @import "~@/assets/scss/theme";
 
 .thumbnailOther {
-  color: $text-light;
   width: $thumbnail-other-size;
   height: $thumbnail-other-size;
   padding-top: $body-line-height * 1em;
