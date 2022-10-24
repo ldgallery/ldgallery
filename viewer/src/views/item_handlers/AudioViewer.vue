@@ -20,7 +20,10 @@
 
 <template>
   <div class="flex-column container-vh-centering">
-    <ItemThumbnail :item="item" />
+    <ItemThumbnail
+      :item="item"
+      :class="$style.audiothumb"
+    />
     <audio
       :class="$style.player"
       :src="itemResourceUrl"
@@ -56,6 +59,12 @@ const itemFileName = computed(() => navigation.getFileName(props.item));
 </script>
 
 <style lang="scss" module>
+@import "~@/assets/scss/theme";
+
+.audiothumb {
+  color: $text-light;
+}
+
 .player {
   width: 100%;
   max-width: 500px;

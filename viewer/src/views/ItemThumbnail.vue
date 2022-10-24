@@ -40,7 +40,7 @@
           size="4x"
         />
       </div>
-      {{ item.title }}
+      <div v-text="item.title" />
     </div>
   </div>
 </template>
