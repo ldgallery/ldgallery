@@ -23,7 +23,7 @@
     v-model="search"
     :placeholder="t('tagInput.placeholder')"
     :tabindex="50"
-    @focus="e => (e.target as HTMLInputElement).select()"
+    @focus="(e: FocusEvent) => (e.target as HTMLInputElement).select()"
     @keypress.enter="inputEnter"
     @keydown.backspace="inputBackspace"
   />
@@ -58,7 +58,8 @@ import LdDropdown from '@/components/LdDropdown.vue';
 import LdInput from '@/components/LdInput.vue';
 import { useIndexFactory } from '@/services/indexFactory';
 import { useGalleryStore } from '@/store/galleryStore';
-import { computedEager, useElementBounding, useFocus, useVModel } from '@vueuse/core';
+import { useUiStore } from '@/store/uiStore';
+import { computedEager, onKeyStroke, useElementBounding, useFocus, useKeyModifier, useVModel } from '@vueuse/core';
 import { computed, ref, StyleValue, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -69,6 +70,7 @@ const emit = defineEmits(['update:modelValue', 'search', 'opening', 'closing']);
 const model = useVModel(props, 'modelValue', emit);
 
 const { t } = useI18n();
+const uiStore = useUiStore();
 const galeryStore = useGalleryStore();
 const indexFactory = useIndexFactory();
 
@@ -85,6 +87,16 @@ const dropdownStyle = computedEager<StyleValue>(() => ({ height: `calc(100vh - 8
 
 const input = ref();
 const { focused } = useFocus(input);
+
+// ---
+
+const controlState = useKeyModifier('Control');
+onKeyStroke('k', e => {
+  if (!controlState.value || focused.value) return;
+  e.preventDefault();
+  uiStore.toggleFullWidth(false);
+  focused.value = true;
+});
 
 // ---
 
