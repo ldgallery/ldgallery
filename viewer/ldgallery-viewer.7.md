@@ -2,7 +2,7 @@
 pagetitle: Viewer user manual - ldgallery
 title: LDGALLERY-VIEWER(7) ldgallery
 author: Pacien TRAN-GIRARD, Guillaume FOUET
-date: 2022-09-04 (v2.1)
+date: 2022-10-26 (v2.1-SNAPSHOT)
 ---
 
 
@@ -41,6 +41,13 @@ Items of the following formats can be opened and visualised within the web appli
 * PDFs
 
 Formats which are not listed above or which are not supported by the user's web browser are offered for download instead of being directly displayed in the same window.
+
+
+# KEYBOARD SHORTCUTS
+
+`CTRL-K`
+: Moves the focus to the tag search field, opening the side search panel if it is closed.
+  Pressing again while in the search input field sets the focus to the browser's address bar.
 
 
 # SEARCH QUERIES
