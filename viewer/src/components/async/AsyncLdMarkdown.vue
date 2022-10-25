@@ -40,7 +40,6 @@ const html = computed(() => marked(props.markdown));
 <style lang="scss" module>
 .markdown {
   color: white;
-  line-height: 1.7;
   word-wrap: break-word;
 
   a {
@@ -52,19 +51,10 @@ const html = computed(() => marked(props.markdown));
     background-color: #666;
   }
 
-  p,
-  blockquote,
-  ul,
-  ol,
-  dl,
-  table,
-  pre {
-    margin: 15px 0;
-  }
-
   ul,
   ol {
-    padding-left: 30px;
+    list-style-type: disc;
+    padding-left: 1em;
   }
 
   h1 {
