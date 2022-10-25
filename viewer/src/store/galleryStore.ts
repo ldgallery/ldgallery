@@ -109,7 +109,7 @@ export const useGalleryStore = defineStore('gallery', {
     // Indexes the gallery
     async indexTags() {
       const root = this.galleryIndex?.tree ?? null;
-      const index = indexFactory.generateTags(root);
+      const index = indexFactory.generateTags(root, this.galleryIndex?.tags);
       this.tagsIndex = index;
       return index;
     },

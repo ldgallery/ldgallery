@@ -43,12 +43,13 @@ function _pushPartToIndex(index: TagNode, part: string, item: Item, rootPart: bo
 }
 
 // Pushes all tags for a root item (and its children) to the index
-function _pushTagsForItem(tagsIndex: TagIndex, item: Item): void {
+function _pushTagsForItem(tagArray: RawTag[], tagsIndex: TagIndex, item: Item): void {
   if (isDirectory(item)) {
-    item.properties.items.forEach(item => _pushTagsForItem(tagsIndex, item));
+    item.properties.items.forEach(item => _pushTagsForItem(tagArray, tagsIndex, item));
     return; // Directories are not indexed
   }
-  for (const tag of item.stringTags) {
+  for (const tagId of item.tags) {
+    const tag = tagArray[tagId];
     const parts = tag.split(':');
     let lastPart: string | null = null;
     for (const part of parts) {
@@ -116,9 +117,10 @@ function _isDiscriminantTagOnly(tags: RawTag[], node: TagNode): boolean {
 // ---
 
 export const useIndexFactory = () => {
-  function generateTags(root: Item | null): TagIndex {
+  function generateTags(root: Item | null, tagArray?: RawTag[]): TagIndex {
     const tagsIndex: TagIndex = {};
-    if (root) _pushTagsForItem(tagsIndex, root);
+    if (!tagArray) return tagsIndex;
+    if (root) _pushTagsForItem(tagArray, tagsIndex, root);
     return tagsIndex;
   }
 
