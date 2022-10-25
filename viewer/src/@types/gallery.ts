@@ -85,12 +85,6 @@ export interface Item {
   datetime: string;
   description: string;
   tags: TagId[];
-
-  /**
-   * @deprecated Use tags (TagId) instead. This is a legacy adapter.
-   */
-  stringTags: RawTag[];
-
   path: string;
   thumbnail?: Thumbnail;
   properties:
