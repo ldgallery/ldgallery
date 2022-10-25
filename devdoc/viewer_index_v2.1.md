@@ -1,7 +1,7 @@
 ---
 title: "Viewer: index v2.1"
 author: pacien
-date: 2022-10-22 (v2)
+date: 2022-10-25 (v3)
 ---
 
 # Abstract
@@ -19,8 +19,9 @@ specification to clarify the problematic behaviours.
 
 # Document version history
 
-1. 2022-10-15: call notes
-2. 2022-10-22: rewritten
+1. 2022-10-15 by pacien: call notes
+2. 2022-10-22 by pacien: rewritten
+3. 2022-10-25 by pacien: include feedbacks from zeroinformatique
 
 
 # Description of the current implementation
@@ -34,8 +35,9 @@ Two indexes are derived from that file through the `indexFactory` service:
 
 - `tagsIndex`:
   - Maps each tag "part" (component) to items tagged with it.
-  - Maps the left-most disambiguating component to all components on its right.
+  - Maps tags to their immediately preceding disambiguating component as child.
   - Includes a normalised version of the tag for searching.
+  - Stores the `childPart`, used to generate tag categories indexes.
   - (Stores the left-most `rootPart` component. This is not used anywhere).
 
 - `tagsCategories`:
@@ -55,7 +57,9 @@ including the disambiguating tag parts.
 
 The auto-completion suggestions are independent of the current directory.
 Suggestions yielding no result (incompatible with the current search query) are
-not excluded either.
+not excluded either. The current implementation makes the choice of suggesting
+everything because the current index does not allow finer filtering, and
+because walking the whole item tree may lead to performance issues.
 
 
 ## Item search
@@ -107,8 +111,14 @@ This is computed using a full gallery search through the `galleryStore` using
   - It is not clear whether intermediate tag components should be treated as
     tags and suggested at all. (They currently are).
 
-- Tags with more than two components do not seem to be handled correctly:
-  - `a:b:c`: `c` is not registered as a child of `a` in `tagsIndex`.
+- Tags with indirect disambiguations are not handled correctly:
+  - Example in `a:b:c`:
+    - `b` is a child of `a`, `c` is a child of `b`.
+    - But `c` is not registered as a child of `a` in `tagsIndex`.
+
+- Homonymous disambiguated tags are not handled in separate categories.
+  - Example with `a` and `b:a`:
+    - `a` seems to be shown under category `b`.
   - This seems to be the cause of tags being displayed in the wrong category in
     the suggestion pane.
 
@@ -117,6 +127,7 @@ This is computed using a full gallery search through the `galleryStore` using
     panel, which restricts the suggestions.
     - This might however be problematic for forced inclusions (union) tags
       which are still meaningful.
+    - They could still be listed but greyed for example.
 
 - The tag occurrence counts in the related tags "propositions" pane is
   misleading:
