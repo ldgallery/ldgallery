@@ -100,7 +100,8 @@ type FileDescriber a =
 
 getImageResolution :: FilePath -> IO Resolution
 getImageResolution fsPath =
-  readProcess "magick" ["identify", "-format", "%w %h", firstFrame] []
+  readProcess "magick"
+    ["identify", "-auto-orient", "-format", "%w %h", firstFrame] []
   >>= parseResolution . break (== ' ')
   where
     firstFrame :: FilePath
