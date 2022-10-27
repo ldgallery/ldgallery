@@ -117,6 +117,19 @@
         ];
       };
 
+      example = pkgs.stdenv.mkDerivation {
+        pname = "ldgallery-example";
+        version = ldgalleryVersion;
+        src = ./example;
+        nativeBuildInputs = [ ldgallery ];
+        buildPhase = ''
+          # Need UTF-8: https://github.com/ldgallery/ldgallery/issues/341
+          export LC_ALL=C.UTF-8
+          ldgallery --input-dir src --output-dir $out --with-viewer
+        '';
+        installPhase = ":";
+      };
+
       default = ldgallery;
     };
 
