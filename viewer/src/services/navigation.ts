@@ -40,6 +40,7 @@ const ICON_BY_TYPE: Record<ItemType, IconDefinition> = {
   markdown: faFileAlt,
   pdf: faFilePdf,
   epub: faBook,
+  djvu: faBook,
   video: faFileVideo,
   audio: faFileAudio,
   other: faFile,
