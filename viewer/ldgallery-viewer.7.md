@@ -38,7 +38,7 @@ Items of the following formats can be opened and visualised within the web appli
 * Videos (OGV, WebM, Matroska, MPEG-4)
 * Audio files (WAV, Opus, FLAC, MP3, MPEG-4)
 * Text files (TXT, Markdown)
-* Ebooks (PDF, EPUB)
+* Ebooks (PDF, EPUB, DjVu)
 
 Formats which are not listed above or which are not supported by the user's web browser are offered for download instead of being directly displayed in the same window.
 The item being visualised can be downloaded using the download button at the top-left corner.
