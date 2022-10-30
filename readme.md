@@ -77,6 +77,7 @@ Builds of this software embed and make use of the following libraries:
   * fortawesome/vue-fontawesome, licensed under the MIT License
   * vueuse/core, licensed under the MIT License
   * core-js, licensed under the MIT License
+  * Epub.js, licensed under the BSD-2-Clause License
   * hammerjs, licensed under the MIT License
   * marked, licensed under the MIT License
   * mosha-vue-toastify, licensed under the MIT License
