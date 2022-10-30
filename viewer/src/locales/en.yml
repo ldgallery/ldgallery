@@ -15,6 +15,9 @@ directory:
   no-results: Empty directory
 download:
   download-file-fmt: Download {0}
+epubViewer:
+  previousSection: Previous section
+  nextSection: Next section
 gallery:
   resource-loading-error: Error loading resource
   unknown-resource: Resource not found

@@ -44,6 +44,7 @@ import { computedEager } from '@vueuse/shared';
 import { computed, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
 import GallerySearch from './GallerySearch.vue';
+import { EpubViewer } from './item_handlers/async';
 import AudioViewer from './item_handlers/AudioViewer.vue';
 import DirectoryViewer from './item_handlers/DirectoryViewer.vue';
 import DownloadViewer from './item_handlers/DownloadViewer.vue';
@@ -67,6 +68,7 @@ const COMPONENT_BY_TYPE: Record<ItemType, unknown> = {
   plaintext: PlainTextViewer,
   markdown: MarkdownViewer,
   pdf: PdfViewer,
+  epub: EpubViewer,
   video: VideoViewer,
   audio: AudioViewer,
   other: DownloadViewer,
