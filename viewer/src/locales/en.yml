@@ -1,6 +1,7 @@
 command:
   back: Go back
   parent: Go to parent directory
+  download: Download
   search:
     clear: Clear
     search: Search

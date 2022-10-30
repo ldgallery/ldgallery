@@ -19,7 +19,10 @@
 
 <template>
   <div class="flex">
-    <LayoutCommand :current-item-path="galleryStore.currentItemPath" />
+    <LayoutCommand
+      :current-item-path="galleryStore.currentItemPath"
+      :item="galleryStore.currentItem"
+    />
     <LayoutBreadcrumb
       :current-item-path="galleryStore.currentItemPath"
       :search-mode="uiStore.searchMode"

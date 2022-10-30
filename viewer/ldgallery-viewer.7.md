@@ -41,6 +41,7 @@ Items of the following formats can be opened and visualised within the web appli
 * PDFs
 
 Formats which are not listed above or which are not supported by the user's web browser are offered for download instead of being directly displayed in the same window.
+The item being visualised can be downloaded using the download button at the top-left corner.
 
 
 # KEYBOARD SHORTCUTS
