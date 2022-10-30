@@ -50,6 +50,7 @@ import DirectoryViewer from './item_handlers/DirectoryViewer.vue';
 import DownloadViewer from './item_handlers/DownloadViewer.vue';
 import MarkdownViewer from './item_handlers/MarkdownViewer.vue';
 import PdfViewer from './item_handlers/PdfViewer.vue';
+import DjVuViewer from './item_handlers/DjVuViewer.vue';
 import PictureViewer from './item_handlers/PictureViewer.vue';
 import PlainTextViewer from './item_handlers/PlainTextViewer.vue';
 import VideoViewer from './item_handlers/VideoViewer.vue';
@@ -69,6 +70,7 @@ const COMPONENT_BY_TYPE: Record<ItemType, unknown> = {
   markdown: MarkdownViewer,
   pdf: PdfViewer,
   epub: EpubViewer,
+  djvu: DjVuViewer,
   video: VideoViewer,
   audio: AudioViewer,
   other: DownloadViewer,
