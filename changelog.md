@@ -7,6 +7,7 @@ release. Releases are tracked and referred to using git tags.
 ## [next release]
 - New features:
   - viewer: add `CTRL-K` keyboard shortcut for quick search.
+  - viewer: added a button to download the current item.
 - Bug fixes:
   - compiler: fix detection of dimensions of EXIF-rotated pictures.
     Rebuild the gallery with `--rebuild-all` to purge erroneous cached data.

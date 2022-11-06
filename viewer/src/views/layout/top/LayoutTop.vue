@@ -18,8 +18,14 @@
 -->
 
 <template>
-  <div class="flex">
-    <LayoutCommand :current-item-path="galleryStore.currentItemPath" />
+  <div
+    v-if="galleryStore.currentItem"
+    class="flex"
+  >
+    <LayoutCommand
+      :current-item-path="galleryStore.currentItemPath"
+      :item="galleryStore.currentItem"
+    />
     <LayoutBreadcrumb
       :current-item-path="galleryStore.currentItemPath"
       :search-mode="uiStore.searchMode"

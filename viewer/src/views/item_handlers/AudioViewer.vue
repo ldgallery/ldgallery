@@ -43,7 +43,7 @@
 import { AudioItem } from '@/@types/gallery';
 import { useNavigation } from '@/services/navigation';
 import { useItemResource } from '@/services/ui/ldItemResourceUrl';
-import { computed, PropType } from 'vue';
+import { computed, PropType, toRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ItemThumbnail from '../ItemThumbnail.vue';
 
@@ -54,7 +54,7 @@ const props = defineProps({
 const { t } = useI18n();
 const navigation = useNavigation();
 
-const { itemResourceUrl } = useItemResource(props.item);
+const { itemResourceUrl } = useItemResource(toRef(props, 'item'));
 const itemFileName = computed(() => navigation.getFileName(props.item));
 </script>
 

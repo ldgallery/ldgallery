@@ -2,7 +2,7 @@
 --             pictures into a searchable web gallery.
 --
 -- Copyright (C) 2019-2022  Guillaume FOUET
---               2020       Pacien TRAN-GIRARD
+--               2020-2022  Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -33,7 +33,24 @@
         size="lg"
       />
     </LdLink>
-    <LayoutCommandSort :tabindex="20" />
+
+    <LdLink
+      v-if="itemResourceUrl"
+      :title="t('command.download')"
+      :download="navigation.getFileName(props.item)"
+      :href="itemResourceUrl"
+      :tabindex="20"
+    >
+      <fa-icon
+        :icon="faFileDownload"
+        size="lg"
+      />
+    </LdLink>
+    <LayoutCommandSort
+      v-else
+      :tabindex="20"
+    />
+
     <LdLink
       :class="{ disabled: isEntryPoint(), [$style.commandSecondary]: true }"
       :title="t('command.back')"
@@ -66,22 +83,34 @@
 <script setup lang="ts">
 import { Item } from '@/@types/gallery';
 import LdLink from '@/components/LdLink.vue';
+import { useNavigation } from '@/services/navigation';
+import { useItemResource } from '@/services/ui/ldItemResourceUrl';
 import { useUiStore } from '@/store/uiStore';
-import { faAngleDoubleLeft, faArrowLeft, faFolder, faLevelUpAlt, faSearch } from '@fortawesome/free-solid-svg-icons';
+import {
+  faAngleDoubleLeft,
+  faArrowLeft,
+  faFileDownload,
+  faFolder,
+  faLevelUpAlt,
+  faSearch,
+} from '@fortawesome/free-solid-svg-icons';
 import { computedEager } from '@vueuse/shared';
-import { computed } from 'vue';
+import { computed, PropType, toRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import LayoutCommandSort from './LayoutCommandSort.vue';
 
 const props = defineProps({
   currentItemPath: { type: Array<Item>, required: true },
+  item: { type: Object as PropType<Item>, required: true },
 });
 
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const uiStore = useUiStore();
+const navigation = useNavigation();
+const { itemResourceUrl } = useItemResource(toRef(props, 'item'));
 
 const commandToggleSearchPanelIcon = computed(() => uiStore.fullWidth ? faSearch : faAngleDoubleLeft);
 const isRoot = computedEager(() => props.currentItemPath.length <= 1 && !uiStore.searchMode);

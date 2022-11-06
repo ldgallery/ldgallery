@@ -37,13 +37,13 @@ import { PlainTextItem } from '@/@types/gallery';
 import LdLoading from '@/components/LdLoading.vue';
 import { useItemResource } from '@/services/ui/ldItemResourceUrl';
 import { useFetch } from '@vueuse/core';
-import { PropType } from 'vue';
+import { PropType, toRef } from 'vue';
 
 const props = defineProps({
   item: { type: Object as PropType<PlainTextItem>, required: true },
 });
 
-const { itemResourceUrl } = useItemResource(props.item);
+const { itemResourceUrl } = useItemResource(toRef(props, 'item'));
 const { isFinished, data } = useFetch(itemResourceUrl).text();
 </script>
 
