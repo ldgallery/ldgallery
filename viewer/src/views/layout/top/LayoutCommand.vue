@@ -34,14 +34,10 @@
       />
     </LdLink>
 
-    <LayoutCommandSort
-      v-if="isListing"
-      :tabindex="20"
-    />
-    <a
-      v-else
+    <LdLink
+      v-if="itemResourceUrl"
       :title="t('command.download')"
-      :download="itemFileName"
+      :download="navigation.getFileName(props.item)"
       :href="itemResourceUrl"
       :tabindex="20"
     >
@@ -49,7 +45,11 @@
         :icon="faFileDownload"
         size="lg"
       />
-    </a>
+    </LdLink>
+    <LayoutCommandSort
+      v-else
+      :tabindex="20"
+    />
 
     <LdLink
       :class="{ disabled: isEntryPoint(), [$style.commandSecondary]: true }"
@@ -83,20 +83,19 @@
 <script setup lang="ts">
 import { Item } from '@/@types/gallery';
 import LdLink from '@/components/LdLink.vue';
-import { useUiStore } from '@/store/uiStore';
-import { useGalleryStore } from '@/store/galleryStore';
 import { useNavigation } from '@/services/navigation';
-import { isDirectory, isDownloadableItem } from '@/services/itemGuards';
+import { useItemResource } from '@/services/ui/ldItemResourceUrl';
+import { useUiStore } from '@/store/uiStore';
 import {
   faAngleDoubleLeft,
   faArrowLeft,
+  faFileDownload,
   faFolder,
   faLevelUpAlt,
   faSearch,
-  faFileDownload,
 } from '@fortawesome/free-solid-svg-icons';
 import { computedEager } from '@vueuse/shared';
-import { computed, PropType } from 'vue';
+import { computed, PropType, toRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import LayoutCommandSort from './LayoutCommandSort.vue';
@@ -110,16 +109,8 @@ const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const uiStore = useUiStore();
-const galleryStore = useGalleryStore();
 const navigation = useNavigation();
-
-const isListing = computedEager(() => !props.item || isDirectory(props.item));
-const itemFileName = computed(() => navigation.getFileName(props.item));
-const itemResourceUrl = computed(() =>
-  isDownloadableItem(props.item)
-    ? galleryStore.resourceRoot + props.item.properties.resource
-    : '',
-);
+const { itemResourceUrl } = useItemResource(toRef(props, 'item'));
 
 const commandToggleSearchPanelIcon = computed(() => uiStore.fullWidth ? faSearch : faAngleDoubleLeft);
 const isRoot = computedEager(() => props.currentItemPath.length <= 1 && !uiStore.searchMode);

@@ -18,7 +18,10 @@
 -->
 
 <template>
-  <div class="flex">
+  <div
+    v-if="galleryStore.currentItem"
+    class="flex"
+  >
     <LayoutCommand
       :current-item-path="galleryStore.currentItemPath"
       :item="galleryStore.currentItem"

@@ -46,7 +46,7 @@ import { useLdZoom } from '@/services/ui/ldZoom';
 import { useUiStore } from '@/store/uiStore';
 import { unrefElement, VueInstance } from '@vueuse/core';
 import { createToast } from 'mosha-vue-toastify';
-import { CSSProperties, onMounted, onUnmounted, PropType, ref } from 'vue';
+import { CSSProperties, onMounted, onUnmounted, PropType, ref, toRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const props = defineProps({
@@ -63,7 +63,7 @@ const loader = ref(false);
 const containerElement = ref<HTMLDivElement>();
 const imageElement = ref<VueInstance>();
 
-const { itemResourceUrl, thumbnailResourceUrl } = useItemResource(props.item);
+const { itemResourceUrl, thumbnailResourceUrl } = useItemResource(toRef(props, 'item'));
 
 onMounted(() => {
   generateSlowLoadingStyle();

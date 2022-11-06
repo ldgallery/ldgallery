@@ -50,7 +50,7 @@ import { Item } from '@/@types/gallery';
 import { useNavigation } from '@/services/navigation';
 import { useItemResource } from '@/services/ui/ldItemResourceUrl';
 import VLazyImage from 'v-lazy-image';
-import { computed, PropType, ref } from 'vue';
+import { computed, PropType, ref, toRef } from 'vue';
 
 const props = defineProps({
   item: { type: Object as PropType<Item>, required: true },
@@ -60,7 +60,7 @@ const navigation = useNavigation();
 
 const loading = ref(false);
 
-const { thumbnailResourceUrl } = useItemResource(props.item);
+const { thumbnailResourceUrl } = useItemResource(toRef(props, 'item'));
 
 const pictureStyle = computed(() => {
   const resolution = props.item.thumbnail?.resolution ?? { width: 1, height: 1 };

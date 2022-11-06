@@ -33,13 +33,13 @@ import { LdMarkdown } from '@/components/async';
 import LdLoading from '@/components/LdLoading.vue';
 import { useLdFetch } from '@/services/api/ldFetch';
 import { useItemResource } from '@/services/ui/ldItemResourceUrl';
-import { PropType } from 'vue';
+import { PropType, toRef } from 'vue';
 
 const props = defineProps({
   item: { type: Object as PropType<MarkdownItem>, required: true },
 });
 
-const { itemResourceUrl } = useItemResource(props.item);
+const { itemResourceUrl } = useItemResource(toRef(props, 'item'));
 const { isFetching, data, error } = useLdFetch(itemResourceUrl).text();
 </script>
 
