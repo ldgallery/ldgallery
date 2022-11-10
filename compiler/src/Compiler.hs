@@ -85,7 +85,8 @@ loadGalleryIndex path =
   doesFileExist path >>= bool (return Nothing) decodeIndex
   where
     decodeIndex =
-      JSON.eitherDecodeFileStrict path
+      putStrLn ("Loading previous index:\t" ++ path)
+      >>  JSON.eitherDecodeFileStrict path
       >>= either (\err -> warn err >> return Nothing) (return . Just)
     warn = putStrLn . ("Warning:\tUnable to reuse existing index as cache: " ++)
 
@@ -136,10 +137,13 @@ compileGallery configPath inputDirPath outputDirPath outputIndexPath excludedDir
   do
     config <- readConfig $ inputGalleryConf configPath
 
+    putStrLn "Inventorying input files"
     inputDir <- readDirectory inputDirPath
     excludedCanonicalDirs <- mapM canonicalizePath excludedDirs
+
     let sourceFilter = galleryDirFilter config excludedCanonicalDirs
     let sourceTree = filterDir sourceFilter inputDir
+    putStrLn "Reading input metadata"
     inputTree <- readInputTree sourceTree
     let curatedInputTree = filterInputTree (inputTreeFilter config) inputTree
 
