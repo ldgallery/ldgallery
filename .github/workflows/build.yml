@@ -37,7 +37,7 @@ jobs:
           key: compiler-${{ runner.os }}-${{ hashFiles('compiler/stack.yaml') }}
       - uses: haskell/actions/setup@v1
         with:
-          ghc-version: 8.10.4
+          ghc-version: 9.0.2
           enable-stack: true
       - name: Build Haskell Stack project
         working-directory: compiler
