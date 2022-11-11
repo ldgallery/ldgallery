@@ -85,22 +85,16 @@ export const useGalleryStore = defineStore('gallery', {
     },
     // Indexes the gallery
     async indexTags() {
-      const root = this.galleryIndex?.tree ?? null;
-      const index = indexFactory.generateTags(root, this.galleryIndex?.tags);
-      this.tagsIndex = index;
-      return index;
+      const { tree, tags } = this.galleryIndex ?? {};
+      return (this.tagsIndex = indexFactory.generateTags(tree, tags));
     },
     // Indexes the proposed categories
     async indexTagCategories() {
-      const categories = indexFactory.generateCategories(this.tagsIndex, this.galleryIndex?.properties.tagCategories);
-      this.tagsCategories = categories;
-      return categories;
+      return (this.tagsCategories = indexFactory.generateCategories(this.tagsIndex, this.galleryIndex?.properties.tagCategories));
     },
     // Searches for tags
     async search(filters: string[]) {
-      const results = filters.flatMap(filter => indexFactory.searchTags(this.tagsIndex, filter, true));
-      this.currentSearch = results;
-      return results;
+      return (this.currentSearch = filters.flatMap(filter => indexFactory.searchTags(this.tagsIndex, filter, true)));
     },
   },
 });

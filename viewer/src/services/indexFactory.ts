@@ -117,7 +117,7 @@ function _isDiscriminantTagOnly(tags: RawTag[], node: TagNode): boolean {
 // ---
 
 export const useIndexFactory = () => {
-  function generateTags(root: Item | null, tagArray?: RawTag[]): TagIndex {
+  function generateTags(root?: Item, tagArray?: RawTag[]): TagIndex {
     const tagsIndex: TagIndex = {};
     if (!tagArray) return tagsIndex;
     if (root) _pushTagsForItem(tagArray, tagsIndex, root);
