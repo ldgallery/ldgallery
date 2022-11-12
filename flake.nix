@@ -22,14 +22,27 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    flaky-utils.url = "git+https://cgit.pacien.net/libs/flaky-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, flaky-utils }:
   flake-utils.lib.eachDefaultSystem (system: let
     pkgs = import nixpkgs { inherit system; };
     ldgalleryVersion = "2.1";
+    devTools = with pkgs; [
+      # generic
+      tmux
 
-  in rec {
+      # viewer
+      nodejs-16_x
+      yarn
+
+      # compiler
+      stack
+    ];
+
+  in pkgs.lib.fold pkgs.lib.recursiveUpdate { } [
+  (rec {
     packages = rec {
       compiler = pkgs.haskell.lib.compose.overrideCabal (super: {
         pname = "ldgallery-compiler";
@@ -138,5 +151,25 @@
 
       default = ldgallery;
     };
-  });
+
+    devShell = flaky-utils.lib.mkDevShell {
+      inherit pkgs;
+      tools = devTools;
+      shell = null;
+    };
+  })
+
+  (flaky-utils.lib.mkSandboxSystem {
+    inherit nixpkgs system;
+    restrictNetwork = false;
+    patchQemu9p = true;
+    config = {
+      environment.systemPackages = devTools;
+      virtualisation.forwardPorts = [
+        { from = "host"; host.port = 8085; guest.port = 8085; }  # vue-cli
+      ];
+    };
+  })
+
+  ]);
 }

@@ -15,6 +15,21 @@
         "type": "github"
       }
     },
+    "flaky-utils": {
+      "locked": {
+        "lastModified": 1668221526,
+        "narHash": "sha256-cUtnjzEIgnfohdb0UhPU0ZVYyJ9USQhUwnEXexLlMNc=",
+        "ref": "master",
+        "rev": "bfa3be010c8c90f1bd0326747b9b424535381bb2",
+        "revCount": 11,
+        "type": "git",
+        "url": "https://cgit.pacien.net/libs/flaky-utils"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://cgit.pacien.net/libs/flaky-utils"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1662019588,
@@ -34,6 +49,7 @@
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
+        "flaky-utils": "flaky-utils",
         "nixpkgs": "nixpkgs"
       }
     }
