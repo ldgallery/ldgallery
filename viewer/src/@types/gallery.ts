@@ -2,6 +2,7 @@
 --             pictures into a searchable web gallery.
 --
 -- Copyright (C) 2019-2022  Guillaume FOUET
+--               2022       Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -41,6 +42,7 @@ export interface Thumbnail {
   resolution: Resolution;
 }
 export type RawTag = string;
+export type TagId = number;
 
 // ---
 
@@ -82,7 +84,7 @@ export interface Item {
   title: string;
   datetime: string;
   description: string;
-  tags: RawTag[];
+  tags: TagId[];
   path: string;
   thumbnail?: Thumbnail;
   properties:
@@ -125,5 +127,6 @@ export interface IndexProperties {
 }
 export interface Index {
   properties: IndexProperties;
+  tags: RawTag[];
   tree: DirectoryItem;
 }

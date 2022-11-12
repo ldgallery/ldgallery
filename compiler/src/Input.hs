@@ -1,7 +1,7 @@
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019-2021  Pacien TRAN-GIRARD
+-- Copyright (C) 2019-2022  Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -17,38 +17,28 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 module Input
-  ( decodeYamlFile
-  , Sidecar(..)
+  ( Sidecar(..)
   , InputTree(..), readInputTree, filterInputTree
+  , aggregateTags
   ) where
 
 
 import GHC.Generics (Generic)
-import Control.Exception (Exception, AssertionFailed(..), throw, throwIO)
-import Control.Monad.IO.Class (MonadIO, liftIO)
+import Control.Exception (AssertionFailed(..), throw)
 import Data.Function ((&))
 import Data.Functor ((<&>))
 import Data.Maybe (catMaybes, fromMaybe)
 import Data.Bool (bool)
-import Data.List (find, isSuffixOf)
+import Data.List (find, isSuffixOf, sort, group)
 import Data.Time.Clock (UTCTime)
 import Data.Time.LocalTime (ZonedTime)
-import Data.Yaml (ParseException, decodeFileEither)
 import Data.Aeson (FromJSON)
 import qualified Data.Map.Strict as Map
 import System.FilePath (isExtensionOf, dropExtension)
 import System.Directory (doesFileExist, getModificationTime)
 
 import Files
-
-
-data LoadException = LoadException String ParseException deriving Show
-instance Exception LoadException
-
-decodeYamlFile :: (MonadIO m, FromJSON a) => FileName -> m a
-decodeYamlFile path =
-  liftIO $ Data.Yaml.decodeFileEither path
-  >>= either (throwIO . LoadException path) return
+import Config (TagsFromDirectoriesConfig(..))
 
 
 -- | Tree representing the input from the input directory.
@@ -156,3 +146,26 @@ filterInputTree cond = filterNode
         filter cond items
       & map filterNode
       & \curatedItems -> inputDir { items = curatedItems } :: InputTree
+
+
+-- | Aggregates distinct tags from all the sidecars of an InputTree.
+--   The list is stable (sorted alphabetically).
+aggregateTags :: TagsFromDirectoriesConfig -> InputTree -> [String]
+aggregateTags tagsFromDirsCfg treeNode =
+  map head $ group $ sort $ aggregateNode treeNode
+
+  where
+    aggregateNode :: InputTree -> [String]
+    aggregateNode (InputFile { sidecar }) = extractFromSidecar sidecar
+    aggregateNode (InputDir { sidecar, items, path }) =
+      (extractFromSidecar sidecar)
+      ++ (concatMap aggregateNode items)
+      ++ (directoryNameTags path)
+
+    directoryNameTags :: Path -> [String]
+    directoryNameTags (Path (name:_)) | fromParents tagsFromDirsCfg > 0 =
+      [(prefix tagsFromDirsCfg) ++ name]
+    directoryNameTags _ = []
+
+    extractFromSidecar :: Sidecar -> [String]
+    extractFromSidecar (Sidecar { tags }) = fromMaybe [] tags
