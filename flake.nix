@@ -27,7 +27,7 @@
 
   outputs = { self, nixpkgs, flake-utils, flaky-utils }:
   flake-utils.lib.eachDefaultSystem (system: let
-    pkgs = import nixpkgs { inherit system; };
+    pkgs = nixpkgs.legacyPackages.${system};
     ldgalleryVersion = "2.1";
     devTools = with pkgs; [
       # generic
