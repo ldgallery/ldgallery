@@ -160,7 +160,7 @@
   })
 
   (flaky-utils.lib.mkSandboxSystem {
-    inherit nixpkgs system;
+    inherit pkgs;
     restrictNetwork = false;
     patchQemu9p = true;
     config = {
