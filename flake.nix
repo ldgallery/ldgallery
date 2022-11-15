@@ -163,8 +163,8 @@
     inherit pkgs;
     restrictNetwork = false;
     patchQemu9p = true;
+    tools = devTools;
     config = {
-      environment.systemPackages = devTools;
       virtualisation.forwardPorts = [
         { from = "host"; host.port = 8085; guest.port = 8085; }  # vue-cli
       ];

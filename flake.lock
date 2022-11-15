@@ -17,11 +17,11 @@
     },
     "flaky-utils": {
       "locked": {
-        "lastModified": 1668300734,
-        "narHash": "sha256-9d0hrnlJIfC/0GJyomNtRSMfksvn76Ws73TTIHu0Dts=",
+        "lastModified": 1668472805,
+        "narHash": "sha256-hjRe8QFh2JMo9u6AaxQNGWfDWZxk3psULmPglqsjsLk=",
         "ref": "master",
-        "rev": "42923a5cf2cf6292aaf19eb1b550c6d20bd2a881",
-        "revCount": 16,
+        "rev": "c3f9daf4ec56276e040bc33e29c7eeaf1b99d91c",
+        "revCount": 33,
         "type": "git",
         "url": "https://cgit.pacien.net/libs/flaky-utils"
       },
