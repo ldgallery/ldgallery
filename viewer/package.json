@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vue-tsc --noEmit && vue-cli-service build",
     "lint": "vue-cli-service lint --no-fix --max-warnings 0",
     "lint-autoformat": "vue-cli-service lint --fix"
   },
@@ -45,7 +45,8 @@
     "sass": "1.54.0",
     "sass-loader": "13.0.2",
     "typescript": "4.8.4",
-    "vue-cli-plugin-pinia": "0.1.6"
+    "vue-cli-plugin-pinia": "0.1.6",
+    "vue-tsc": "1.0.9"
   },
   "homepage": "https://ldgallery.pacien.org/",
   "license": "AGPL-3"
