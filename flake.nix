@@ -165,6 +165,10 @@
     patchQemu9p = true;
     tools = devTools;
     config = {
+      # The viewer's build and devel server are resource-hungry.
+      virtualisation.cores = 2;
+      virtualisation.memorySize = 2 * 1024;
+
       virtualisation.forwardPorts = [
         { from = "host"; host.port = 8085; guest.port = 8085; }  # vue-cli
       ];
