@@ -164,6 +164,10 @@
     restrictNetwork = false;
     patchQemu9p = true;
     tools = devTools;
+    envVars = {
+      # File modification watch doesn't work through the VM for live reload.
+      VUE_APP_WEBPACK_WATCH_POLL = "1000";
+    };
     config = {
       # The viewer's build and devel server are resource-hungry.
       virtualisation.cores = 2;

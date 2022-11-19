@@ -41,6 +41,7 @@ module.exports = defineConfig({
     },
     watchOptions: {
       ignored: /node_modules/,
+      poll: parseInt(process.env.VUE_APP_WEBPACK_WATCH_POLL ?? 0),
     },
   },
 
