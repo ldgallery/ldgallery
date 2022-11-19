@@ -39,6 +39,9 @@ module.exports = defineConfig({
     cache: {
       type: 'filesystem',
     },
+    watchOptions: {
+      ignored: /node_modules/,
+    },
   },
 
   chainWebpack: config => {
