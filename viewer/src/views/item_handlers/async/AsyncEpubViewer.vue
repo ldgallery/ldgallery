@@ -52,43 +52,50 @@
 </template>
 
 <script setup lang="ts">
-
 import { EPUBItem } from '@/@types/gallery';
 import { useItemResource } from '@/services/ui/ldItemResourceUrl';
-import ePub from 'epubjs';
+import { useUiStore } from '@/store/uiStore';
+import ePub, { Rendition } from 'epubjs';
 import { SpineItem } from 'epubjs/types/section';
-import { PropType, Ref, ref, toRef, computed, watchEffect } from 'vue';
+import { computed, PropType, Ref, ref, toRef, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+
 const { t } = useI18n();
+const uiStore = useUiStore();
 
 const props = defineProps({
   item: { type: Object as PropType<EPUBItem>, required: true },
 });
 
 const { itemResourceUrl } = useItemResource(toRef(props, 'item'));
+
 const view = ref<HTMLDivElement>();
-
-const book = computed(() => ePub(itemResourceUrl.value));
-
-const rendition = computed(() => {
-  if (!view.value) return;
-  return book.value.renderTo(view.value, {
-    flow: 'scrolled-doc',
-    width: '100%',
-    fullsize: true,
-  });
-});
-
+const rendition = ref<Rendition>();
 const currSection = ref<SpineItem>();
 const prevSection = ref<SpineItem>();
 const nextSection = ref<SpineItem>();
 
-// TODO: reflow on side panel open/close event, like when resizing the window
+const book = computed(() => ePub(itemResourceUrl.value));
 
-watchEffect(async() => {
-  if (!rendition.value) return;
-  await rendition.value.display();
-  rendition.value.on('rendered', updateNavigation);
+watch([book, view], ([book, view]) => {
+  if (!view) return;
+  view.innerHTML = '';
+  rendition.value = book.renderTo(view, {
+    flow: 'scrolled-doc',
+    width: '100%',
+  });
+});
+
+watch(rendition, async(rendition, oldRendition) => {
+  if (!rendition) return;
+  oldRendition?.off('rendered', updateNavigation);
+  await rendition.display();
+  rendition.on('rendered', updateNavigation);
+});
+
+watch(() => uiStore.fullWidth, () => {
+  // Simulate a window resize to force EPub to resize the container
+  setTimeout(() => window.dispatchEvent(new Event('resize')));
 });
 
 function updateNavigation(currentSection: SpineItem) {
