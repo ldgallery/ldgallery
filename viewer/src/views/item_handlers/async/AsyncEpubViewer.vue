@@ -168,9 +168,13 @@ function goToNextSection() {
   background-color: $panel-bottom-bgcolor;
   color: $panel-bottom-txtcolor;
 
-  > * {
+  > li {
     flex: 1;
     text-align: center;
+
+    > a {
+      padding: .5em;
+    }
   }
 }
 </style>
