@@ -10,6 +10,7 @@ includedFiles:
   - '*.txt'
   - '*.md'
   - '*.pdf'
+  - '*.epub'
   - '*.ogg'
   - '*.mp4'
 

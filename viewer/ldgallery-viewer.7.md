@@ -2,7 +2,7 @@
 pagetitle: Viewer user manual - ldgallery
 title: LDGALLERY-VIEWER(7) ldgallery
 author: Pacien TRAN-GIRARD, Guillaume FOUET
-date: 2022-10-26 (v2.1-SNAPSHOT)
+date: 2022-10-30 (v2.1-SNAPSHOT)
 ---
 
 
@@ -37,8 +37,8 @@ Items of the following formats can be opened and visualised within the web appli
 * Pictures (Bitmap, JPEG, PNG, TIFF, HDR, GIF)
 * Videos (OGV, WebM, Matroska, MPEG-4)
 * Audio files (WAV, Opus, FLAC, MP3, MPEG-4)
-* Plain text files (`.txt`)
-* PDFs
+* Text files (TXT, Markdown)
+* Ebooks (PDF, EPUB)
 
 Formats which are not listed above or which are not supported by the user's web browser are offered for download instead of being directly displayed in the same window.
 The item being visualised can be downloaded using the download button at the top-left corner.
