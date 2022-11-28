@@ -34,7 +34,14 @@
         <a
           v-if="prevSection"
           @click.prevent="goToPrevSection"
-        >« {{ prevSectionLabel }}</a>
+        >
+          <fa-icon
+            :icon="faSquareCaretLeft"
+            size="lg"
+            alt="«"
+          />
+          {{ prevSectionLabel }}
+        </a>
       </li>
 
       <li>
@@ -45,7 +52,14 @@
         <a
           v-if="nextSection"
           @click.prevent="goToNextSection"
-        >{{ nextSectionLabel }} »</a>
+        >
+          {{ nextSectionLabel }}
+          <fa-icon
+            :icon="faSquareCaretRight"
+            size="lg"
+            alt="»"
+          />
+        </a>
       </li>
     </ul>
   </div>
@@ -59,6 +73,10 @@ import ePub, { Rendition } from 'epubjs';
 import { SpineItem } from 'epubjs/types/section';
 import { computed, PropType, Ref, ref, toRef, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import {
+  faSquareCaretLeft,
+  faSquareCaretRight,
+} from '@fortawesome/free-solid-svg-icons';
 
 const { t } = useI18n();
 const uiStore = useUiStore();
