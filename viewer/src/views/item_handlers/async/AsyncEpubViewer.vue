@@ -31,9 +31,9 @@
       :class="$style.navBar"
     >
       <li>
-        <a
+        <LdLink
           v-if="prevSection"
-          @click.prevent="goToPrevSection"
+          @click="goToPrevSection"
         >
           <fa-icon
             :icon="faSquareCaretLeft"
@@ -41,7 +41,7 @@
             alt="«"
           />
           {{ prevSectionLabel }}
-        </a>
+        </LdLink>
       </li>
 
       <li>
@@ -49,9 +49,9 @@
       </li>
 
       <li>
-        <a
+        <LdLink
           v-if="nextSection"
-          @click.prevent="goToNextSection"
+          @click="goToNextSection"
         >
           {{ nextSectionLabel }}
           <fa-icon
@@ -59,7 +59,7 @@
             size="lg"
             alt="»"
           />
-        </a>
+        </LdLink>
       </li>
     </ul>
   </div>
@@ -73,6 +73,7 @@ import ePub, { Rendition } from 'epubjs';
 import { SpineItem } from 'epubjs/types/section';
 import { computed, PropType, Ref, ref, toRef, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import LdLink from '@/components/LdLink.vue';
 import {
   faSquareCaretLeft,
   faSquareCaretRight,
