@@ -50,5 +50,5 @@
     "vue-tsc": "1.0.9"
   },
   "homepage": "https://ldgallery.pacien.org/",
-  "license": "AGPL-3"
+  "license": "AGPL-3.0-only"
 }
