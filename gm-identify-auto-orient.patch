@@ -1,0 +1,61 @@
+diff --git a/magick/command.c b/magick/command.c
+--- a/magick/command.c
++++ b/magick/command.c
+@@ -8402,6 +8402,9 @@ MagickExport MagickPassFail IdentifyImag
+   unsigned int
+     ping;
+ 
++  MagickBool
++    auto_orient = MagickFalse;
++
+   MagickPassFail
+     status = MagickPass;
+ 
+@@ -8492,10 +8495,22 @@ MagickExport MagickPassFail IdentifyImag
+                   break;
+                 }
+             }
+-        if (image_info->verbose || !ping)
++        if (image_info->verbose || !ping || auto_orient)
+           image=ReadImage(image_info,exception);
+         else
+           image=PingImage(image_info,exception);
++        if (auto_orient && image != (Image *) NULL)
++          {
++            Image
++              *orient_image;
++
++            orient_image=AutoOrientImage(image,image->orientation,exception);
++            if (orient_image != (Image *) NULL)
++              {
++                DestroyImage(image);
++                image=orient_image;
++              }
++          }
+         status&=image != (Image *) NULL;
+         if (image == (Image *) NULL)
+           {
+@@ -8535,6 +8550,15 @@ MagickExport MagickPassFail IdentifyImag
+       }
+     switch(*(option+1))
+     {
++      case 'a':
++      {
++        if (LocaleCompare("auto-orient",option+1) == 0)
++          {
++            auto_orient = MagickTrue;
++            break;
++          }
++        ThrowIdentifyException(OptionError,UnrecognizedOption,option)
++      }
+       case 'd':
+       {
+         if (LocaleCompare("debug",option+1) == 0)
+@@ -8796,6 +8820,7 @@ static void IdentifyUsage(void)
+                 GetClientName());
+   (void) puts("");
+   (void) puts("Where options include:");
++  (void) puts("  -auto-orient         orient (rotate) images so they are upright");
+   (void) puts("  -debug events        display copious debugging information");
+   (void) puts("  -define values       Coder/decoder specific options");
+   (void) puts("  -density geometry    horizontal and vertical density of the image");

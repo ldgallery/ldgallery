@@ -42,6 +42,18 @@
       stack
     ];
 
+    graphicsMagickPatched = pkgs.graphicsmagick.overrideAttrs (old: {
+      patches = (old.patches or []) ++ [ ./gm-identify-auto-orient.patch ];
+    });
+
+    graphicsMagickCompat = pkgs.runCommand "magick-compat" { } ''
+      mkdir -p "$out/bin"
+      ln -s "${graphicsMagickPatched}/bin/gm" "$out/bin/magick"
+    '';
+
+    #magick = pkgs.imagemagick;
+    magick = graphicsMagickCompat;
+
   in pkgs.lib.fold pkgs.lib.recursiveUpdate { } [
   (rec {
     packages = rec {
@@ -56,7 +68,7 @@
 
           # wrapper for runtime dependencies registration
           wrapProgram "$out/bin/ldgallery" \
-            --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.imagemagick ]}
+            --prefix PATH : ${pkgs.lib.makeBinPath [ magick ]}
 
           # bash completion
           mkdir -p "$out/share/bash-completion/completions"
