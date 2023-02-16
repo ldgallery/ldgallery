@@ -11,7 +11,6 @@ release. Releases are tracked and referred to using git tags.
 - Bug fixes:
   - compiler: fix detection of dimensions of EXIF-rotated pictures.
     Rebuild the gallery with `--rebuild-all` to purge erroneous cached data.
-  - compiler: fix support for non-UTF8 terminals.
   - viewer: fix theme quirks (line spacing, icon colours).
   - viewer: fix ghost keyboard hints when the search panel is closed.
 
