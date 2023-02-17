@@ -4,7 +4,7 @@ homepage:            https://ldgallery.pacien.org
 github:              "pacien/ldgallery"
 license:             AGPL-3.0-only
 author:              "Pacien TRAN-GIRARD, Guillaume FOUET"
-copyright:           "2019-2022 Pacien TRAN-GIRARD, Guillaume FOUET"
+copyright:           "2019-2021 Pacien TRAN-GIRARD, Guillaume FOUET"
 
 extra-source-files:
 - readme.md
@@ -29,7 +29,6 @@ dependencies:
 - safe
 - time
 - process
-- with-utf8
 
 default-extensions:
 - DuplicateRecordFields
