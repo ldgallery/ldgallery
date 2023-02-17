@@ -49,7 +49,7 @@ pandoc --standalone --to man viewer/ldgallery-viewer.7.md --output ldgallery-vie
 Copyright and license
 ---------------------
 
-Copyright (C) 2019-2022  Pacien TRAN-GIRARD and Guillaume FOUET.
+Copyright (C) 2019-2023  Pacien TRAN-GIRARD and Guillaume FOUET.
 
 _ldgallery_ is distributed under the terms of the GNU Affero General Public
 License v3.0, as detailed in `license.md`.
@@ -77,6 +77,7 @@ Builds of this software embed and make use of the following libraries:
   * fortawesome/vue-fontawesome, licensed under the MIT License
   * vueuse/core, licensed under the MIT License
   * core-js, licensed under the MIT License
+  * Epub.js, licensed under the BSD-2-Clause License
   * hammerjs, licensed under the MIT License
   * marked, licensed under the MIT License
   * mosha-vue-toastify, licensed under the MIT License

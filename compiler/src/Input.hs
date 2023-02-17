@@ -1,7 +1,7 @@
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019-2021  Pacien TRAN-GIRARD
+-- Copyright (C) 2019-2022  Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -153,6 +153,4 @@ filterInputTree cond = filterNode
     filterNode :: InputTree -> InputTree
     filterNode inputFile@InputFile{} = inputFile
     filterNode inputDir@InputDir{items} =
-        filter cond items
-      & map filterNode
-      & \curatedItems -> inputDir { items = curatedItems } :: InputTree
+      inputDir { Input.items = filter cond items & map filterNode }

@@ -19,7 +19,18 @@
 
 import { DirectoryItem, DownloadableItem, Item } from '@/@types/gallery';
 import { ItemType } from '@/@types/itemType';
-import { faFile, faFileAlt, faFileAudio, faFilePdf, faFileVideo, faFolder, faHome, faImage, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import {
+  faFile,
+  faFileAlt,
+  faFileAudio,
+  faFilePdf,
+  faBook,
+  faFileVideo,
+  faFolder,
+  faHome,
+  faImage,
+  IconDefinition,
+} from '@fortawesome/free-solid-svg-icons';
 import { isDirectory } from './itemGuards';
 
 const ICON_BY_TYPE: Record<ItemType, IconDefinition> = {
@@ -28,6 +39,7 @@ const ICON_BY_TYPE: Record<ItemType, IconDefinition> = {
   plaintext: faFileAlt,
   markdown: faFileAlt,
   pdf: faFilePdf,
+  epub: faBook,
   video: faFileVideo,
   audio: faFileAudio,
   other: faFile,

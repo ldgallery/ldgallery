@@ -2,8 +2,8 @@
 # git config --global log.mailmap true
 # git log --use-mailmap
 
-zeroinformatique <10961896+zeroinformatique@users.noreply.github.com> <contact@zeroinformatique.fr>
-zeroinformatique <10961896+zeroinformatique@users.noreply.github.com> <OzoneGrif@users.noreply.github.com>
+zeroinformatique <contact@zeroinformatique.fr> <contact@zeroinformatique.fr>
+zeroinformatique <contact@zeroinformatique.fr> <10961896+zeroinformatique@users.noreply.github.com>
+zeroinformatique <contact@zeroinformatique.fr> <OzoneGrif@users.noreply.github.com>
 
-pacien <pacien@users.noreply.github.com>
-pacien <pacien@users.noreply.github.com> <pacien.trangirard@pacien.net>
+pacien <pacien.trangirard@pacien.net> <pacien@users.noreply.github.com>

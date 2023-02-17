@@ -1,7 +1,7 @@
 -- ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019-2021  Pacien TRAN-GIRARD
+-- Copyright (C) 2019-2022  Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -56,7 +56,7 @@ encodingOptions :: JSON.Options
 encodingOptions = JSON.defaultOptions
   { JSON.fieldLabelModifier = map toLower
   , JSON.constructorTagModifier = map toLower
-  , JSON.sumEncoding = JSON.defaultTaggedObject
+  , JSON.sumEncoding = JSON.TaggedObject
       { JSON.tagFieldName = "type"
       , JSON.contentsFieldName = "contents"
       }
@@ -92,6 +92,7 @@ data GalleryItemProps =
   | PlainText { resource :: Resource }
   | Markdown { resource :: Resource }
   | PDF { resource :: Resource }
+  | EPUB { resource :: Resource }
   | Video { resource :: Resource }
   | Audio { resource :: Resource }
   | Other { resource :: Resource }
@@ -179,7 +180,7 @@ buildGalleryTree processItem processThumbnail tagsFromDirsConfig =
       & map (prefix tagsFromDirsConfig ++)
 
     aggregateTags :: [GalleryItem] -> [Tag]
-    aggregateTags = concatMap (\item -> tags (item::GalleryItem))
+    aggregateTags = concatMap Resource.tags
 
     maybeThumbnail :: Path -> Maybe Path -> IO (Maybe Thumbnail)
     maybeThumbnail _ Nothing = return Nothing
@@ -187,7 +188,7 @@ buildGalleryTree processItem processThumbnail tagsFromDirsConfig =
 
     mostRecentModTime :: [GalleryItem] -> Maybe ZonedTime
     mostRecentModTime =
-      maximumByMay comparingTime . map (datetime::(GalleryItem -> ZonedTime))
+      maximumByMay comparingTime . map Resource.datetime
 
     comparingTime :: ZonedTime -> ZonedTime -> Ordering
     comparingTime l r = compare (zonedTimeToUTC l) (zonedTimeToUTC r)
@@ -219,14 +220,11 @@ galleryOutputDiff resources ref =
 
     resPath :: GalleryItemProps -> Maybe Path
     resPath Directory{} = Nothing
-    resPath resourceProps =
-        Just
-      $ resourcePath
-      $ (resource :: (GalleryItemProps -> Resource)) resourceProps
+    resPath resourceProps = Just $ resourcePath $ resourceProps.resource
 
     thumbnailPaths :: [GalleryItem] -> [Path]
     thumbnailPaths =
-        map (resourcePath . (resource :: (Thumbnail -> Resource)))
+        map (\thumbnail -> resourcePath thumbnail.resource)
       . mapMaybe thumbnail
 
     (\\) :: [Path] -> [Path] -> [Path]

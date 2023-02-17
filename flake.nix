@@ -1,7 +1,7 @@
 # ldgallery - A static generator which turns a collection of tagged
 #             pictures into a searchable web gallery.
 #
-# Copyright (C) 2019-2022  Pacien TRAN-GIRARD
+# Copyright (C) 2019-2023  Pacien TRAN-GIRARD
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -20,16 +20,30 @@
   description = "A static web gallery generator with tags";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # GHC 9.2: https://github.com/NixOS/nixpkgs/pull/202022
+    nixpkgs.url = "github:NixOS/nixpkgs/445f264";
     flake-utils.url = "github:numtide/flake-utils";
+    flaky-utils.url = "git+https://cgit.pacien.net/libs/flaky-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, flaky-utils }:
   flake-utils.lib.eachDefaultSystem (system: let
-    pkgs = import nixpkgs { inherit system; };
-    ldgalleryVersion = "2.1";
+    pkgs = nixpkgs.legacyPackages.${system};
+    ldgalleryVersion = "2.2";
+    devTools = with pkgs; [
+      # generic
+      tmux
 
-  in rec {
+      # viewer
+      nodejs-16_x
+      yarn
+
+      # compiler
+      stack
+    ];
+
+  in pkgs.lib.fold pkgs.lib.recursiveUpdate { } [
+  (rec {
     packages = rec {
       compiler = pkgs.haskell.lib.compose.overrideCabal (super: {
         pname = "ldgallery-compiler";
@@ -117,6 +131,19 @@
         ];
       };
 
+      example = pkgs.stdenv.mkDerivation {
+        pname = "ldgallery-example";
+        version = ldgalleryVersion;
+        src = ./example;
+        nativeBuildInputs = [ ldgallery ];
+        buildPhase = ''
+          # Need UTF-8: https://github.com/ldgallery/ldgallery/issues/341
+          export LC_ALL=C.UTF-8
+          ldgallery --input-dir src --output-dir $out --with-viewer
+        '';
+        installPhase = ":";
+      };
+
       default = ldgallery;
     };
 
@@ -127,5 +154,33 @@
 
       default = ldgallery;
     };
-  });
+
+    devShell = flaky-utils.lib.mkDevShell {
+      inherit pkgs;
+      tools = devTools;
+      shell = null;
+    };
+  })
+
+  (flaky-utils.lib.mkSandboxSystem {
+    inherit pkgs;
+    restrictNetwork = false;
+    patchQemu9p = true;
+    tools = devTools;
+    envVars = {
+      # File modification watch doesn't work through the VM for live reload.
+      VUE_APP_WEBPACK_WATCH_POLL = "1000";
+    };
+    config = {
+      # The viewer's build and devel server are resource-hungry.
+      virtualisation.cores = 2;
+      virtualisation.memorySize = 2 * 1024;
+
+      virtualisation.forwardPorts = [
+        { from = "host"; host.port = 8085; guest.port = 8085; }  # vue-cli
+      ];
+    };
+  })
+
+  ]);
 }

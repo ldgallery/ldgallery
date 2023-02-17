@@ -39,6 +39,10 @@ module.exports = defineConfig({
     cache: {
       type: 'filesystem',
     },
+    watchOptions: {
+      ignored: /node_modules/,
+      poll: parseInt(process.env.VUE_APP_WEBPACK_WATCH_POLL ?? 0),
+    },
   },
 
   chainWebpack: config => {

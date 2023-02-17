@@ -1,7 +1,7 @@
 /* ldgallery - A static generator which turns a collection of tagged
 --             pictures into a searchable web gallery.
 --
--- Copyright (C) 2019-2021  Guillaume FOUET
+-- Copyright (C) 2022  Pacien TRAN-GIRARD
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -17,14 +17,7 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-export enum ItemType {
-  OTHER = 'other',
-  PICTURE = 'picture',
-  PLAINTEXT = 'plaintext',
-  MARKDOWN = 'markdown',
-  PDF = 'pdf',
-  EPUB = 'epub',
-  VIDEO = 'video',
-  AUDIO = 'audio',
-  DIRECTORY = 'directory',
-}
+import { defineAsyncComponent } from 'vue';
+
+export const EpubViewer = defineAsyncComponent(() =>
+  import(/* webpackChunkName: "epub-viewer" */ './AsyncEpubViewer.vue'));

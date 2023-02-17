@@ -2,7 +2,7 @@
 pagetitle: Viewer user manual - ldgallery
 title: LDGALLERY-VIEWER(7) ldgallery
 author: Pacien TRAN-GIRARD, Guillaume FOUET
-date: 2022-09-04 (v2.1)
+date: 2023-02-17 (v2.2)
 ---
 
 
@@ -37,10 +37,18 @@ Items of the following formats can be opened and visualised within the web appli
 * Pictures (Bitmap, JPEG, PNG, TIFF, HDR, GIF)
 * Videos (OGV, WebM, Matroska, MPEG-4)
 * Audio files (WAV, Opus, FLAC, MP3, MPEG-4)
-* Plain text files (`.txt`)
-* PDFs
+* Text files (TXT, Markdown)
+* Ebooks (PDF, EPUB)
 
 Formats which are not listed above or which are not supported by the user's web browser are offered for download instead of being directly displayed in the same window.
+The item being visualised can be downloaded using the download button at the top-left corner.
+
+
+# KEYBOARD SHORTCUTS
+
+`CTRL-K`
+: Moves the focus to the tag search field, opening the side search panel if it is closed.
+  Pressing again while in the search input field sets the focus to the browser's address bar.
 
 
 # SEARCH QUERIES
@@ -161,7 +169,7 @@ The ldgallery source code is available on <https://ldgallery.pacien.org>.
 
 # LICENSE
 
-Copyright (C) 2019-2022  Pacien TRAN-GIRARD and Guillaume FOUET.
+Copyright (C) 2019-2023  Pacien TRAN-GIRARD and Guillaume FOUET.
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

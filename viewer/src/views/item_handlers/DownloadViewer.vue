@@ -41,7 +41,7 @@ import { DownloadableItem } from '@/@types/gallery';
 import { useNavigation } from '@/services/navigation';
 import { useItemResource } from '@/services/ui/ldItemResourceUrl';
 import { faFileDownload } from '@fortawesome/free-solid-svg-icons';
-import { computed, PropType } from 'vue';
+import { computed, PropType, toRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const props = defineProps({
@@ -52,7 +52,7 @@ const { t } = useI18n();
 const navigation = useNavigation();
 
 const itemFileName = computed(() => navigation.getFileName(props.item));
-const { itemResourceUrl } = useItemResource(props.item);
+const { itemResourceUrl } = useItemResource(toRef(props, 'item'));
 </script>
 
 <style lang="scss" module>

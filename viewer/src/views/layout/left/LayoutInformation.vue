@@ -67,6 +67,7 @@ const formatDate = computed(() => {
 .infopanel {
   padding: 2px 2px 7px 7px;
   overflow-wrap: break-word;
+  max-height: 50%;
 
   .title {
     font-weight: bold;
@@ -79,13 +80,6 @@ const formatDate = computed(() => {
     padding-bottom: 7px;
     > * {
       margin-top: 5px;
-    }
-    ul,
-    ol {
-      margin-left: 1em;
-    }
-    ul {
-      list-style-type: disc;
     }
     a {
       color: $palette-200;

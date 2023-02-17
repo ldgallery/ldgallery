@@ -36,12 +36,12 @@
 <script setup lang="ts">
 import { VideoItem } from '@/@types/gallery';
 import { useItemResource } from '@/services/ui/ldItemResourceUrl';
-import { PropType } from 'vue';
+import { PropType, toRef } from 'vue';
 import DownloadViewer from './DownloadViewer.vue';
 
 const props = defineProps({
   item: { type: Object as PropType<VideoItem>, required: true },
 });
 
-const { itemResourceUrl, thumbnailResourceUrl } = useItemResource(props.item);
+const { itemResourceUrl, thumbnailResourceUrl } = useItemResource(toRef(props, 'item'));
 </script>

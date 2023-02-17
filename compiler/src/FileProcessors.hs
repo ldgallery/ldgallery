@@ -100,17 +100,35 @@ type FileDescriber a =
 
 getImageResolution :: FilePath -> IO Resolution
 getImageResolution fsPath =
-  readProcess "magick" ["identify", "-format", "%w %h", firstFrame] []
-  >>= parseResolution . break (== ' ')
+  readProcess "magick"
+    [ "identify"
+    , "-ping"
+    , "-format", "%[orientation] %w %h"
+    , firstFrame
+    ] []
+  >>= parseOutput . words
+
   where
     firstFrame :: FilePath
     firstFrame = fsPath ++ "[0]"
+
+    -- Flip the dimensions when necessary according to the metadata.
+    -- ImageMagick's `-auto-orient` flag does the same, but isn't compatible
+    -- with `-ping` and causes the whole image file to be loaded.
+    parseOutput :: [String] -> IO Resolution
+    parseOutput ["RightTop", w, h] = parseResolution (h, w)
+    parseOutput ["LeftBottom", w, h] = parseResolution (h, w)
+    parseOutput [_, w, h] = parseResolution (w, h)
+    parseOutput _ = throwIO failedRead
 
     parseResolution :: (String, String) -> IO Resolution
     parseResolution (widthString, heightString) =
       case (readMaybe widthString, readMaybe heightString) of
         (Just w, Just h) -> return $ Resolution w h
-        _ -> throwIO $ ProcessingException fsPath "Unable to read image resolution."
+        _ -> throwIO failedRead
+
+    failedRead :: ProcessingException
+    failedRead = ProcessingException fsPath "Unable to read image resolution."
 
 resourceAt :: FileDescriber Resource
 resourceAt resPath fsPath = Resource resPath <$> getModificationTime fsPath

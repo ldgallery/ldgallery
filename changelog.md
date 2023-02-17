@@ -4,6 +4,22 @@ This file lists notable changes that have been made to the application on each
 release. Releases are tracked and referred to using git tags.
 
 
+## [next release]
+
+- _None yet._
+
+
+## v2.2 - 2023-02-17
+- New features:
+  - viewer: add `CTRL-K` keyboard shortcut for quick search.
+  - viewer: added a button to download the current item.
+- Bug fixes:
+  - compiler: fix detection of dimensions of EXIF-rotated pictures.
+    Rebuild the gallery with `--rebuild-all` to purge erroneous cached data.
+  - viewer: fix theme quirks (line spacing, icon colours).
+  - viewer: fix ghost keyboard hints when the search panel is closed.
+
+
 ## v2.1 - 2022-09-04
 - New features:
   - Add support for Markdown-formatted files, which are now rendered.

@@ -64,6 +64,9 @@ export interface MarkdownProperties extends Downloadable {
 export interface PDFProperties extends Downloadable {
   type: ItemType.PDF;
 }
+export interface EPUBProperties extends Downloadable {
+  type: ItemType.EPUB;
+}
 export interface VideoProperties extends Downloadable {
   type: ItemType.VIDEO;
 }
@@ -106,6 +109,9 @@ export interface MarkdownItem extends Item {
 }
 export interface PDFItem extends Item {
   properties: PDFProperties;
+}
+export interface EPUBItem extends Item {
+  properties: EPUBProperties;
 }
 export interface VideoItem extends Item {
   properties: VideoProperties;
