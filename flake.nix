@@ -1,7 +1,7 @@
 # ldgallery - A static generator which turns a collection of tagged
 #             pictures into a searchable web gallery.
 #
-# Copyright (C) 2019-2022  Pacien TRAN-GIRARD
+# Copyright (C) 2019-2023  Pacien TRAN-GIRARD
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -29,7 +29,7 @@
   outputs = { self, nixpkgs, flake-utils, flaky-utils }:
   flake-utils.lib.eachDefaultSystem (system: let
     pkgs = nixpkgs.legacyPackages.${system};
-    ldgalleryVersion = "2.1";
+    ldgalleryVersion = "2.2";
     devTools = with pkgs; [
       # generic
       tmux

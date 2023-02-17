@@ -2,7 +2,7 @@
 pagetitle: Viewer user manual - ldgallery
 title: LDGALLERY-VIEWER(7) ldgallery
 author: Pacien TRAN-GIRARD, Guillaume FOUET
-date: 2022-10-30 (v2.1-SNAPSHOT)
+date: 2023-02-17 (v2.2)
 ---
 
 
@@ -169,7 +169,7 @@ The ldgallery source code is available on <https://ldgallery.pacien.org>.
 
 # LICENSE
 
-Copyright (C) 2019-2022  Pacien TRAN-GIRARD and Guillaume FOUET.
+Copyright (C) 2019-2023  Pacien TRAN-GIRARD and Guillaume FOUET.
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

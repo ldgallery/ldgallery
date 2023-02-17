@@ -1,10 +1,10 @@
 name:                ldgallery-compiler
-version:             2.1
+version:             2.2
 homepage:            https://ldgallery.pacien.org
 github:              "pacien/ldgallery"
 license:             AGPL-3.0-only
 author:              "Pacien TRAN-GIRARD, Guillaume FOUET"
-copyright:           "2019-2021 Pacien TRAN-GIRARD, Guillaume FOUET"
+copyright:           "2019-2023 Pacien TRAN-GIRARD, Guillaume FOUET"
 
 extra-source-files:
 - readme.md

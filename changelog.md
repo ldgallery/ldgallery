@@ -5,6 +5,11 @@ release. Releases are tracked and referred to using git tags.
 
 
 ## [next release]
+
+- _None yet._
+
+
+## v2.2 - 2023-02-17
 - New features:
   - viewer: add `CTRL-K` keyboard shortcut for quick search.
   - viewer: added a button to download the current item.
