@@ -26,6 +26,7 @@
   >
     <pre
       v-if="isFinished"
+      class="scrollbar"
       v-text="data"
     />
     <LdLoading v-else />
@@ -63,7 +64,7 @@ const { isFinished, data } = useFetch(itemResourceUrl).text();
     border: none;
     white-space: pre-wrap;
     resize: horizontal; // Allow the user to adjust the width of the text view for easier column reading.
-    overflow: hidden; // Necessary for the resize handle to be shown in Chromium.
+    overflow-x: hidden !important; // Necessary for the resize handle to be shown in Chromium.
   }
 }
 </style>
