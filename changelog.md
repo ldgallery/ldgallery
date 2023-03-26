@@ -6,7 +6,11 @@ release. Releases are tracked and referred to using git tags.
 
 ## [next release]
 
-- _None yet._
+- New features:
+  - viewer: resizable viewport width for markdown and other views
+- Bug fixes:
+  - viewer: fix plain text view scroll with keyboard
+  - viewer: properly prevent drag'n'drop in picture viewer on Firefox
 
 
 ## v2.2 - 2023-02-17
