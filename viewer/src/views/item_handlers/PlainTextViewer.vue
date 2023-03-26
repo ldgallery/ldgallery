@@ -50,6 +50,5 @@ const { isFinished, data } = useFetch(itemResourceUrl).text();
   background: $viewer-text-background;
   color: $viewer-text;
   white-space: pre-wrap;
-  font-size: 1.5em;
 }
 </style>
