@@ -19,18 +19,12 @@
 -->
 
 <template>
-  <!-- Outer div necessary for the resize handle to appear on Firefox. -->
-  <div
+  <pre
+    v-if="isFinished"
     :class="$style.content"
-    class="fill"
-  >
-    <pre
-      v-if="isFinished"
-      class="scrollbar"
-      v-text="data"
-    />
-    <LdLoading v-else />
-  </div>
+    v-text="data"
+  />
+  <LdLoading v-else />
 </template>
 
 <script setup lang="ts">
@@ -52,19 +46,10 @@ const { isFinished, data } = useFetch(itemResourceUrl).text();
 @import "~@/assets/scss/theme";
 
 .content {
-  display: flex;
-  justify-content: center;
+  margin: 1em;
   background: $viewer-text-background;
   color: $viewer-text;
-
-  > pre {
-    width: 100%;
-    max-width: 100%; // Forbid overflow when resizing.
-    margin: 1em; // Necessary for the resize handle to be selectable on qutebrowser.
-    border: none;
-    white-space: pre-wrap;
-    resize: horizontal; // Allow the user to adjust the width of the text view for easier column reading.
-    overflow-x: hidden !important; // Necessary for the resize handle to be shown in Chromium.
-  }
+  white-space: pre-wrap;
+  font-size: 1.5em;
 }
 </style>
