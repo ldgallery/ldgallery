@@ -6821,10 +6821,10 @@ vue-demi@*:
   resolved "https://registry.yarnpkg.com/vue-demi/-/vue-demi-0.13.11.tgz#7d90369bdae8974d87b1973564ad390182410d99"
   integrity sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==
 
-vue-dragscroll@4.0.4:
-  version "4.0.4"
-  resolved "https://registry.yarnpkg.com/vue-dragscroll/-/vue-dragscroll-4.0.4.tgz#761e77f787d78de321f905dfb44cd6fe10a09101"
-  integrity sha512-2VaDPzvVJKR0FxOwIt9ot53tpVG3K6Qcb7LFOHQ869WVBXWuVcJTXyBRKyrUACY82O3kIdPvj/Kzsw4ZeBkL0w==
+vue-dragscroll@4.0.5:
+  version "4.0.5"
+  resolved "https://registry.yarnpkg.com/vue-dragscroll/-/vue-dragscroll-4.0.5.tgz#b07bbbc0300a5dee892bc48b000942a93d258cd8"
+  integrity sha512-1V4/2rUlNTM8vYC6/y2yfjKjOynuCfp1VRpj+IOGCcj8FWl4/3FMs9GBUJShd5mLoD4BvhY1xveezeuD+9i/mw==
   dependencies:
     vue "^3.2.37"
 

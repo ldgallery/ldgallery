@@ -18,12 +18,14 @@
 -->
 
 <template>
+  <!-- @dragstart.prevent stops Drag 'n Drop of pictures on FireFox -->
   <div
     ref="containerElement"
     v-dragscroll
     class="scrollbar"
     :class="$style.pictureContainer"
     @dblclick="uiStore.toggleFullscreen()"
+    @dragstart.prevent="false"
   >
     <img
       v-if="!error"
