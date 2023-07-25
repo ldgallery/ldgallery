@@ -20,8 +20,7 @@
   description = "A static web gallery generator with tags";
 
   inputs = {
-    # GHC 9.2: https://github.com/NixOS/nixpkgs/pull/202022
-    nixpkgs.url = "github:NixOS/nixpkgs/445f264";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
     flake-utils.url = "github:numtide/flake-utils";
     flaky-utils.url = "git+https://cgit.pacien.net/libs/flaky-utils";
   };
@@ -29,13 +28,13 @@
   outputs = { self, nixpkgs, flake-utils, flaky-utils }:
   flake-utils.lib.eachDefaultSystem (system: let
     pkgs = nixpkgs.legacyPackages.${system};
-    ldgalleryVersion = "2.2";
+    ldgalleryVersion = "2.3";
     devTools = with pkgs; [
       # generic
       tmux
 
       # viewer
-      nodejs-16_x
+      nodejs-18_x
       yarn
 
       # compiler

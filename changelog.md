@@ -4,15 +4,20 @@ This file lists notable changes that have been made to the application on each
 release. Releases are tracked and referred to using git tags.
 
 
-## [next release]
+## v2.3 - 2023-07-26
 
-- _None yet._
+- New features:
+  - viewer: resizable viewport width for markdown and other views
+- Bug fixes:
+  - viewer: fix plain text view scroll with keyboard
+  - viewer: properly prevent drag'n'drop in picture viewer on Firefox
 
 
 ## v2.2 - 2023-02-17
 - New features:
   - viewer: add `CTRL-K` keyboard shortcut for quick search.
   - viewer: added a button to download the current item.
+  - viewer: add support for EPUB files
 - Bug fixes:
   - compiler: fix detection of dimensions of EXIF-rotated pictures.
     Rebuild the gallery with `--rebuild-all` to purge erroneous cached data.

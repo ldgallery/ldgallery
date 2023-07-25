@@ -128,6 +128,14 @@ function validateSpashScreen() {
     left: var(--layout-left);
     z-index: 3;
     overflow-x: hidden;
+
+    // Forbid overflow when resizing.
+    // Necessary for the resize handle to be selectable on qutebrowser.
+    max-width: calc(100% - var(--layout-left) - $scrollbar-width);
+    margin: 0 auto; // Center
+    resize: horizontal;
+    // ---
+
     &:focus {
       outline: none;
     }
