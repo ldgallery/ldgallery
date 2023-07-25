@@ -2,7 +2,7 @@
 pagetitle: Quickstart guide - ldgallery
 title: LDGALLERY-QUICKSTART(7) ldgallery
 author: Pacien TRAN-GIRARD, Guillaume FOUET
-date: 2023-02-17 (v2.2)
+date: 2023-07-26 (v2.3)
 ---
 
 # ABOUT

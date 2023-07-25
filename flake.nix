@@ -28,7 +28,7 @@
   outputs = { self, nixpkgs, flake-utils, flaky-utils }:
   flake-utils.lib.eachDefaultSystem (system: let
     pkgs = nixpkgs.legacyPackages.${system};
-    ldgalleryVersion = "2.2";
+    ldgalleryVersion = "2.3";
     devTools = with pkgs; [
       # generic
       tmux

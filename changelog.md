@@ -4,7 +4,7 @@ This file lists notable changes that have been made to the application on each
 release. Releases are tracked and referred to using git tags.
 
 
-## [next release]
+## v2.3 - 2023-07-26
 
 - New features:
   - viewer: resizable viewport width for markdown and other views
