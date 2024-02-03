@@ -39,6 +39,7 @@ data Format =
   | MarkdownFormat
   | PortableDocumentFormat
   | EPUBFormat
+  | DjVuFormat
   | VideoFormat
   | AudioFormat
   | Unknown
@@ -61,6 +62,8 @@ formatFromPath =
       ".md" -> MarkdownFormat
       ".pdf" -> PortableDocumentFormat
       ".epub" -> EPUBFormat
+      ".djvu" -> DjVuFormat
+      ".djv" -> DjVuFormat
       ".wav" -> AudioFormat
       ".oga" -> AudioFormat
       ".ogg" -> AudioFormat
@@ -106,6 +109,7 @@ itemFileProcessor maxResolution =
     processorFor MarkdownFormat _ = copyResource Markdown
     processorFor PortableDocumentFormat _ = copyResource PDF
     processorFor EPUBFormat _ = copyResource EPUB
+    processorFor DjVuFormat _ = copyResource DjVu
     processorFor VideoFormat _ = copyResource Video
     processorFor AudioFormat _ = copyResource Audio
     processorFor Unknown _ = copyResource Other

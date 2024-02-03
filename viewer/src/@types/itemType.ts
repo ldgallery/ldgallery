@@ -24,6 +24,7 @@ export enum ItemType {
   MARKDOWN = 'markdown',
   PDF = 'pdf',
   EPUB = 'epub',
+  DJVU = 'djvu',
   VIDEO = 'video',
   AUDIO = 'audio',
   DIRECTORY = 'directory',

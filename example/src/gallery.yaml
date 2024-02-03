@@ -11,6 +11,7 @@ includedFiles:
   - '*.md'
   - '*.pdf'
   - '*.epub'
+  - '*.djvu'
   - '*.ogg'
   - '*.mp4'
 

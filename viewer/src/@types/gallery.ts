@@ -67,6 +67,9 @@ export interface PDFProperties extends Downloadable {
 export interface EPUBProperties extends Downloadable {
   type: ItemType.EPUB;
 }
+export interface DjVuProperties extends Downloadable {
+  type: ItemType.DJVU;
+}
 export interface VideoProperties extends Downloadable {
   type: ItemType.VIDEO;
 }
@@ -112,6 +115,9 @@ export interface PDFItem extends Item {
 }
 export interface EPUBItem extends Item {
   properties: EPUBProperties;
+}
+export interface DjVuItem extends Item {
+  properties: DjVuProperties;
 }
 export interface VideoItem extends Item {
   properties: VideoProperties;

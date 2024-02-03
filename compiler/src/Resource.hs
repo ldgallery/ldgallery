@@ -93,6 +93,7 @@ data GalleryItemProps =
   | Markdown { resource :: Resource }
   | PDF { resource :: Resource }
   | EPUB { resource :: Resource }
+  | DjVu { resource :: Resource }
   | Video { resource :: Resource }
   | Audio { resource :: Resource }
   | Other { resource :: Resource }
